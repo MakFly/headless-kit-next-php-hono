@@ -27,12 +27,19 @@ function extractToken(authHeader: string | undefined): string | null {
  */
 export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
   async (c, next) => {
+    const requestId = c.get('requestId');
     const authHeader = c.req.header('Authorization');
     const token = extractToken(authHeader);
 
     if (!token) {
       return c.json(
-        { error: 'Unauthorized', message: 'No token provided' },
+        {
+          error: 'Unauthorized',
+          message: 'No token provided',
+          code: 'UNAUTHORIZED',
+          status: 401,
+          request_id: requestId,
+        },
         401
       );
     }
@@ -40,7 +47,13 @@ export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
     const payload = await verifyToken(token);
     if (!payload) {
       return c.json(
-        { error: 'Unauthorized', message: 'Invalid or expired token' },
+        {
+          error: 'Unauthorized',
+          message: 'Invalid or expired token',
+          code: 'UNAUTHORIZED',
+          status: 401,
+          request_id: requestId,
+        },
         401
       );
     }
@@ -49,7 +62,13 @@ export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
     const user = await userRepository.findById(payload.sub);
     if (!user) {
       return c.json(
-        { error: 'Unauthorized', message: 'User not found' },
+        {
+          error: 'Unauthorized',
+          message: 'User not found',
+          code: 'UNAUTHORIZED',
+          status: 401,
+          request_id: requestId,
+        },
         401
       );
     }

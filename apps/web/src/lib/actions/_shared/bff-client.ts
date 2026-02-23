@@ -14,12 +14,15 @@
 import { cookies } from 'next/headers';
 import { env } from '@/lib/config/env';
 import { BffActionError } from './errors';
+import { ApiException, apiRequestJson } from '@/lib/http';
 import type { BffRequestOptions } from './types';
 
 /**
  * Base URL of Next.js BFF
  */
 const BFF_URL = env.NEXT_PUBLIC_APP_URL;
+const INTERNAL_REQUEST_HEADER = 'x-bff-internal';
+const REQUEST_ID_HEADER = 'x-request-id';
 
 /**
  * Auth cookie name
@@ -51,6 +54,8 @@ export async function bffRequest<T>(
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    [INTERNAL_REQUEST_HEADER]: '1',
+    [REQUEST_ID_HEADER]: crypto.randomUUID(),
     ...fetchOptions.headers,
   };
 
@@ -60,22 +65,20 @@ export async function bffRequest<T>(
     (headers as Record<string, string>)['Cookie'] = `${AUTH_COOKIE_NAME}=${authToken.value}`;
   }
 
-  const response = await fetch(url, {
-    ...fetchOptions,
-    headers,
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Request failed' }));
+  try {
+    return await apiRequestJson<T>(url, {
+      ...fetchOptions,
+      headers,
+    });
+  } catch (error) {
+    const normalized = ApiException.fromUnknown(error, 'Request failed');
     throw new BffActionError(
-      error.message || `HTTP error ${response.status}`,
-      response.status,
-      error.code,
-      error.details
+      normalized.message,
+      normalized.statusCode,
+      normalized.code,
+      normalized.details
     );
   }
-
-  return response.json();
 }
 
 /**

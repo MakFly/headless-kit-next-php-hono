@@ -81,7 +81,7 @@ export const roleColumns: ColumnDef<Role>[] = [
   },
 ]
 
-export function RolesTable({ roles, permissions = [] }: RolesTableProps) {
+export function RolesTable({ roles, permissions: _permissions = [] }: RolesTableProps) {
   return (
     <DataTable
       columns={roleColumns}

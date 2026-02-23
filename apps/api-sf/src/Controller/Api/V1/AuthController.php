@@ -12,9 +12,12 @@ use BetterAuth\Core\TokenManager;
 use BetterAuth\Providers\TotpProvider\TotpProvider;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -43,6 +46,9 @@ class AuthController extends AbstractController
         private readonly TokenSignerInterface $tokenSigner,
         private readonly UserRepositoryInterface $userRepository,
         private readonly TotpProvider $totpProvider,
+        #[Autowire(service: 'cache.app')]
+        private readonly CacheItemPoolInterface $cache,
+        private readonly RequestStack $requestStack,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -58,11 +64,11 @@ class AuthController extends AbstractController
             $name = $data['name'] ?? null;
 
             if (!$email || !$password) {
-                return $this->json(['error' => 'Email and password are required'], 400);
+                return $this->jsonNoStore(['error' => 'Email and password are required'], 400);
             }
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return $this->json(['error' => 'Invalid email format'], 422);
+                return $this->jsonNoStore(['error' => 'Invalid email format'], 422);
             }
 
             $additionalData = $name !== null ? ['name' => $name] : [];
@@ -78,16 +84,17 @@ class AuthController extends AbstractController
 
             $this->logger?->info('User registered', ['email' => $email]);
 
-            return $this->json($result, 201);
+            return $this->jsonNoStore($result, 201);
         } catch (\Exception $e) {
             $this->logger?->error('Registration failed', [
                 'email' => $data['email'] ?? 'unknown',
                 'error' => $e->getMessage(),
             ]);
 
-            $statusCode = str_contains($e->getMessage(), 'already exists') ? 409 : 400;
+            $statusCode = str_contains(strtolower($e->getMessage()), 'already exists') ? 409 : 400;
+            $message = $statusCode === 409 ? 'Email already registered' : 'Registration failed';
 
-            return $this->json(['error' => $e->getMessage()], $statusCode);
+            return $this->jsonNoStore(['error' => $message], $statusCode);
         }
     }
 
@@ -101,7 +108,17 @@ class AuthController extends AbstractController
             $password = $data['password'] ?? null;
 
             if (!$email || !$password) {
-                return $this->json(['error' => 'Email and password are required'], 400);
+                return $this->jsonNoStore(['error' => 'Email and password are required'], 400);
+            }
+
+            $limiterKey = sprintf(
+                'login:%s:%s',
+                $request->getClientIp() ?? 'unknown',
+                strtolower((string) $email)
+            );
+            $rateLimitResponse = $this->consumeRateLimit($request, 'login', $limiterKey, 5, 900);
+            if ($rateLimitResponse instanceof JsonResponse) {
+                return $rateLimitResponse;
             }
 
             $result = $this->authManager->signIn(
@@ -115,7 +132,7 @@ class AuthController extends AbstractController
             $userId = $userData['id'];
 
             if ($this->totpProvider->requires2fa($userId)) {
-                return $this->json([
+                return $this->jsonNoStore([
                     'requires2fa' => true,
                     'message' => 'Two-factor authentication required',
                     'user' => $userData,
@@ -128,14 +145,14 @@ class AuthController extends AbstractController
                 $result = $this->createShortLivedTokens($userId, $result);
             }
 
-            return $this->json($result);
+            return $this->jsonNoStore($result);
         } catch (\Exception $e) {
             $this->logger?->warning('Login failed', [
                 'email' => $data['email'] ?? 'unknown',
                 'error' => $e->getMessage(),
             ]);
 
-            return $this->json(['error' => 'Invalid credentials'], 401);
+            return $this->jsonNoStore(['error' => 'Invalid credentials'], 401);
         }
     }
 
@@ -150,7 +167,7 @@ class AuthController extends AbstractController
             $code = $data['code'] ?? null;
 
             if (!$email || !$password || !$code) {
-                return $this->json(['error' => 'Email, password and 2FA code are required'], 400);
+                return $this->jsonNoStore(['error' => 'Email, password and 2FA code are required'], 400);
             }
 
             $result = $this->authManager->signIn(
@@ -171,12 +188,12 @@ class AuthController extends AbstractController
                     $this->authManager->revokeAllTokens($userId);
                 }
 
-                return $this->json(['error' => 'Invalid 2FA code'], 401);
+                return $this->jsonNoStore(['error' => 'Invalid 2FA code'], 401);
             }
 
-            return $this->json($result);
+            return $this->jsonNoStore($result);
         } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 401);
+            return $this->jsonNoStore(['error' => 'Invalid authentication flow'], 401);
         }
     }
 
@@ -187,17 +204,17 @@ class AuthController extends AbstractController
             $token = $this->extractBearerToken($request);
 
             if (!$token) {
-                return $this->json(['error' => 'No token provided'], 401);
+                return $this->jsonNoStore(['error' => 'No token provided'], 401);
             }
 
             $payload = $this->tokenManager->parse($token);
             if (!$payload) {
-                return $this->json(['error' => 'Invalid token'], 401);
+                return $this->jsonNoStore(['error' => 'Invalid token'], 401);
             }
 
             $user = $this->tokenManager->getUserFromToken($token);
             if (!$user) {
-                return $this->json(['error' => 'Invalid token'], 401);
+                return $this->jsonNoStore(['error' => 'Invalid token'], 401);
             }
 
             $response = ['user' => $this->formatUser($user)];
@@ -206,9 +223,9 @@ class AuthController extends AbstractController
                 $response['expiresAt'] = (new \DateTimeImmutable('@' . $payload['exp']))->format(\DateTimeInterface::ATOM);
             }
 
-            return $this->json($response);
+            return $this->jsonNoStore($response);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Invalid token'], 401);
+            return $this->jsonNoStore(['error' => 'Invalid token'], 401);
         }
     }
 
@@ -220,16 +237,26 @@ class AuthController extends AbstractController
             $refreshToken = $data['refreshToken'] ?? $data['refresh_token'] ?? null;
 
             if (!$refreshToken) {
-                return $this->json(['error' => 'Refresh token is required'], 400);
+                return $this->jsonNoStore(['error' => 'Refresh token is required'], 400);
+            }
+
+            $limiterKey = sprintf(
+                'refresh:%s:%s',
+                $request->getClientIp() ?? 'unknown',
+                substr(hash('sha256', (string) $refreshToken), 0, 16)
+            );
+            $rateLimitResponse = $this->consumeRateLimit($request, 'refresh', $limiterKey, 30, 60);
+            if ($rateLimitResponse instanceof JsonResponse) {
+                return $rateLimitResponse;
             }
 
             $result = $this->authManager->refresh($refreshToken);
 
-            return $this->json($result);
+            return $this->jsonNoStore($result);
         } catch (\Exception $e) {
             $this->logger?->warning('Token refresh failed', ['error' => $e->getMessage()]);
 
-            return $this->json(['error' => 'Invalid refresh token'], 401);
+            return $this->jsonNoStore(['error' => 'Invalid refresh token'], 401);
         }
     }
 
@@ -240,14 +267,14 @@ class AuthController extends AbstractController
             $token = $this->extractBearerToken($request);
 
             if (!$token) {
-                return $this->json(['error' => 'No token provided'], 401);
+                return $this->jsonNoStore(['error' => 'No token provided'], 401);
             }
 
             $this->authManager->signOut($token);
 
-            return $this->json(['message' => 'Logged out successfully']);
+            return $this->jsonNoStore(['message' => 'Logged out successfully']);
         } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
+            return $this->jsonNoStore(['error' => 'Logout failed'], 400);
         }
     }
 
@@ -284,20 +311,89 @@ class AuthController extends AbstractController
             $token = $this->extractBearerToken($request);
 
             if (!$token) {
-                return $this->json(['error' => 'No token provided'], 401);
+                return $this->jsonNoStore(['error' => 'No token provided'], 401);
             }
 
             $user = $this->tokenManager->getUserFromToken($token);
 
             if (!$user) {
-                return $this->json(['error' => 'Invalid token'], 401);
+                return $this->jsonNoStore(['error' => 'Invalid token'], 401);
             }
 
             $this->authManager->revokeAllTokens($user->getId());
 
-            return $this->json(['message' => 'All sessions revoked']);
+            return $this->jsonNoStore(['message' => 'All sessions revoked']);
         } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
+            return $this->jsonNoStore(['error' => 'Revoke all failed'], 400);
+        }
+    }
+
+    private function consumeRateLimit(
+        Request $request,
+        string $scope,
+        string $identifier,
+        int $maxAttempts,
+        int $windowSeconds
+    ): ?JsonResponse {
+        $now = time();
+        $window = intdiv($now, $windowSeconds);
+        $fingerprint = sha1(($request->getClientIp() ?? 'unknown') . ':' . $identifier);
+        $cacheKey = sprintf('auth_rl_%s_%s_%d', $scope, $fingerprint, $window);
+
+        $item = $this->cache->getItem($cacheKey);
+        $count = $item->isHit() ? (int) $item->get() : 0;
+        $count++;
+
+        $retryAfter = max(1, (($window + 1) * $windowSeconds) - $now);
+
+        $item->set($count);
+        $item->expiresAfter($retryAfter);
+        $this->cache->save($item);
+
+        if ($count <= $maxAttempts) {
+            return null;
+        }
+
+        $response = $this->jsonNoStore(
+            ['error' => 'Too many attempts. Please try again later.'],
+            429
+        );
+
+        $response->headers->set('Retry-After', (string) $retryAfter);
+
+        return $response;
+    }
+
+    private function jsonNoStore(array $data, int $status = 200): JsonResponse
+    {
+        $requestId = $this->getRequestId();
+        if (!isset($data['status'])) {
+            $data['status'] = $status;
+        }
+        if (!isset($data['request_id'])) {
+            $data['request_id'] = $requestId;
+        }
+
+        $response = $this->json($data, $status);
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('X-Request-Id', $requestId);
+
+        return $response;
+    }
+
+    private function getRequestId(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        $incoming = $request?->headers->get('X-Request-Id');
+        if (is_string($incoming) && $incoming !== '') {
+            return $incoming;
+        }
+
+        try {
+            return bin2hex(random_bytes(16));
+        } catch (\Exception) {
+            return uniqid('req_', true);
         }
     }
 }

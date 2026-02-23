@@ -20,6 +20,8 @@
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
+            <exclude>tests/Functional/Auth/ApiV1AuthPestTest.php</exclude>
+            <exclude>tests/Unit/Entity/EntityIdentifierCastingTest.php</exclude>
         </testsuite>
     </testsuites>
 

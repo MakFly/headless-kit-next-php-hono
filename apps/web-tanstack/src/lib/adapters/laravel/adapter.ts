@@ -8,6 +8,7 @@ import type {
 } from '../types'
 import { BaseAdapter, AdapterError } from '../base-adapter'
 import { generateSignature, BFF_SECRET, BFF_ID } from '../../security/hmac'
+import { apiRequestJson } from '../../http/api-request'
 import {
   transformAuthResponse,
   transformMeResponse,
@@ -71,43 +72,16 @@ export class LaravelAdapter extends BaseAdapter {
       if (token) requestHeaders['Authorization'] = `Bearer ${token}`
     }
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), this.config.timeout)
-
     try {
-      const response = await fetch(url, {
+      return await apiRequestJson<T>(url, {
         method,
         headers: requestHeaders,
         body: normalizedBody,
-        signal: controller.signal,
+        timeoutMs: this.config.timeout,
       })
-
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        let errorBody: unknown
-        try { errorBody = await response.json() } catch {}
-        throw AdapterError.fromResponse(response, errorBody)
-      }
-
-      const contentType = response.headers.get('content-type')
-      if (!contentType?.includes('application/json')) return {} as T
-
-      const text = await response.text()
-      if (!text) return {} as T
-
-      return JSON.parse(text) as T
     } catch (error) {
-      clearTimeout(timeoutId)
       if (error instanceof AdapterError) throw error
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new AdapterError('Request timeout', 408, 'TIMEOUT')
-      }
-      throw new AdapterError(
-        error instanceof Error ? error.message : 'Network error',
-        0,
-        'NETWORK_ERROR'
-      )
+      throw AdapterError.fromUnknown(error)
     }
   }
 

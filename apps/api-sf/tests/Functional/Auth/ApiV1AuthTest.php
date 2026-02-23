@@ -36,11 +36,13 @@ class ApiV1AuthTest extends WebTestCase
     {
         $container = $this->client->getContainer();
         $em = $container->get('doctrine')->getManager();
+        $cache = $container->get('cache.app');
 
         $connection = $em->getConnection();
         $connection->executeStatement('DELETE FROM refresh_tokens');
         $connection->executeStatement('DELETE FROM sessions');
         $connection->executeStatement('DELETE FROM users');
+        $cache->clear();
     }
 
     private function registerUser(string $email = self::TEST_EMAIL): array
@@ -255,7 +257,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Get me without token should return 401. Response: ' . $response->getContent());
+            'Get me without token should return 401.');
     }
 
     public function testMeWithInvalidToken(): void
@@ -369,7 +371,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Logout without token should return 401. Response: ' . $response->getContent());
+            'Logout without token should return 401.');
     }
 
     // ==================== REVOKE ALL TESTS ====================
@@ -407,6 +409,6 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Revoke all without token should return 401. Response: ' . $response->getContent());
+            'Revoke all without token should return 401.');
     }
 }

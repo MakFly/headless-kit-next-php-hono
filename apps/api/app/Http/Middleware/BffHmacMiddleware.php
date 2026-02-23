@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Middleware de protection BFF
@@ -25,13 +26,15 @@ class BffHmacMiddleware
         $validation = HmacValidator::validate($request);
 
         if (!$validation['valid']) {
+            $requestId = $request->header('X-Request-Id') ?: (string) Str::uuid();
             Log::warning('BFF authentication failed', [
                 'error' => $validation['error'],
                 'path' => $request->path(),
                 'ip' => $request->ip(),
+                'request_id' => $requestId,
             ]);
 
-            return $this->errorResponse($validation['error']);
+            return $this->errorResponse($validation['error'], $requestId);
         }
 
         return $next($request);
@@ -40,11 +43,20 @@ class BffHmacMiddleware
     /**
      * Génère une réponse d'erreur JSON
      */
-    private function errorResponse(string $message): JsonResponse
+    private function errorResponse(string $message, string $requestId): JsonResponse
     {
-        return response()->json([
+        $response = response()->json([
             'error' => $message,
             'message' => 'BFF authentication failed',
+            'code' => 'BFF_AUTH_FAILED',
+            'status' => 403,
+            'request_id' => $requestId,
         ], 403);
+
+        $response->headers->set('X-Request-Id', $requestId);
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        $response->headers->set('Pragma', 'no-cache');
+
+        return $response;
     }
 }

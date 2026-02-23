@@ -5,32 +5,34 @@
  * without triggering 'next/headers' imports.
  */
 
+import { ApiException } from '../http/api-exception';
+
 /**
  * Custom error for adapter operations
  */
-export class AdapterError extends Error {
+export class AdapterError extends ApiException {
   constructor(
     message: string,
-    public statusCode: number,
-    public code?: string,
-    public details?: unknown
+    statusCode: number,
+    code?: string,
+    details?: unknown
   ) {
-    super(message);
+    super(message, { statusCode, code, details });
     this.name = 'AdapterError';
   }
 
   static fromResponse(response: Response, body?: unknown): AdapterError {
-    let message = `HTTP ${response.status}: ${response.statusText}`;
-    let code: string | undefined;
-    let details: unknown;
+    const error = ApiException.fromResponse(response, body);
+    return new AdapterError(error.message, error.statusCode, error.code, error.details);
+  }
 
-    if (body && typeof body === 'object') {
-      const bodyObj = body as Record<string, unknown>;
-      message = (bodyObj.message as string) || (bodyObj.error as string) || message;
-      code = bodyObj.code as string | undefined;
-      details = bodyObj.errors || bodyObj.details;
-    }
-
-    return new AdapterError(message, response.status, code, details);
+  static fromUnknown(error: unknown, fallbackMessage = 'Request failed'): AdapterError {
+    const normalized = ApiException.fromUnknown(error, fallbackMessage);
+    return new AdapterError(
+      normalized.message,
+      normalized.statusCode,
+      normalized.code,
+      normalized.details
+    );
   }
 }

@@ -90,7 +90,7 @@ export const userColumns: ColumnDef<User>[] = [
   },
 ]
 
-export function UsersTable({ users, roles = [] }: UsersTableProps) {
+export function UsersTable({ users, roles: _roles = [] }: UsersTableProps) {
   return (
     <DataTable
       columns={userColumns}

@@ -98,4 +98,5 @@ export interface Env {
 export interface AppVariables {
   user: SafeUser | null;
   jwtPayload: JwtPayload | null;
+  requestId: string;
 }

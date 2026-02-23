@@ -30,10 +30,10 @@ const createQueryClient = () => {
           const status = (error as { status: number }).status
           if (status === 401 || status === 400) {
             try {
-              const { user } = await refreshTokenFn()
-              useAuthStore.getState().setUser(user)
+              const { user, expiresIn } = await refreshTokenFn()
+              useAuthStore.getState().setUser(user, expiresIn)
             } catch {
-              useAuthStore.getState().setUser(null)
+              useAuthStore.getState().setUser(null, null)
             }
           }
         }

@@ -35,6 +35,7 @@ class PasswordResetTest extends WebTestCase
     {
         $container = $this->client->getContainer();
         $em = $container->get('doctrine')->getManager();
+        $cache = $container->get('cache.app');
 
         $connection = $em->getConnection();
 
@@ -48,6 +49,7 @@ class PasswordResetTest extends WebTestCase
         $connection->executeStatement('DELETE FROM refresh_tokens');
         $connection->executeStatement('DELETE FROM sessions');
         $connection->executeStatement('DELETE FROM users');
+        $cache->clear();
     }
 
     private function registerUser(string $email = self::TEST_EMAIL): void

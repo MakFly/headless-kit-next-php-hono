@@ -5,10 +5,12 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { authHandler, loginSchema, registerSchema, refreshSchema } from '../handlers/index.ts';
-import { authMiddleware } from '../middleware/index.ts';
+import { authMiddleware, noStoreMiddleware, rateLimitMiddleware } from '../middleware/index.ts';
 import type { AppVariables } from '../types/index.ts';
 
 const auth = new Hono<{ Variables: AppVariables }>();
+
+auth.use('*', noStoreMiddleware);
 
 /**
  * POST /api/auth/register
@@ -23,6 +25,8 @@ auth.post(
           error: 'Validation failed',
           code: 'VALIDATION_ERROR',
           details: result.error.flatten().fieldErrors,
+          status: 400,
+          request_id: c.get('requestId'),
         },
         400
       );
@@ -40,6 +44,11 @@ auth.post(
  */
 auth.post(
   '/login',
+  rateLimitMiddleware({
+    scope: 'auth-login',
+    maxAttempts: 5,
+    windowSeconds: 15 * 60,
+  }),
   zValidator('json', loginSchema, (result, c) => {
     if (!result.success) {
       return c.json(
@@ -47,6 +56,8 @@ auth.post(
           error: 'Validation failed',
           code: 'VALIDATION_ERROR',
           details: result.error.flatten().fieldErrors,
+          status: 400,
+          request_id: c.get('requestId'),
         },
         400
       );
@@ -64,6 +75,11 @@ auth.post(
  */
 auth.post(
   '/refresh',
+  rateLimitMiddleware({
+    scope: 'auth-refresh',
+    maxAttempts: 30,
+    windowSeconds: 60,
+  }),
   zValidator('json', refreshSchema, (result, c) => {
     if (!result.success) {
       return c.json(
@@ -71,6 +87,8 @@ auth.post(
           error: 'Validation failed',
           code: 'VALIDATION_ERROR',
           details: result.error.flatten().fieldErrors,
+          status: 400,
+          request_id: c.get('requestId'),
         },
         400
       );

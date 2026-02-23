@@ -42,7 +42,7 @@ When the user switches back to the tab (`visibilitychange`), the hook re-reads `
 ## Key Design Decisions
 
 - **75% TTL**: refresh fires at 75% of the token lifetime (e.g., 45min for a 1h token), leaving a comfortable margin
-- **5s cooldown**: prevents double-refresh from concurrent triggers (visibility + timer)
+- **10s cooldown**: prevents double-refresh from concurrent triggers (visibility + timer)
 - **No polling**: no `setInterval` to check status, no server function to read cookies — pure timer-based
 - **`onExpired` via `useRef`**: avoids recreating the timer when the callback reference changes
 - **Zustand as single source of truth**: both `useTokenRefresh` and `TokenStatus` read from the same store

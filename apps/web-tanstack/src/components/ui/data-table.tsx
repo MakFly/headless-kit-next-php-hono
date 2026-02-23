@@ -13,8 +13,6 @@ import {
   type PaginationState,
   type SortingState,
   type VisibilityState,
-  type Row,
-  type Table as TableType,
 } from '@tanstack/react-table'
 import {
   ChevronLeftIcon,
@@ -25,7 +23,6 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   EyeIcon,
-  EyeOffIcon,
 } from 'lucide-react'
 import {
   Table,
@@ -307,7 +304,7 @@ export function DataTable<TData, TValue>({
                         className="capitalize"
                         checked={column.getIsVisible()}
                         onCheckedChange={(value) =>
-                          column.toggleVisible(!!value)
+                          column.toggleVisibility(!!value)
                         }
                       >
                         {column.id}

@@ -4,13 +4,12 @@ import {
   setCookie,
   deleteCookie,
 } from '@tanstack/react-start/server'
-import type { Request } from '@tanstack/react-start'
 import {
-  getBackendType,
   getAdapterConfig,
   type BackendType,
   type AdapterConfig,
 } from '@/lib/adapters'
+import { ApiException, apiRequest, readResponseBody } from '@/lib/http'
 import {
   TOKEN_CONFIG,
   COOKIE_NAMES,
@@ -19,6 +18,9 @@ import {
 } from '@/lib/services/token-service'
 
 const SAFE_PATH_SEGMENT = /^[a-zA-Z0-9_-]+$/
+const REQUEST_ID_HEADER = 'x-request-id'
+const INTERNAL_REQUEST_HEADER = 'x-bff-internal'
+const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 
 const COOKIE_CONFIG = {
   httpOnly: true,
@@ -27,43 +29,102 @@ const COOKIE_CONFIG = {
   path: '/',
 }
 
+function setNoStoreHeaders(headers: Headers): void {
+  headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+  headers.set('Pragma', 'no-cache')
+}
+
+function getRequestId(request: Request): string {
+  return request.headers.get(REQUEST_ID_HEADER) || crypto.randomUUID()
+}
+
+function getOriginFromReferer(referer: string | null): string | null {
+  if (!referer) return null
+  try {
+    return new URL(referer).origin
+  } catch {
+    return null
+  }
+}
+
+function validateCsrf(request: Request, method: string): void {
+  if (!MUTATING_METHODS.has(method)) return
+
+  if (request.headers.get(INTERNAL_REQUEST_HEADER) === '1') return
+
+  const expectedOrigin = new URL(request.url).origin
+  const origin = request.headers.get('origin')
+  const refererOrigin = getOriginFromReferer(request.headers.get('referer'))
+
+  if (origin && origin === expectedOrigin) return
+  if (!origin && refererOrigin && refererOrigin === expectedOrigin) return
+
+  throw new ApiException('CSRF validation failed', {
+    statusCode: 403,
+    code: origin || refererOrigin ? 'CSRF_ORIGIN_MISMATCH' : 'CSRF_MISSING_ORIGIN',
+  })
+}
+
+function jsonErrorResponse(
+  message: string,
+  status: number,
+  code?: string,
+  details?: unknown,
+  requestId?: string,
+): Response {
+  const payload: Record<string, unknown> = {
+    error: message,
+    code,
+    status,
+  }
+  if (requestId) {
+    payload.request_id = requestId
+  }
+  if (details !== undefined) {
+    payload.details = details
+  }
+  const headers = new Headers({ 'Content-Type': 'application/json' })
+  if (requestId) {
+    headers.set(REQUEST_ID_HEADER, requestId)
+  }
+  setNoStoreHeaders(headers)
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers,
+  })
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+    ? (value as Record<string, unknown>)
+    : {}
+}
+
 function validatePathSegments(segments: string[]): void {
   for (const segment of segments) {
     if (!segment) {
-      throw new Response(
-        JSON.stringify({ error: 'Invalid path: empty segment' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      throw new ApiException('Invalid path: empty segment', {
+        statusCode: 400,
+        code: 'INVALID_PATH',
+      })
     }
     if (segment === '..' || segment === '.') {
-      throw new Response(
-        JSON.stringify({ error: 'Invalid path: traversal not allowed' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      throw new ApiException('Invalid path: traversal not allowed', {
+        statusCode: 400,
+        code: 'INVALID_PATH',
+      })
     }
     if (segment.includes('://') || segment.startsWith('//')) {
-      throw new Response(
-        JSON.stringify({ error: 'Invalid path: absolute URLs not allowed' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      throw new ApiException('Invalid path: absolute URLs not allowed', {
+        statusCode: 400,
+        code: 'INVALID_PATH',
+      })
     }
     if (!SAFE_PATH_SEGMENT.test(segment)) {
-      throw new Response(
-        JSON.stringify({ error: 'Invalid path: forbidden characters' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      throw new ApiException('Invalid path: forbidden characters', {
+        statusCode: 400,
+        code: 'INVALID_PATH',
+      })
     }
   }
 }
@@ -83,7 +144,7 @@ function getProxyConfig() {
   return { backend, config }
 }
 
-function buildBackendUrl(config: AdapterConfig, path: string): URL {
+function buildBackendUrl(config: Partial<AdapterConfig>, path: string): URL {
   const baseUrl = config.baseUrl?.replace(/\/$/, '') || 'http://localhost:8000'
   return new URL(path, baseUrl)
 }
@@ -115,30 +176,11 @@ function getSignatureHeaders(
   const bodyStr = body ? JSON.stringify(body) : ''
   const signaturePayload = `${timestamp}${method}${path}${bodyStr}`
 
-  let signature: string
-  try {
-    const crypto = globalThis.crypto
-    if (crypto?.subtle) {
-      const encoder = new TextEncoder()
-      const key = encoder.encode(secret)
-      const data = encoder.encode(signaturePayload)
-      const hash = crypto.subtle.sign('HMAC', key, data)
-      if (hash instanceof Promise) {
-        throw new Error('Promise-based crypto not supported')
-      }
-      signature = Array.from(new Uint8Array(hash))
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('')
-    } else {
-      throw new Error('No crypto')
-    }
-  } catch {
-    const nodeCrypto = require('crypto')
-    signature = nodeCrypto
-      .createHmac('sha256', secret)
-      .update(signaturePayload)
-      .digest('hex')
-  }
+  const nodeCrypto = require('crypto')
+  const signature = nodeCrypto
+    .createHmac('sha256', secret)
+    .update(signaturePayload)
+    .digest('hex')
 
   return {
     headers: {
@@ -167,8 +209,9 @@ function getRefreshEndpoint(backend: BackendType): string {
 
 async function attemptTokenRefresh(
   backend: BackendType,
-  config: AdapterConfig,
+  config: Partial<AdapterConfig>,
   refreshToken: string,
+  requestId: string,
 ): Promise<{
   accessToken: string
   refreshToken: string
@@ -181,6 +224,7 @@ async function attemptTokenRefresh(
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      [REQUEST_ID_HEADER]: requestId,
     }
 
     if (backend === 'laravel') {
@@ -193,22 +237,28 @@ async function attemptTokenRefresh(
       )
       Object.assign(headers, signatureHeaders)
 
-      const response = await fetch(refreshUrl.toString(), {
+      const response = await apiRequest(refreshUrl.toString(), {
         method: 'POST',
         headers,
         body: normalizedBody || JSON.stringify(body),
+        timeoutMs: config.timeout || 30000,
       })
 
       if (!response.ok) return null
 
-      const data = await response.json()
+      const data = asRecord(await readResponseBody(response))
+      const dataContainer = asRecord(data.data)
       return {
-        accessToken: data.data?.access_token || data.access_token,
+        accessToken:
+          (dataContainer.access_token as string) ||
+          (data.access_token as string),
         refreshToken:
-          data.data?.refresh_token || data.refresh_token || refreshToken,
+          (dataContainer.refresh_token as string) ||
+          (data.refresh_token as string) ||
+          refreshToken,
         expiresIn:
-          data.data?.expires_in ||
-          data.expires_in ||
+          (dataContainer.expires_in as number) ||
+          (data.expires_in as number) ||
           TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE,
       }
     }
@@ -218,23 +268,33 @@ async function attemptTokenRefresh(
       refreshToken: refreshToken,
     })
 
-    const response = await fetch(refreshUrl.toString(), {
+    const response = await apiRequest(refreshUrl.toString(), {
       method: 'POST',
       headers,
       body,
+      timeoutMs: config.timeout || 30000,
     })
 
     if (!response.ok) return null
 
-    const data = await response.json()
+    const data = asRecord(await readResponseBody(response))
     return {
-      accessToken: data.access_token || data.accessToken,
-      refreshToken: data.refresh_token || data.refreshToken || refreshToken,
+      accessToken: (data.access_token as string) || (data.accessToken as string),
+      refreshToken:
+        (data.refresh_token as string) ||
+        (data.refreshToken as string) ||
+        refreshToken,
       expiresIn:
-        data.expires_in || data.expiresIn || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE,
+        (data.expires_in as number) ||
+        (data.expiresIn as number) ||
+        TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE,
     }
   } catch (error) {
-    console.error('Token refresh error:', error)
+    const apiError = ApiException.fromUnknown(error, 'Token refresh failed')
+    console.error('Token refresh error:', {
+      message: apiError.message,
+      statusCode: apiError.statusCode,
+    })
     return null
   }
 }
@@ -276,7 +336,7 @@ async function clearAuthCookies(): Promise<void> {
   deleteCookie(COOKIE_NAMES.TOKEN_EXPIRES_AT)
 }
 
-function isPublicRoute(backend: BackendType, path: string): boolean {
+function isPublicRoute(path: string): boolean {
   const publicPaths = [
     '/api/v1/auth/login',
     '/api/v1/auth/register',
@@ -300,87 +360,73 @@ function isPublicRoute(backend: BackendType, path: string): boolean {
 
 async function handleBffRequest(request: Request): Promise<Response> {
   const { backend, config } = getProxyConfig()
-
-  const url = new URL(request.url)
-  const pathSegments = url.pathname
-    .replace(/^\/api\/v1\//, '')
-    .split('/')
-    .filter(Boolean)
-
-  if (pathSegments.length === 0) {
-    return new Response(JSON.stringify({ error: 'Missing path' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-  validatePathSegments(pathSegments)
-
-  const bffPath = `/api/v1/${pathSegments.join('/')}`
-  const backendPath = transformPath(backend, bffPath)
-  const backendUrl = buildBackendUrl(config, backendPath)
-
-  const expectedHost = new URL(config.baseUrl!).host
-  if (backendUrl.host !== expectedHost) {
-    return new Response(
-      JSON.stringify({ error: 'Invalid request: host mismatch' }),
-      {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
-  }
-
-  const method = request.method
-  let body: unknown = null
-
-  if (method !== 'GET' && method !== 'HEAD') {
-    try {
-      body = await request.json()
-    } catch {}
-  }
-
-  const { headers: signatureHeaders, normalizedBody } = getSignatureHeaders(
-    backend,
-    method,
-    backendPath,
-    body,
-  )
-
-  let authToken = getCookie(COOKIE_NAMES.ACCESS_TOKEN) ?? undefined
-  const refreshToken = getCookie(COOKIE_NAMES.REFRESH_TOKEN) ?? undefined
-
-  if (!authToken && !isPublicRoute(backend, backendPath)) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized', message: 'No auth token found' }),
-      {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
-  }
-
-  const requestHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    ...signatureHeaders,
-  }
-
-  if (authToken) {
-    requestHeaders['Authorization'] = `Bearer ${authToken}`
-  }
-
-  const controller = new AbortController()
-  const timeoutId = setTimeout(
-    () => controller.abort(),
-    config.timeout || 30000,
-  )
-
+  const requestId = getRequestId(request)
   try {
+    const url = new URL(request.url)
+    const pathSegments = url.pathname
+      .replace(/^\/api\/v1\//, '')
+      .split('/')
+      .filter(Boolean)
+
+    if (pathSegments.length === 0) {
+      throw new ApiException('Missing path', {
+        statusCode: 400,
+        code: 'MISSING_PATH',
+      })
+    }
+
+    validatePathSegments(pathSegments)
+
+    const bffPath = `/api/v1/${pathSegments.join('/')}`
+    const backendPath = transformPath(backend, bffPath)
+    const backendUrl = buildBackendUrl(config, backendPath)
+
+    const expectedHost = new URL(config.baseUrl!).host
+    if (backendUrl.host !== expectedHost) {
+      throw new ApiException('Invalid request: host mismatch', {
+        statusCode: 400,
+        code: 'INVALID_HOST',
+      })
+    }
+
+    const method = request.method
+    validateCsrf(request, method)
+    let body: unknown = null
+
+    if (method !== 'GET' && method !== 'HEAD') {
+      try {
+        body = await request.json()
+      } catch {}
+    }
+
+    const { headers: signatureHeaders, normalizedBody } = getSignatureHeaders(
+      backend,
+      method,
+      backendPath,
+      body,
+    )
+
+    const authToken = getCookie(COOKIE_NAMES.ACCESS_TOKEN) ?? undefined
+    const refreshToken = getCookie(COOKIE_NAMES.REFRESH_TOKEN) ?? undefined
+
+    if (!authToken && !isPublicRoute(backendPath)) {
+      return jsonErrorResponse('No auth token found', 401, 'UNAUTHORIZED', undefined, requestId)
+    }
+
+    const requestHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      [REQUEST_ID_HEADER]: requestId,
+      ...signatureHeaders,
+    }
+
+    if (authToken) {
+      requestHeaders['Authorization'] = `Bearer ${authToken}`
+    }
+
     const options: RequestInit = {
       method,
       headers: requestHeaders,
-      signal: controller.signal,
     }
 
     if (method !== 'GET' && method !== 'HEAD') {
@@ -395,38 +441,34 @@ async function handleBffRequest(request: Request): Promise<Response> {
       backendUrl.searchParams.set(key, value)
     })
 
-    let response = await fetch(backendUrl.toString(), options)
-    clearTimeout(timeoutId)
+    let response = await apiRequest(backendUrl.toString(), {
+      ...options,
+      timeoutMs: config.timeout || 30000,
+    })
 
     if (
       response.status === 401 &&
       refreshToken &&
       !backendPath.includes('/refresh')
     ) {
-      const newTokens = await attemptTokenRefresh(backend, config, refreshToken)
+      const newTokens = await attemptTokenRefresh(backend, config, refreshToken, requestId)
 
       if (newTokens) {
         requestHeaders['Authorization'] = `Bearer ${newTokens.accessToken}`
 
-        const retryController = new AbortController()
-        const retryTimeoutId = setTimeout(
-          () => retryController.abort(),
-          config.timeout || 30000,
-        )
-
-        response = await fetch(backendUrl.toString(), {
+        response = await apiRequest(backendUrl.toString(), {
           ...options,
           headers: requestHeaders,
-          signal: retryController.signal,
+          timeoutMs: config.timeout || 30000,
         })
-
-        clearTimeout(retryTimeoutId)
 
         const responseData = await response.text()
         const headers = new Headers()
         response.headers.forEach((value, key) => {
           if (key !== 'set-cookie') headers.set(key, value)
         })
+        headers.set(REQUEST_ID_HEADER, requestId)
+        setNoStoreHeaders(headers)
         response.headers
           .getSetCookie()
           .forEach((cookie) => headers.append('set-cookie', cookie))
@@ -442,19 +484,10 @@ async function handleBffRequest(request: Request): Promise<Response> {
           statusText: response.statusText,
           headers,
         })
-      } else {
-        await clearAuthCookies()
-        return new Response(
-          JSON.stringify({
-            error: 'Session expired',
-            message: 'Please log in again',
-          }),
-          {
-            status: 401,
-            headers: { 'Content-Type': 'application/json' },
-          },
-        )
       }
+
+      await clearAuthCookies()
+      return jsonErrorResponse('Session expired', 401, 'SESSION_EXPIRED', undefined, requestId)
     }
 
     const responseData = await response.text()
@@ -462,6 +495,8 @@ async function handleBffRequest(request: Request): Promise<Response> {
     response.headers.forEach((value, key) => {
       if (key !== 'set-cookie') responseHeaders.set(key, value)
     })
+    responseHeaders.set(REQUEST_ID_HEADER, requestId)
+    setNoStoreHeaders(responseHeaders)
     response.headers
       .getSetCookie()
       .forEach((cookie) => responseHeaders.append('set-cookie', cookie))
@@ -517,24 +552,21 @@ async function handleBffRequest(request: Request): Promise<Response> {
       headers: responseHeaders,
     })
   } catch (error) {
-    clearTimeout(timeoutId)
+    const apiError = ApiException.fromUnknown(error, 'Failed to proxy request')
 
-    if (error instanceof Error && error.name === 'AbortError') {
-      return new Response(JSON.stringify({ error: 'Request timeout' }), {
-        status: 504,
-        headers: { 'Content-Type': 'application/json' },
+    if (apiError.statusCode >= 500) {
+      console.error('BFF proxy request failed', {
+        message: apiError.message,
+        statusCode: apiError.statusCode,
       })
     }
 
-    return new Response(
-      JSON.stringify({
-        error: 'Internal server error',
-        message: 'Failed to proxy request',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      },
+    return jsonErrorResponse(
+      apiError.message,
+      apiError.statusCode,
+      apiError.code,
+      apiError.details,
+      requestId,
     )
   }
 }

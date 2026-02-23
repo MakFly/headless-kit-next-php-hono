@@ -67,12 +67,12 @@ Route::prefix('v1')
         // Routes d'auth publiques (sans auth:api, mais avec HMAC)
         // Le BFF Next.js peut appeler ces routes avec HMAC
         // -------------------------------------------------------------------
-        Route::prefix('auth')->group(function () {
+        Route::prefix('auth')->middleware('api.security')->group(function () {
             Route::post('/register', [AuthController::class, 'register']);
-            Route::post('/login', [AuthController::class, 'login']);
+            Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,15');
             Route::get('/providers', [OAuthController::class, 'providers']);
             // Refresh token endpoint - public (uses refresh_token in body, not auth header)
-            Route::post('/refresh', [RefreshTokenController::class, 'refresh']);
+            Route::post('/refresh', [RefreshTokenController::class, 'refresh'])->middleware('throttle:30,1');
         });
 
         // -------------------------------------------------------------------
@@ -81,7 +81,7 @@ Route::prefix('v1')
         Route::middleware('auth:api')->group(function () {
 
             // Auth routes
-            Route::prefix('auth')->group(function () {
+            Route::prefix('auth')->middleware('api.security')->group(function () {
                 Route::post('/logout', [AuthController::class, 'logout']);
                 // Note: /refresh is now a public route above (uses refresh_token body, not auth header)
                 // Keep this for backward compatibility with old token-based refresh
@@ -91,7 +91,7 @@ Route::prefix('v1')
             });
 
             // Current User
-            Route::get('/me', [AuthController::class, 'me']);
+            Route::get('/me', [AuthController::class, 'me'])->middleware('api.security');
 
             // Users list (accessible par tous les users authentifiés)
             Route::get('/users', function () {

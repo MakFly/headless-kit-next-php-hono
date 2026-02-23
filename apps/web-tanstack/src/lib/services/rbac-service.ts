@@ -1,28 +1,46 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getAuthAdapter } from '@/lib/adapters'
+import { getAuthAdapter, getBackendType, getAdapterConfig } from '@/lib/adapters'
 import type { Permission, Role, User } from './rbac-types'
 
 export type { Permission, Role, User } from './rbac-types'
+
+function getApiBaseUrl(): string {
+  const backend = getBackendType()
+  const config = getAdapterConfig(backend)
+  const fallback = process.env.LARAVEL_API_URL || 'http://localhost:8000'
+  return (config.baseUrl || fallback).replace(/\/$/, '')
+}
 
 async function fetchFromApi<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
   const adapter = getAuthAdapter()
-  const token = await adapter.getAccessToken()
+  const baseUrl = getApiBaseUrl()
 
-  const response = await fetch(
-    `${process.env.LARAVEL_API_URL || 'http://localhost:8000'}${path}`,
-    {
+  const executeRequest = async (accessToken: string | null): Promise<Response> =>
+    fetch(`${baseUrl}${path}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         ...options.headers,
       },
-    },
-  )
+    })
+
+  let token = await adapter.getAccessToken()
+  let response = await executeRequest(token)
+
+  if (response.status === 401) {
+    try {
+      const refreshed = await adapter.refresh()
+      token = refreshed.tokens.access_token
+      response = await executeRequest(token)
+    } catch {
+      await adapter.clearTokens()
+    }
+  }
 
   if (!response.ok) {
     throw new Error(`API Error: ${response.status}`)

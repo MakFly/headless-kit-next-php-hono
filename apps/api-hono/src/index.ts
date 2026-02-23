@@ -10,6 +10,7 @@ import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
 import { authRoutes } from './routes/index.ts';
+import { requestContextMiddleware } from './middleware/index.ts';
 import type { AppVariables } from './types/index.ts';
 
 // Configuration
@@ -24,6 +25,7 @@ const app = new Hono<{ Variables: AppVariables }>();
 app.use('*', logger());
 app.use('*', prettyJSON());
 app.use('*', secureHeaders());
+app.use('*', requestContextMiddleware);
 
 // CORS configuration
 app.use(
@@ -31,7 +33,7 @@ app.use(
   cors({
     origin: [frontendUrl, 'http://localhost:3001'],
     credentials: true,
-    allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Request-Id'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     exposeHeaders: ['Content-Length', 'X-Request-Id'],
     maxAge: 86400,
@@ -72,15 +74,21 @@ app.notFound((c) => {
 // Error handler
 app.onError((err, c) => {
   console.error('Unhandled error:', err);
+  const requestId = c.get('requestId');
 
-  return c.json(
+  const response = c.json(
     {
       error: 'Internal Server Error',
       message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
       code: 'INTERNAL_ERROR',
+      status: 500,
+      request_id: requestId,
     },
     500
   );
+
+  response.headers.set('X-Request-Id', requestId);
+  return response;
 });
 
 // Start server

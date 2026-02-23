@@ -42,16 +42,28 @@ function formatAuthResponse(response: Awaited<ReturnType<typeof authService.logi
  * Handle service errors
  */
 function handleError(c: Context, error: unknown) {
+  const requestId = c.get('requestId');
+
   if (error instanceof AuthError) {
     return c.json(
-      { error: error.message, code: error.code },
-      error.statusCode as 400 | 401 | 409
+      {
+        error: error.message,
+        code: error.code,
+        status: error.statusCode,
+        request_id: requestId,
+      },
+      error.statusCode as 400 | 401 | 403 | 404 | 409 | 429
     );
   }
 
   console.error('Auth error:', error);
   return c.json(
-    { error: 'Internal server error', code: 'INTERNAL_ERROR' },
+    {
+      error: 'Internal server error',
+      code: 'INTERNAL_ERROR',
+      status: 500,
+      request_id: requestId,
+    },
     500
   );
 }
@@ -97,7 +109,12 @@ export async function refresh(c: Context, data: RefreshInput) {
     const refreshToken = data.refreshToken || data.refresh_token;
     if (!refreshToken) {
       return c.json(
-        { error: 'Refresh token is required', code: 'MISSING_TOKEN' },
+        {
+          error: 'Refresh token is required',
+          code: 'MISSING_TOKEN',
+          status: 400,
+          request_id: c.get('requestId'),
+        },
         400
       );
     }
@@ -144,7 +161,12 @@ export async function me(c: Context<{ Variables: AppVariables }>) {
     const userWithRoles = await authService.getCurrentUser(user.id);
     if (!userWithRoles) {
       return c.json(
-        { error: 'User not found', code: 'USER_NOT_FOUND' },
+        {
+          error: 'User not found',
+          code: 'USER_NOT_FOUND',
+          status: 404,
+          request_id: c.get('requestId'),
+        },
         404
       );
     }

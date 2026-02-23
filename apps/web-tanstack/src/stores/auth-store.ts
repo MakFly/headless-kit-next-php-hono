@@ -60,16 +60,20 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
 
-      setUser: (user, expiresIn) => {
-        set({ user, ...(expiresIn !== undefined && { expiresIn }) })
-      },
+      setUser: (user, expiresIn) =>
+        set((state) => ({
+          user,
+          expiresIn:
+            expiresIn !== undefined ? expiresIn : user ? state.expiresIn : null,
+        })),
 
       hydrate: (user, expiresIn) =>
-        set({
+        set((state) => ({
           user,
           isHydrated: true,
-          ...(expiresIn !== undefined && { expiresIn }),
-        }),
+          expiresIn:
+            expiresIn !== undefined ? expiresIn : user ? state.expiresIn : null,
+        })),
 
       login: async (credentials) => {
         set({ error: null, isLoading: true })

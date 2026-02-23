@@ -14,7 +14,6 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { BffException, BffErrorCode } from '@/lib/security/types';
 import {
   getProxyConfig,
   isPublicRoute,
@@ -23,14 +22,14 @@ import {
 } from '@/lib/adapters/proxy-config';
 import { getBackendType } from '@/lib/adapters';
 import { createLogger } from '@/lib/logger';
+import { ApiException, apiRequest, readResponseBody } from '@/lib/http';
 import {
   TOKEN_CONFIG,
   COOKIE_NAMES,
-  decodeJwtPayload,
   calculateExpirationTimestamp,
   formatExpirationForCookie,
 } from '@/lib/services/token-service';
-import { REFRESH_NEEDED_HEADER } from '@/middleware';
+import { REFRESH_NEEDED_HEADER } from '@/proxy';
 
 const log = createLogger('bff-proxy');
 
@@ -45,6 +44,9 @@ type RouteParams = {
  * Regex to validate path segments (alphanumerics, dashes, underscores only)
  */
 const SAFE_PATH_SEGMENT = /^[a-zA-Z0-9_-]+$/;
+const REQUEST_ID_HEADER = 'x-request-id';
+const INTERNAL_REQUEST_HEADER = 'x-bff-internal';
+const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 /**
  * Cookie configuration
@@ -56,32 +58,115 @@ const COOKIE_CONFIG = {
   path: '/',
 };
 
+function setNoStoreHeaders(headers: Headers): void {
+  headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  headers.set('Pragma', 'no-cache');
+}
+
+function getRequestId(request: NextRequest): string {
+  return request.headers.get(REQUEST_ID_HEADER) || crypto.randomUUID();
+}
+
+function getOriginFromReferer(referer: string | null): string | null {
+  if (!referer) {
+    return null;
+  }
+  try {
+    return new URL(referer).origin;
+  } catch {
+    return null;
+  }
+}
+
+function validateCsrf(request: NextRequest, method: string): void {
+  if (!MUTATING_METHODS.has(method)) {
+    return;
+  }
+
+  if (request.headers.get(INTERNAL_REQUEST_HEADER) === '1') {
+    return;
+  }
+
+  const expectedOrigin = request.nextUrl.origin;
+  const origin = request.headers.get('origin');
+  const refererOrigin = getOriginFromReferer(request.headers.get('referer'));
+
+  if (origin && origin === expectedOrigin) {
+    return;
+  }
+
+  if (!origin && refererOrigin && refererOrigin === expectedOrigin) {
+    return;
+  }
+
+  throw new ApiException('CSRF validation failed', {
+    statusCode: 403,
+    code: origin || refererOrigin ? 'CSRF_ORIGIN_MISMATCH' : 'CSRF_MISSING_ORIGIN',
+  });
+}
+
 /**
  * Validates path segments to prevent SSRF/Path Traversal attacks
- * @throws {BffException} if path contains dangerous segments
+ * @throws {ApiException} if path contains dangerous segments
  */
 function validatePathSegments(segments: string[]): void {
   for (const segment of segments) {
     // Reject empty segments
     if (!segment) {
-      throw new BffException(BffErrorCode.INVALID_SIGNATURE, 'Invalid path: empty segment');
+      throw new ApiException('Invalid path: empty segment', {
+        statusCode: 400,
+        code: 'INVALID_PATH',
+      });
     }
 
     // Reject path traversal
     if (segment === '..' || segment === '.') {
-      throw new BffException(BffErrorCode.INVALID_SIGNATURE, 'Invalid path: traversal not allowed');
+      throw new ApiException('Invalid path: traversal not allowed', {
+        statusCode: 400,
+        code: 'INVALID_PATH',
+      });
     }
 
     // Reject absolute URLs
     if (segment.includes('://') || segment.startsWith('//')) {
-      throw new BffException(BffErrorCode.INVALID_SIGNATURE, 'Invalid path: absolute URLs not allowed');
+      throw new ApiException('Invalid path: absolute URLs not allowed', {
+        statusCode: 400,
+        code: 'INVALID_PATH',
+      });
     }
 
     // Validate segment format (alphanumerics, dashes, underscores)
     if (!SAFE_PATH_SEGMENT.test(segment)) {
-      throw new BffException(BffErrorCode.INVALID_SIGNATURE, 'Invalid path: forbidden characters');
+      throw new ApiException('Invalid path: forbidden characters', {
+        statusCode: 400,
+        code: 'INVALID_PATH',
+      });
     }
   }
+}
+
+function errorResponse(error: ApiException, requestId: string): NextResponse {
+  const payload: Record<string, unknown> = {
+    error: error.message,
+    code: error.code,
+    status: error.statusCode,
+    request_id: requestId,
+  };
+
+  if (error.details !== undefined) {
+    payload.details = error.details;
+  }
+
+  const response = NextResponse.json(payload, { status: error.statusCode });
+  response.headers.set(REQUEST_ID_HEADER, requestId);
+  setNoStoreHeaders(response.headers);
+  return response;
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 /**
@@ -129,16 +214,18 @@ function getRefreshEndpoint(backend: string): string {
 async function attemptTokenRefresh(
   config: ProxyConfig,
   backend: string,
-  refreshToken: string
+  refreshToken: string,
+  requestId: string
 ): Promise<{ accessToken: string; refreshToken: string; expiresIn: number } | null> {
   try {
     const refreshPath = getRefreshEndpoint(backend);
     const refreshUrl = buildBackendUrl(config, refreshPath);
 
     // Build headers
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      [REQUEST_ID_HEADER]: requestId,
     };
 
     // Add HMAC for Laravel
@@ -151,10 +238,11 @@ async function attemptTokenRefresh(
       );
       Object.assign(headers, signatureHeaders);
 
-      const response = await fetch(refreshUrl.toString(), {
+      const response = await apiRequest(refreshUrl.toString(), {
         method: 'POST',
         headers,
         body: normalizedBody || JSON.stringify(body),
+        timeoutMs: config.timeout,
       });
 
       if (!response.ok) {
@@ -162,12 +250,21 @@ async function attemptTokenRefresh(
         return null;
       }
 
-      const data = await response.json();
+      const data = asRecord(await readResponseBody(response));
+      const dataContainer = asRecord(data.data);
       // Laravel format: { data: { access_token, refresh_token?, expires_in? } }
       return {
-        accessToken: data.data?.access_token || data.access_token,
-        refreshToken: data.data?.refresh_token || data.refresh_token || refreshToken,
-        expiresIn: data.data?.expires_in || data.expires_in || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE,
+        accessToken:
+          (dataContainer.access_token as string) ||
+          (data.access_token as string),
+        refreshToken:
+          (dataContainer.refresh_token as string) ||
+          (data.refresh_token as string) ||
+          refreshToken,
+        expiresIn:
+          ((dataContainer.expires_in as number) ||
+            (data.expires_in as number) ||
+            TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE),
       };
     }
 
@@ -177,10 +274,11 @@ async function attemptTokenRefresh(
       refreshToken: refreshToken, // Some backends expect camelCase
     });
 
-    const response = await fetch(refreshUrl.toString(), {
+    const response = await apiRequest(refreshUrl.toString(), {
       method: 'POST',
       headers,
       body,
+      timeoutMs: config.timeout,
     });
 
     if (!response.ok) {
@@ -188,15 +286,21 @@ async function attemptTokenRefresh(
       return null;
     }
 
-    const data = await response.json();
+    const data = asRecord(await readResponseBody(response));
     return {
-      accessToken: data.access_token || data.accessToken,
-      refreshToken: data.refresh_token || data.refreshToken || refreshToken,
-      expiresIn: data.expires_in || data.expiresIn || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE,
+      accessToken: (data.access_token as string) || (data.accessToken as string),
+      refreshToken:
+        (data.refresh_token as string) || (data.refreshToken as string) || refreshToken,
+      expiresIn:
+        (data.expires_in as number) ||
+        (data.expiresIn as number) ||
+        TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE,
     };
   } catch (error) {
+    const apiError = ApiException.fromUnknown(error, 'Token refresh failed');
     log.error('Token refresh error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: apiError.message,
+      statusCode: apiError.statusCode,
       backend,
     });
     return null;
@@ -212,13 +316,7 @@ function storeTokensInResponse(
   refreshToken: string,
   expiresIn: number
 ): void {
-  // Calculate actual expiration from token if possible
-  let actualExpiresIn = expiresIn;
-  const payload = decodeJwtPayload(accessToken);
-  if (payload?.exp) {
-    const now = Math.floor(Date.now() / 1000);
-    actualExpiresIn = Math.max(payload.exp - now, 0);
-  }
+  const actualExpiresIn = Math.max(0, expiresIn);
 
   // Store access token
   response.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, accessToken, {
@@ -260,6 +358,7 @@ async function proxyRequest(
 ): Promise<NextResponse> {
   const config = getProxyConfig();
   const backend = getBackendType();
+  const requestId = getRequestId(request);
 
   try {
     // Extract path from params
@@ -268,6 +367,7 @@ async function proxyRequest(
 
     // Validate segments to prevent SSRF
     validatePathSegments(pathSegments);
+    validateCsrf(request, method);
 
     // Build BFF path
     const bffPath = `/api/v1/${pathSegments.join('/')}`;
@@ -281,7 +381,10 @@ async function proxyRequest(
     // Security check: ensure final URL points to configured backend
     const expectedHost = new URL(config.baseUrl).host;
     if (backendUrl.host !== expectedHost) {
-      throw new BffException(BffErrorCode.INVALID_SIGNATURE, 'Invalid request: host mismatch');
+      throw new ApiException('Invalid request: host mismatch', {
+        statusCode: 400,
+        code: 'INVALID_HOST',
+      });
     }
 
     // Extract body for signature (Laravel HMAC)
@@ -298,6 +401,9 @@ async function proxyRequest(
     const cookieStore = await cookies();
     let authToken = cookieStore.get(COOKIE_NAMES.ACCESS_TOKEN)?.value;
     const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
+    let proactivelyRefreshedTokens:
+      | { accessToken: string; refreshToken: string; expiresIn: number }
+      | null = null;
 
     // Check if middleware signaled refresh needed
     const refreshNeeded = request.headers.get(REFRESH_NEEDED_HEADER);
@@ -305,8 +411,9 @@ async function proxyRequest(
     // Proactive refresh if middleware signaled it (and this isn't the refresh endpoint itself)
     if (refreshNeeded && refreshToken && !backendPath.includes('/refresh')) {
       log.info('Attempting proactive token refresh', { refreshNeeded, bffPath });
-      const newTokens = await attemptTokenRefresh(config, backend, refreshToken);
+      const newTokens = await attemptTokenRefresh(config, backend, refreshToken, requestId);
       if (newTokens) {
+        proactivelyRefreshedTokens = newTokens;
         authToken = newTokens.accessToken;
         log.info('Proactive refresh successful');
       }
@@ -315,15 +422,29 @@ async function proxyRequest(
     // Check if route requires authentication
     if (!authToken && !isPublicRoute(config, backendPath)) {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'No auth token found' },
-        { status: 401 }
+        {
+          error: 'Unauthorized',
+          message: 'No auth token found',
+          code: 'UNAUTHORIZED',
+          status: 401,
+          request_id: requestId,
+        },
+        {
+          status: 401,
+          headers: {
+            [REQUEST_ID_HEADER]: requestId,
+            'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+            Pragma: 'no-cache',
+          },
+        }
       );
     }
 
     // Build request headers
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      [REQUEST_ID_HEADER]: requestId,
       ...signatureHeaders,
     };
 
@@ -332,127 +453,119 @@ async function proxyRequest(
       headers['Authorization'] = `Bearer ${authToken}`;
     }
 
-    // Create AbortController for timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+    // Prepare fetch options
+    const options: RequestInit = {
+      method,
+      headers,
+    };
 
-    try {
-      // Prepare fetch options
-      const options: RequestInit = {
-        method,
-        headers,
-        signal: controller.signal,
-      };
-
-      // Use normalized body for Laravel (HMAC consistency), original for others
-      if (method !== 'GET' && method !== 'HEAD') {
-        if (normalizedBody !== undefined) {
-          options.body = normalizedBody;
-        } else if (body) {
-          options.body = JSON.stringify(body);
-        }
+    // Use normalized body for Laravel (HMAC consistency), original for others
+    if (method !== 'GET' && method !== 'HEAD') {
+      if (normalizedBody !== undefined) {
+        options.body = normalizedBody;
+      } else if (body) {
+        options.body = JSON.stringify(body);
       }
-
-      // Copy query params
-      request.nextUrl.searchParams.forEach((value, key) => {
-        backendUrl.searchParams.set(key, value);
-      });
-
-      // Make request to backend
-      let response = await fetch(backendUrl.toString(), options);
-
-      clearTimeout(timeoutId);
-
-      // 401 Interceptor: Attempt refresh and retry
-      if (response.status === 401 && refreshToken && !backendPath.includes('/refresh')) {
-        log.info('Received 401, attempting token refresh', { bffPath });
-
-        const newTokens = await attemptTokenRefresh(config, backend, refreshToken);
-
-        if (newTokens) {
-          log.info('Refresh successful, retrying request');
-
-          // Retry with new token
-          headers['Authorization'] = `Bearer ${newTokens.accessToken}`;
-
-          const retryController = new AbortController();
-          const retryTimeoutId = setTimeout(() => retryController.abort(), config.timeout);
-
-          response = await fetch(backendUrl.toString(), {
-            ...options,
-            headers,
-            signal: retryController.signal,
-          });
-
-          clearTimeout(retryTimeoutId);
-
-          // Create response and store new tokens
-          const responseData = await response.text();
-          const nextResponse = await buildResponse(response, responseData, backend);
-          storeTokensInResponse(
-            nextResponse,
-            newTokens.accessToken,
-            newTokens.refreshToken,
-            newTokens.expiresIn
-          );
-          return nextResponse;
-        } else {
-          log.warn('Refresh failed, clearing auth cookies');
-          // Refresh failed - clear cookies and return 401
-          const nextResponse = NextResponse.json(
-            { error: 'Session expired', message: 'Please log in again' },
-            { status: 401 }
-          );
-          clearAuthCookies(nextResponse);
-          return nextResponse;
-        }
-      }
-
-      // Build and return response
-      const responseData = await response.text();
-      const nextResponse = await buildResponse(response, responseData, backend);
-
-      // Handle proactive refresh - store new tokens if we refreshed earlier
-      if (refreshNeeded && refreshToken && !backendPath.includes('/refresh')) {
-        const newTokens = await attemptTokenRefresh(config, backend, refreshToken);
-        if (newTokens) {
-          storeTokensInResponse(
-            nextResponse,
-            newTokens.accessToken,
-            newTokens.refreshToken,
-            newTokens.expiresIn
-          );
-        }
-      }
-
-      return nextResponse;
-    } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new BffException(BffErrorCode.TIMEOUT, 'Request timeout');
-      }
-
-      throw error;
     }
-  } catch (error) {
-    // Error handling
-    if (error instanceof BffException) {
-      return NextResponse.json(
-        { error: error.message, code: error.code },
-        { status: 500 }
+
+    // Copy query params
+    request.nextUrl.searchParams.forEach((value, key) => {
+      backendUrl.searchParams.set(key, value);
+    });
+
+    // Make request to backend
+    let response = await apiRequest(backendUrl.toString(), {
+      ...options,
+      timeoutMs: config.timeout,
+    });
+
+    // 401 Interceptor: Attempt refresh and retry
+    if (response.status === 401 && refreshToken && !backendPath.includes('/refresh')) {
+      log.info('Received 401, attempting token refresh', { bffPath });
+
+      const newTokens = await attemptTokenRefresh(config, backend, refreshToken, requestId);
+
+      if (newTokens) {
+        log.info('Refresh successful, retrying request');
+
+        // Retry with new token
+        headers['Authorization'] = `Bearer ${newTokens.accessToken}`;
+
+        response = await apiRequest(backendUrl.toString(), {
+          ...options,
+          headers,
+          timeoutMs: config.timeout,
+        });
+
+        // Create response and store new tokens
+        const responseData = await response.text();
+        const nextResponse = await buildResponse(response, responseData, backend, requestId);
+        storeTokensInResponse(
+          nextResponse,
+          newTokens.accessToken,
+          newTokens.refreshToken,
+          newTokens.expiresIn
+        );
+        return nextResponse;
+      }
+
+      log.warn('Refresh failed, clearing auth cookies');
+      // Refresh failed - clear cookies and return 401
+      const nextResponse = NextResponse.json(
+        {
+          error: 'Session expired',
+          message: 'Please log in again',
+          code: 'SESSION_EXPIRED',
+          status: 401,
+          request_id: requestId,
+        },
+        {
+          status: 401,
+          headers: {
+            [REQUEST_ID_HEADER]: requestId,
+            'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+            Pragma: 'no-cache',
+          },
+        }
+      );
+      clearAuthCookies(nextResponse);
+      return nextResponse;
+    }
+
+    // Build and return response
+    const responseData = await response.text();
+    const nextResponse = await buildResponse(response, responseData, backend, requestId);
+
+    if (proactivelyRefreshedTokens) {
+      storeTokensInResponse(
+        nextResponse,
+        proactivelyRefreshedTokens.accessToken,
+        proactivelyRefreshedTokens.refreshToken,
+        proactivelyRefreshedTokens.expiresIn
       );
     }
 
-    log.error('Proxy request failed', {
-      backend,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return nextResponse;
+  } catch (error) {
+    const apiError = ApiException.fromUnknown(error, 'Failed to proxy request');
 
-    return NextResponse.json(
-      { error: 'Internal server error', message: 'Failed to proxy request' },
-      { status: 500 }
-    );
+    if (apiError.statusCode >= 500) {
+      log.error('Proxy request failed', {
+        backend,
+        error: apiError.message,
+        statusCode: apiError.statusCode,
+        requestId,
+      });
+    } else {
+      log.warn('Proxy request rejected', {
+        backend,
+        error: apiError.message,
+        statusCode: apiError.statusCode,
+        requestId,
+      });
+    }
+
+    return errorResponse(apiError, requestId);
   }
 }
 
@@ -462,7 +575,8 @@ async function proxyRequest(
 async function buildResponse(
   response: Response,
   responseData: string,
-  backend: string
+  backend: string,
+  requestId: string
 ): Promise<NextResponse> {
   // Get response cookies
   const setCookieHeaders = response.headers.getSetCookie();
@@ -474,6 +588,8 @@ async function buildResponse(
       responseHeaders.set(key, value);
     }
   });
+  responseHeaders.set(REQUEST_ID_HEADER, requestId);
+  setNoStoreHeaders(responseHeaders);
 
   // Transfer cookies from backend
   setCookieHeaders.forEach((cookie) => {
@@ -509,15 +625,10 @@ async function buildResponse(
 
     // Store tokens if present
     if (accessToken) {
-      const actualExpiresIn = expiresIn || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE;
-
-      // Calculate actual expiration from JWT if possible
-      let tokenMaxAge = actualExpiresIn;
-      const payload = decodeJwtPayload(accessToken);
-      if (payload?.exp) {
-        const now = Math.floor(Date.now() / 1000);
-        tokenMaxAge = Math.max(payload.exp - now, 0);
-      }
+      const tokenMaxAge = Math.max(
+        0,
+        expiresIn || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE
+      );
 
       // Set access token cookie
       nextResponse.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, accessToken, {

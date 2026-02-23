@@ -36,12 +36,14 @@ class AuthenticationTest extends WebTestCase
     {
         $container = $this->client->getContainer();
         $em = $container->get('doctrine')->getManager();
+        $cache = $container->get('cache.app');
 
         // Clear all users for clean tests
         $connection = $em->getConnection();
         $connection->executeStatement('DELETE FROM refresh_tokens');
         $connection->executeStatement('DELETE FROM sessions');
         $connection->executeStatement('DELETE FROM users');
+        $cache->clear();
     }
 
     private function registerUser(string $email = self::TEST_EMAIL, string $password = self::TEST_PASSWORD, string $name = self::TEST_NAME): array

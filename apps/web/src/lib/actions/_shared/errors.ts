@@ -8,6 +8,7 @@
 
 // Import from errors.ts directly to avoid 'next/headers' chain
 import { AdapterError } from '../../adapters/errors';
+import { ApiException } from '../../http/api-exception';
 
 /**
  * Base error class for all Server Actions
@@ -29,6 +30,15 @@ export class ActionError extends Error {
   static fromAdapterError(error: unknown): ActionError {
     if (error instanceof ActionError) {
       return error;
+    }
+
+    if (error instanceof ApiException) {
+      return new ActionError(
+        error.message,
+        error.statusCode,
+        error.code,
+        error.details
+      );
     }
 
     if (error instanceof AdapterError) {

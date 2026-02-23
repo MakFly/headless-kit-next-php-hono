@@ -1,6 +1,22 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie } from '@tanstack/react-start/server'
 import { getAuthAdapter, toUser, COOKIE_NAMES } from '../adapters'
+import { ApiException } from '../http'
+
+function getExpiresInFromCookie(): number | null {
+  const expiresValue = getCookie(COOKIE_NAMES.TOKEN_EXPIRES_AT)
+  if (!expiresValue) return null
+
+  const expiresAt = new Date(expiresValue).getTime()
+  if (isNaN(expiresAt)) return null
+
+  return Math.max(0, Math.floor((expiresAt - Date.now()) / 1000))
+}
+
+function isAuthFailure(error: unknown): boolean {
+  const status = ApiException.getStatusCode(error)
+  return status === 400 || status === 401 || status === 403
+}
 
 export const loginFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { email: string; password: string }) => data)
@@ -40,16 +56,29 @@ export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
 export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
   async () => {
     const adapter = getAuthAdapter()
-    const normalized = await adapter.getUser()
+    let normalized = await adapter.getUser()
+    let expiresIn: number | null = null
+
+    if (!normalized) {
+      const refreshToken = getCookie(COOKIE_NAMES.REFRESH_TOKEN)
+      if (!refreshToken) return null
+
+      try {
+        const refreshed = await adapter.refresh({ refresh_token: refreshToken })
+        normalized = refreshed.user
+        expiresIn = refreshed.tokens.expires_in ?? null
+      } catch (error) {
+        if (isAuthFailure(error)) {
+          await adapter.clearTokens()
+        }
+        return null
+      }
+    }
+
     if (!normalized) return null
 
-    let expiresIn: number | null = null
-    const expiresValue = getCookie(COOKIE_NAMES.TOKEN_EXPIRES_AT)
-    if (expiresValue) {
-      const expiresAt = new Date(expiresValue).getTime()
-      if (!isNaN(expiresAt)) {
-        expiresIn = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000))
-      }
+    if (expiresIn == null) {
+      expiresIn = getExpiresInFromCookie()
     }
 
     return { user: toUser(normalized), expiresIn }

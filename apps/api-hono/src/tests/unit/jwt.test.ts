@@ -2,7 +2,7 @@
  * Unit tests for JWT utilities
  */
 
-import { describe, it, expect, beforeAll } from 'bun:test';
+import { describe, it, expect } from 'bun:test';
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -32,9 +32,10 @@ describe('JWT Utilities', () => {
   });
 
   describe('getRefreshTokenExpiration', () => {
-    it('should return default expiration', () => {
+    it('should return configured expiration', () => {
       const exp = getRefreshTokenExpiration();
-      expect(exp).toBe(604800); // 7 days default
+      const expected = parseInt(process.env.JWT_REFRESH_EXPIRES_IN || '604800', 10);
+      expect(exp).toBe(expected);
     });
   });
 

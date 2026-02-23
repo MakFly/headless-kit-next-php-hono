@@ -38,6 +38,7 @@ type LaravelAuthResponse = {
   data: {
     user: LaravelUser
     access_token: string
+    refresh_token?: string
     token_type?: string
     expires_in?: number
   }
@@ -67,6 +68,7 @@ export function transformUser(laravelUser: LaravelUser): NormalizedUser {
 export function transformAuthResponse(response: LaravelAuthResponse): AuthResponse {
   const tokens: TokenStorage = {
     access_token: response.data.access_token,
+    refresh_token: response.data.refresh_token,
     token_type: response.data.token_type || 'Bearer',
     expires_in: response.data.expires_in,
   }

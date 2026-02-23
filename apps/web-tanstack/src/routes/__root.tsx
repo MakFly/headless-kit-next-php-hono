@@ -55,7 +55,7 @@ function RootComponent() {
   const hydrate = useAuthStore((s) => s.hydrate)
 
   const handleExpired = useCallback(() => {
-    hydrate(null)
+    hydrate(null, null)
   }, [hydrate])
 
   useTokenRefresh({ onExpired: handleExpired })

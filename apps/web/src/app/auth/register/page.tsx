@@ -264,6 +264,11 @@ export default function RegisterPage() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4 pb-8">
+          <div className="text-xs text-muted-foreground text-center">
+            Backend context: <Link href="/laravel" className="text-red-600 hover:underline">Laravel</Link> ·{' '}
+            <Link href="/symfony" className="text-violet-600 hover:underline">Symfony</Link> ·{' '}
+            <Link href="/hono" className="text-emerald-600 hover:underline">Hono</Link>
+          </div>
           <div className="text-sm text-center text-muted-foreground">
             Already have an account?{" "}
             <Link href="/auth/login" className="text-violet-600 hover:text-violet-700 font-medium">

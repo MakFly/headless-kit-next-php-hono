@@ -21,5 +21,6 @@ export {
   getCurrentUserAction,
   getOAuthProvidersAction,
   getOAuthUrlAction,
+  sendMagicLinkAction,
   AuthActionError,
 } from './actions';

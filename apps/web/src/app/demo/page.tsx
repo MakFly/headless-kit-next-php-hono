@@ -32,20 +32,25 @@ export default function DemoPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              L'authentification est gérée par <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">/auth/login</code> et
-              utilise le backend configuré via <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">AUTH_BACKEND</code>.
+              L'authentification est isolée par backend via
+              <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">/laravel</code>,
+              <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">/symfony</code> et
+              <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">/hono</code>.
             </p>
             <div className="flex gap-3">
               <Button asChild size="sm" variant="outline" className="border-blue-200 hover:bg-blue-100">
-                <Link href="/auth/login">
+                <Link href="/laravel">
                   <LogIn className="h-4 w-4 mr-2" />
-                  Se connecter
+                  Login Laravel
                 </Link>
               </Button>
               <Button asChild size="sm" variant="outline" className="border-blue-200 hover:bg-blue-100">
-                <Link href="/auth/register">
-                  Créer un compte
+                <Link href="/symfony">
+                  Login Symfony
                 </Link>
+              </Button>
+              <Button asChild size="sm" variant="outline" className="border-blue-200 hover:bg-blue-100">
+                <Link href="/hono">Login Hono</Link>
               </Button>
             </div>
           </CardContent>

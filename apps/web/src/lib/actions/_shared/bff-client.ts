@@ -16,6 +16,11 @@ import { env } from '@/lib/config/env';
 import { BffActionError } from './errors';
 import { ApiException, apiRequestJson } from '@/lib/http';
 import type { BffRequestOptions } from './types';
+import {
+  AUTH_BACKEND_COOKIE,
+  getCookieNamesForBackend,
+  resolveBackend,
+} from '@/lib/auth/backend-context';
 
 /**
  * Base URL of Next.js BFF
@@ -27,8 +32,6 @@ const REQUEST_ID_HEADER = 'x-request-id';
 /**
  * Auth cookie name
  */
-const AUTH_COOKIE_NAME = env.AUTH_COOKIE_NAME;
-
 /**
  * Makes a request to the BFF with automatic cookie handling
  *
@@ -49,7 +52,12 @@ export async function bffRequest<T>(
 
   // Get cookie for authenticated requests
   const cookieStore = await cookies();
-  const authToken = cookieStore.get(AUTH_COOKIE_NAME);
+  const backend = resolveBackend(cookieStore.get(AUTH_BACKEND_COOKIE)?.value);
+  const cookieNames = getCookieNamesForBackend(backend);
+
+  const authToken = cookieStore.get(cookieNames.accessToken);
+  const refreshToken = cookieStore.get(cookieNames.refreshToken);
+  const backendCookie = cookieStore.get(AUTH_BACKEND_COOKIE);
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -61,8 +69,24 @@ export async function bffRequest<T>(
 
   // For server-to-server requests, pass cookie manually
   // IMPORTANT: credentials: 'include' is ignored in Node.js
-  if (!skipAuth && authToken?.value) {
-    (headers as Record<string, string>)['Cookie'] = `${AUTH_COOKIE_NAME}=${authToken.value}`;
+  if (!skipAuth) {
+    const forwardedCookies: string[] = [];
+
+    if (authToken?.value) {
+      forwardedCookies.push(`${cookieNames.accessToken}=${authToken.value}`);
+    }
+
+    if (refreshToken?.value) {
+      forwardedCookies.push(`${cookieNames.refreshToken}=${refreshToken.value}`);
+    }
+
+    if (backendCookie?.value) {
+      forwardedCookies.push(`${AUTH_BACKEND_COOKIE}=${backendCookie.value}`);
+    }
+
+    if (forwardedCookies.length > 0) {
+      (headers as Record<string, string>)['Cookie'] = forwardedCookies.join('; ');
+    }
   }
 
   try {

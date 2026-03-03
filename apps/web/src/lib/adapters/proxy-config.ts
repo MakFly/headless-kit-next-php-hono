@@ -6,6 +6,7 @@
  */
 
 import { getBackendType } from './index';
+import type { BackendType } from './types';
 import { generateSignature } from '../security/hmac';
 
 /**
@@ -148,8 +149,8 @@ function getNodeConfig(): ProxyConfig {
 /**
  * Get proxy configuration for the current backend
  */
-export function getProxyConfig(): ProxyConfig {
-  const backend = getBackendType();
+export function getProxyConfig(backendOverride?: BackendType): ProxyConfig {
+  const backend = backendOverride ?? getBackendType();
 
   switch (backend) {
     case 'laravel':

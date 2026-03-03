@@ -32,6 +32,7 @@ install-api:
 
 install-api-sf:
 	@echo "Installing Symfony API dependencies..."
+	cd apps/api-sf && cp -n .env.example .env || true
 	cd apps/api-sf && composer install --ignore-platform-req=ext-gmp --no-interaction
 
 install-api-hono:
@@ -52,6 +53,7 @@ api-reset:
 
 # Symfony API (port 8002) - Test users: admin@example.com / Admin1234!
 api-sf:
+	cd apps/api-sf && cp -n .env.example .env || true
 	cd apps/api-sf && composer install --ignore-platform-req=ext-gmp --no-interaction
 	cd apps/api-sf && symfony server:start --port=8002 --no-tls
 

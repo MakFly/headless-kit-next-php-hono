@@ -20,16 +20,20 @@ import {
   buildBackendUrl,
   type ProxyConfig,
 } from '@/lib/adapters/proxy-config';
-import { getBackendType } from '@/lib/adapters';
+import type { BackendType } from '@/lib/adapters/types';
 import { createLogger } from '@/lib/logger';
 import { ApiException, apiRequest, readResponseBody } from '@/lib/http';
 import {
   TOKEN_CONFIG,
-  COOKIE_NAMES,
   calculateExpirationTimestamp,
   formatExpirationForCookie,
 } from '@/lib/services/token-service';
 import { REFRESH_NEEDED_HEADER } from '@/proxy';
+import {
+  AUTH_BACKEND_COOKIE,
+  getCookieNamesForBackend,
+  resolveBackend,
+} from '@/lib/auth/backend-context';
 
 const log = createLogger('bff-proxy');
 
@@ -312,28 +316,30 @@ async function attemptTokenRefresh(
  */
 function storeTokensInResponse(
   response: NextResponse,
+  backend: BackendType,
   accessToken: string,
   refreshToken: string,
   expiresIn: number
 ): void {
+  const cookieNames = getCookieNamesForBackend(backend);
   const actualExpiresIn = Math.max(0, expiresIn);
 
   // Store access token
-  response.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, accessToken, {
+  response.cookies.set(cookieNames.accessToken, accessToken, {
     ...COOKIE_CONFIG,
     maxAge: actualExpiresIn,
   });
 
   // Store expiration for client UX
   const expiresAt = calculateExpirationTimestamp(actualExpiresIn);
-  response.cookies.set(COOKIE_NAMES.TOKEN_EXPIRES_AT, formatExpirationForCookie(expiresAt), {
+  response.cookies.set(cookieNames.tokenExpiresAt, formatExpirationForCookie(expiresAt), {
     ...COOKIE_CONFIG,
     httpOnly: false,
     maxAge: actualExpiresIn,
   });
 
   // Store refresh token
-  response.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, refreshToken, {
+  response.cookies.set(cookieNames.refreshToken, refreshToken, {
     ...COOKIE_CONFIG,
     maxAge: TOKEN_CONFIG.REFRESH_TOKEN_MAX_AGE,
   });
@@ -342,10 +348,12 @@ function storeTokensInResponse(
 /**
  * Clear auth cookies on logout or invalid refresh
  */
-function clearAuthCookies(response: NextResponse): void {
-  response.cookies.delete(COOKIE_NAMES.ACCESS_TOKEN);
-  response.cookies.delete(COOKIE_NAMES.REFRESH_TOKEN);
-  response.cookies.delete(COOKIE_NAMES.TOKEN_EXPIRES_AT);
+function clearAuthCookies(response: NextResponse, backend: BackendType): void {
+  const cookieNames = getCookieNamesForBackend(backend);
+
+  response.cookies.delete(cookieNames.accessToken);
+  response.cookies.delete(cookieNames.refreshToken);
+  response.cookies.delete(cookieNames.tokenExpiresAt);
 }
 
 /**
@@ -356,8 +364,9 @@ async function proxyRequest(
   method: string,
   paramsPromise: RouteParams['params']
 ): Promise<NextResponse> {
-  const config = getProxyConfig();
-  const backend = getBackendType();
+  const cookieStore = await cookies();
+  const backend = resolveBackend(cookieStore.get(AUTH_BACKEND_COOKIE)?.value);
+  const config = getProxyConfig(backend);
   const requestId = getRequestId(request);
 
   try {
@@ -398,9 +407,9 @@ async function proxyRequest(
     );
 
     // Get tokens from cookies
-    const cookieStore = await cookies();
-    let authToken = cookieStore.get(COOKIE_NAMES.ACCESS_TOKEN)?.value;
-    const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
+    const cookieNames = getCookieNamesForBackend(backend);
+    let authToken = cookieStore.get(cookieNames.accessToken)?.value;
+    const refreshToken = cookieStore.get(cookieNames.refreshToken)?.value;
     let proactivelyRefreshedTokens:
       | { accessToken: string; refreshToken: string; expiresIn: number }
       | null = null;
@@ -502,6 +511,7 @@ async function proxyRequest(
         const nextResponse = await buildResponse(response, responseData, backend, requestId);
         storeTokensInResponse(
           nextResponse,
+          backend,
           newTokens.accessToken,
           newTokens.refreshToken,
           newTokens.expiresIn
@@ -528,7 +538,7 @@ async function proxyRequest(
           },
         }
       );
-      clearAuthCookies(nextResponse);
+      clearAuthCookies(nextResponse, backend);
       return nextResponse;
     }
 
@@ -539,6 +549,7 @@ async function proxyRequest(
     if (proactivelyRefreshedTokens) {
       storeTokensInResponse(
         nextResponse,
+        backend,
         proactivelyRefreshedTokens.accessToken,
         proactivelyRefreshedTokens.refreshToken,
         proactivelyRefreshedTokens.expiresIn
@@ -575,7 +586,7 @@ async function proxyRequest(
 async function buildResponse(
   response: Response,
   responseData: string,
-  backend: string,
+  backend: BackendType,
   requestId: string
 ): Promise<NextResponse> {
   // Get response cookies
@@ -609,6 +620,7 @@ async function buildResponse(
     let accessToken: string | undefined;
     let refreshTokenFromResponse: string | undefined;
     let expiresIn: number | undefined;
+    const cookieNames = getCookieNamesForBackend(backend);
 
     // Extract token based on backend format
     if (backend === 'laravel') {
@@ -630,15 +642,14 @@ async function buildResponse(
         expiresIn || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE
       );
 
-      // Set access token cookie
-      nextResponse.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, accessToken, {
+      nextResponse.cookies.set(cookieNames.accessToken, accessToken, {
         ...COOKIE_CONFIG,
         maxAge: tokenMaxAge,
       });
 
       // Set expiration cookie for client UX
       const expiresAt = calculateExpirationTimestamp(tokenMaxAge);
-      nextResponse.cookies.set(COOKIE_NAMES.TOKEN_EXPIRES_AT, formatExpirationForCookie(expiresAt), {
+      nextResponse.cookies.set(cookieNames.tokenExpiresAt, formatExpirationForCookie(expiresAt), {
         ...COOKIE_CONFIG,
         httpOnly: false,
         maxAge: tokenMaxAge,
@@ -647,7 +658,7 @@ async function buildResponse(
 
     // Handle refresh token if present
     if (refreshTokenFromResponse) {
-      nextResponse.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, refreshTokenFromResponse, {
+      nextResponse.cookies.set(cookieNames.refreshToken, refreshTokenFromResponse, {
         ...COOKIE_CONFIG,
         maxAge: TOKEN_CONFIG.REFRESH_TOKEN_MAX_AGE,
       });

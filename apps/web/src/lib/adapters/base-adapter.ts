@@ -17,12 +17,16 @@ import type {
 } from './types';
 import {
   TOKEN_CONFIG,
-  COOKIE_NAMES as TOKEN_COOKIE_NAMES,
   calculateExpirationTimestamp,
   formatExpirationForCookie,
 } from '../services/token-service';
 import { AdapterError } from './errors';
 import { apiRequestJson } from '../http/api-request';
+import {
+  AUTH_BACKEND_COOKIE,
+  getCookieNamesForBackend,
+  resolveBackend,
+} from '@/lib/auth/backend-context';
 
 // Re-export AdapterError for backwards compatibility
 export { AdapterError } from './errors';
@@ -36,10 +40,9 @@ const BASE_COOKIE_CONFIG = {
   path: '/',
 };
 
-/**
- * Cookie names - re-exported from token service for convenience
- */
-export const COOKIE_NAMES = TOKEN_COOKIE_NAMES;
+export const COOKIE_NAMES = {
+  BACKEND: AUTH_BACKEND_COOKIE,
+};
 
 /**
  * Default request timeout in milliseconds
@@ -125,13 +128,14 @@ export abstract class BaseAdapter implements AuthAdapter {
    */
   async storeTokens(tokens: TokenStorage): Promise<void> {
     const cookieStore = await cookies();
+    const cookieNames = await this.getCookieNames();
 
     const expiresIn = tokens.expires_in || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE;
 
     // Store access token (HttpOnly, 1h max-age)
     if (tokens.access_token) {
       cookieStore.set({
-        name: COOKIE_NAMES.ACCESS_TOKEN,
+        name: cookieNames.accessToken,
         value: tokens.access_token,
         ...BASE_COOKIE_CONFIG,
         httpOnly: true,
@@ -141,7 +145,7 @@ export abstract class BaseAdapter implements AuthAdapter {
       // Store expiration timestamp (non-HttpOnly for client UX)
       const expiresAt = calculateExpirationTimestamp(expiresIn);
       cookieStore.set({
-        name: COOKIE_NAMES.TOKEN_EXPIRES_AT,
+        name: cookieNames.tokenExpiresAt,
         value: formatExpirationForCookie(expiresAt),
         ...BASE_COOKIE_CONFIG,
         httpOnly: false, // Client can read this for UX
@@ -152,7 +156,7 @@ export abstract class BaseAdapter implements AuthAdapter {
     // Store refresh token if present (HttpOnly, 30 days)
     if (tokens.refresh_token) {
       cookieStore.set({
-        name: COOKIE_NAMES.REFRESH_TOKEN,
+        name: cookieNames.refreshToken,
         value: tokens.refresh_token,
         ...BASE_COOKIE_CONFIG,
         httpOnly: true,
@@ -166,9 +170,11 @@ export abstract class BaseAdapter implements AuthAdapter {
    */
   async clearTokens(): Promise<void> {
     const cookieStore = await cookies();
-    cookieStore.delete(COOKIE_NAMES.ACCESS_TOKEN);
-    cookieStore.delete(COOKIE_NAMES.REFRESH_TOKEN);
-    cookieStore.delete(COOKIE_NAMES.TOKEN_EXPIRES_AT);
+    const cookieNames = await this.getCookieNames();
+
+    cookieStore.delete(cookieNames.accessToken);
+    cookieStore.delete(cookieNames.refreshToken);
+    cookieStore.delete(cookieNames.tokenExpiresAt);
   }
 
   /**
@@ -176,7 +182,8 @@ export abstract class BaseAdapter implements AuthAdapter {
    */
   async getAccessToken(): Promise<string | null> {
     const cookieStore = await cookies();
-    const token = cookieStore.get(COOKIE_NAMES.ACCESS_TOKEN);
+    const cookieNames = await this.getCookieNames();
+    const token = cookieStore.get(cookieNames.accessToken);
     return token?.value ?? null;
   }
 
@@ -185,8 +192,16 @@ export abstract class BaseAdapter implements AuthAdapter {
    */
   protected async getRefreshToken(): Promise<string | null> {
     const cookieStore = await cookies();
-    const token = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN);
+    const cookieNames = await this.getCookieNames();
+    const token = cookieStore.get(cookieNames.refreshToken);
     return token?.value ?? null;
+  }
+
+  protected async getCookieNames() {
+    const cookieStore = await cookies();
+    const backend = resolveBackend(cookieStore.get(AUTH_BACKEND_COOKIE)?.value);
+
+    return getCookieNamesForBackend(backend);
   }
 
   // Abstract methods to be implemented by each adapter

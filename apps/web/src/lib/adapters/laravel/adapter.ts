@@ -11,28 +11,33 @@ import type {
   RefreshTokenRequest,
   AuthResponse,
   NormalizedUser,
-} from '../types';
-import { BaseAdapter, AdapterError } from '../base-adapter';
-import { generateSignature, BFF_SECRET, BFF_ID } from '../../security/hmac';
-import { apiRequestJson } from '../../http/api-request';
+} from "../types";
+import { BaseAdapter, AdapterError } from "../base-adapter";
+import { generateSignature, BFF_SECRET, BFF_ID } from "../../security/hmac";
+import { apiRequestJson } from "../../http/api-request";
 import {
   transformAuthResponse,
   transformMeResponse,
   transformOAuthProviders,
   transformOAuthRedirect,
-} from './transformer';
+} from "./transformer";
 
 /**
- * Laravel API endpoints
+ * Laravel API endpoints (BetterAuth)
  */
 const ENDPOINTS = {
-  LOGIN: '/api/v1/auth/login',
-  REGISTER: '/api/v1/auth/register',
-  LOGOUT: '/api/v1/auth/logout',
-  REFRESH: '/api/v1/auth/refresh',
-  ME: '/api/v1/me',
-  OAUTH_PROVIDERS: '/api/v1/auth/providers',
-  OAUTH_REDIRECT: (provider: string) => `/api/v1/auth/${provider}/redirect`,
+  LOGIN: "/api/auth/login",
+  REGISTER: "/api/auth/register",
+  LOGOUT: "/api/auth/logout",
+  REFRESH: "/api/auth/refresh",
+  ME: "/api/auth/me",
+  OAUTH_PROVIDERS: "/api/auth/oauth/providers",
+  OAUTH_REDIRECT: (provider: string) => `/api/auth/oauth/${provider}`,
+  TWO_FACTOR_STATUS: "/api/auth/2fa/status",
+  TWO_FACTOR_SETUP: "/api/auth/2fa/setup",
+  TWO_FACTOR_VERIFY: "/api/auth/2fa/verify",
+  TWO_FACTOR_DISABLE: "/api/auth/2fa/disable",
+  MAGIC_LINK: "/api/auth/magic-link",
 };
 
 /**
@@ -53,7 +58,7 @@ export class LaravelAdapter extends BaseAdapter {
 
   constructor(config: Partial<LaravelAdapterConfig> = {}) {
     const fullConfig: LaravelAdapterConfig = {
-      baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8000',
+      baseUrl: process.env.LARAVEL_API_URL || "http://localhost:8000",
       timeout: 30000,
       secret: config.secret || BFF_SECRET,
       bffId: config.bffId || BFF_ID,
@@ -73,17 +78,21 @@ export class LaravelAdapter extends BaseAdapter {
       body?: unknown;
       headers?: Record<string, string>;
       includeAuth?: boolean;
-    } = {}
+    } = {},
   ): Promise<T> {
     const { body, headers = {}, includeAuth = true } = options;
 
     // Generate HMAC signature
-    const { normalizedBody, ...hmacHeaders } = generateSignature(method, path, body);
+    const { normalizedBody, ...hmacHeaders } = generateSignature(
+      method,
+      path,
+      body,
+    );
 
     const url = `${this.config.baseUrl}${path}`;
     const requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
       ...hmacHeaders,
       ...headers,
     };
@@ -92,7 +101,7 @@ export class LaravelAdapter extends BaseAdapter {
     if (includeAuth) {
       const token = await this.getAccessToken();
       if (token) {
-        requestHeaders['Authorization'] = `Bearer ${token}`;
+        requestHeaders["Authorization"] = `Bearer ${token}`;
       }
     }
 
@@ -116,8 +125,13 @@ export class LaravelAdapter extends BaseAdapter {
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     const response = await this.makeRequest<{
-      data: { user: unknown; access_token: string; token_type?: string; expires_in?: number };
-    }>('POST', ENDPOINTS.LOGIN, {
+      data: {
+        user: unknown;
+        access_token: string;
+        token_type?: string;
+        expires_in?: number;
+      };
+    }>("POST", ENDPOINTS.LOGIN, {
       body: credentials,
       includeAuth: false,
     });
@@ -135,8 +149,13 @@ export class LaravelAdapter extends BaseAdapter {
    */
   async register(data: RegisterRequest): Promise<AuthResponse> {
     const response = await this.makeRequest<{
-      data: { user: unknown; access_token: string; token_type?: string; expires_in?: number };
-    }>('POST', ENDPOINTS.REGISTER, {
+      data: {
+        user: unknown;
+        access_token: string;
+        token_type?: string;
+        expires_in?: number;
+      };
+    }>("POST", ENDPOINTS.REGISTER, {
       body: data,
       includeAuth: false,
     });
@@ -154,7 +173,7 @@ export class LaravelAdapter extends BaseAdapter {
    */
   async logout(): Promise<void> {
     try {
-      await this.makeRequest('POST', ENDPOINTS.LOGOUT);
+      await this.makeRequest("POST", ENDPOINTS.LOGOUT);
     } finally {
       // Always clear tokens, even if the request fails
       await this.clearTokens();
@@ -165,11 +184,17 @@ export class LaravelAdapter extends BaseAdapter {
    * Refresh the access token
    */
   async refresh(request?: RefreshTokenRequest): Promise<AuthResponse> {
-    const refreshToken = request?.refresh_token || (await this.getRefreshToken());
+    const refreshToken =
+      request?.refresh_token || (await this.getRefreshToken());
 
     const response = await this.makeRequest<{
-      data: { user: unknown; access_token: string; token_type?: string; expires_in?: number };
-    }>('POST', ENDPOINTS.REFRESH, {
+      data: {
+        user: unknown;
+        access_token: string;
+        token_type?: string;
+        expires_in?: number;
+      };
+    }>("POST", ENDPOINTS.REFRESH, {
       body: refreshToken ? { refresh_token: refreshToken } : undefined,
     });
 
@@ -186,7 +211,10 @@ export class LaravelAdapter extends BaseAdapter {
    */
   async getUser(): Promise<NormalizedUser | null> {
     try {
-      const response = await this.makeRequest<{ data: unknown }>('GET', ENDPOINTS.ME);
+      const response = await this.makeRequest<{ data: unknown }>(
+        "GET",
+        ENDPOINTS.ME,
+      );
       return transformMeResponse(response as never);
     } catch (error) {
       if (error instanceof AdapterError) {
@@ -204,9 +232,9 @@ export class LaravelAdapter extends BaseAdapter {
    */
   async getOAuthProviders(): Promise<string[]> {
     const response = await this.makeRequest<{ data: string[] }>(
-      'GET',
+      "GET",
       ENDPOINTS.OAUTH_PROVIDERS,
-      { includeAuth: false }
+      { includeAuth: false },
     );
     return transformOAuthProviders(response);
   }
@@ -216,10 +244,17 @@ export class LaravelAdapter extends BaseAdapter {
    */
   async getOAuthUrl(provider: string): Promise<string> {
     const response = await this.makeRequest<{ data: { redirect_url: string } }>(
-      'GET',
+      "GET",
       ENDPOINTS.OAUTH_REDIRECT(provider),
-      { includeAuth: false }
+      { includeAuth: false },
     );
     return transformOAuthRedirect(response);
+  }
+
+  async sendMagicLink(email: string): Promise<void> {
+    await this.makeRequest('POST', ENDPOINTS.MAGIC_LINK, {
+      body: { email },
+      includeAuth: false,
+    });
   }
 }

@@ -1,29 +1,29 @@
 /**
  * Server Actions for authentication
- *
- * These actions use the adapter pattern to communicate with the configured backend
- * (Laravel, Symfony, or Node.js). The backend is determined by AUTH_BACKEND env var.
- *
- * Authentication uses HttpOnly cookies for secure token storage.
  */
 
 'use server';
 
 import type { User, LoginCredentials, RegisterData, AuthTokens, ApiResponse } from '@rbac/types';
+import { cookies } from 'next/headers';
 import { getAuthAdapter, toUser, AdapterError } from '../../adapters';
 import { createLogger } from '@/lib/logger';
 import { AuthActionError, throwAuthError } from '../_shared/errors';
+import { AUTH_BACKEND_COOKIE, resolveBackend } from '@/lib/auth/backend-context';
 
 const log = createLogger('auth');
 
-/**
- * Register a new user
- */
+async function getCurrentBackend() {
+  const cookieStore = await cookies();
+  return resolveBackend(cookieStore.get(AUTH_BACKEND_COOKIE)?.value);
+}
+
 export async function registerAction(
   data: RegisterData
 ): Promise<ApiResponse<{ user: User; access_token: string }>> {
   try {
-    const adapter = getAuthAdapter();
+    const backend = await getCurrentBackend();
+    const adapter = getAuthAdapter(backend);
     const response = await adapter.register({
       name: data.name,
       email: data.email,
@@ -42,14 +42,12 @@ export async function registerAction(
   }
 }
 
-/**
- * Log in a user
- */
 export async function loginAction(
   credentials: LoginCredentials
 ): Promise<ApiResponse<{ user: User; access_token: string }>> {
   try {
-    const adapter = getAuthAdapter();
+    const backend = await getCurrentBackend();
+    const adapter = getAuthAdapter(backend);
     const response = await adapter.login({
       email: credentials.email,
       password: credentials.password,
@@ -66,30 +64,27 @@ export async function loginAction(
   }
 }
 
-/**
- * Log out
- */
 export async function logoutAction(): Promise<void> {
+  const backend = await getCurrentBackend();
+
   try {
-    const adapter = getAuthAdapter();
+    const adapter = getAuthAdapter(backend);
     await adapter.logout();
   } catch (error) {
-    // Log but don't throw - we still want to clear local state
     log.error('Logout error', {
       error: error instanceof Error ? error.message : 'Unknown error',
+      backend,
     });
-    // Ensure tokens are cleared even on error
-    const adapter = getAuthAdapter();
+
+    const adapter = getAuthAdapter(backend);
     await adapter.clearTokens();
   }
 }
 
-/**
- * Refresh token
- */
 export async function refreshTokenAction(): Promise<ApiResponse<AuthTokens>> {
   try {
-    const adapter = getAuthAdapter();
+    const backend = await getCurrentBackend();
+    const adapter = getAuthAdapter(backend);
     const response = await adapter.refresh();
 
     return {
@@ -105,15 +100,10 @@ export async function refreshTokenAction(): Promise<ApiResponse<AuthTokens>> {
   }
 }
 
-/**
- * Get current user
- *
- * Note: Returns null if user is not logged in
- * (rather than throwing an error)
- */
 export async function getCurrentUserAction(): Promise<User | null> {
   try {
-    const adapter = getAuthAdapter();
+    const backend = await getCurrentBackend();
+    const adapter = getAuthAdapter(backend);
     const user = await adapter.getUser();
 
     if (!user) {
@@ -122,22 +112,20 @@ export async function getCurrentUserAction(): Promise<User | null> {
 
     return toUser(user);
   } catch (error) {
-    // If adapter throws for auth issues, return null
     if (error instanceof AdapterError) {
       if (error.statusCode === 401 || error.statusCode === 403) {
         return null;
       }
     }
+
     throw error;
   }
 }
 
-/**
- * Get list of OAuth providers
- */
 export async function getOAuthProvidersAction(): Promise<ApiResponse<string[]>> {
   try {
-    const adapter = getAuthAdapter();
+    const backend = await getCurrentBackend();
+    const adapter = getAuthAdapter(backend);
     const providers = await adapter.getOAuthProviders();
 
     return {
@@ -148,12 +136,10 @@ export async function getOAuthProvidersAction(): Promise<ApiResponse<string[]>> 
   }
 }
 
-/**
- * Get OAuth redirect URL
- */
 export async function getOAuthUrlAction(provider: string): Promise<{ url: string }> {
   try {
-    const adapter = getAuthAdapter();
+    const backend = await getCurrentBackend();
+    const adapter = getAuthAdapter(backend);
     const url = await adapter.getOAuthUrl(provider);
 
     return { url };
@@ -162,5 +148,33 @@ export async function getOAuthUrlAction(provider: string): Promise<{ url: string
   }
 }
 
-// Re-export error class for external use
+export async function sendMagicLinkAction(email: string): Promise<ApiResponse<{ message: string }>> {
+  try {
+    const backend = await getCurrentBackend();
+
+    if (backend !== 'laravel') {
+      throw new AuthActionError(
+        'Magic link is only available on Laravel backend',
+        400,
+        'MAGIC_LINK_UNSUPPORTED'
+      );
+    }
+
+    const adapter = getAuthAdapter(backend);
+    if (!adapter.sendMagicLink) {
+      throw new AuthActionError('Magic link is not available for this backend', 400, 'MAGIC_LINK_UNSUPPORTED');
+    }
+
+    await adapter.sendMagicLink(email);
+
+    return {
+      data: {
+        message: 'Magic link sent successfully',
+      },
+    };
+  } catch (error) {
+    throwAuthError(error);
+  }
+}
+
 export { AuthActionError };

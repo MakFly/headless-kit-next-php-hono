@@ -132,6 +132,11 @@ export type AuthAdapter = {
   getOAuthUrl(provider: string): Promise<string>;
 
   /**
+   * Send magic link email (optional, backend dependent)
+   */
+  sendMagicLink?(email: string): Promise<void>;
+
+  /**
    * Store tokens in HttpOnly cookies
    */
   storeTokens(tokens: TokenStorage): Promise<void>;

@@ -16,10 +16,11 @@ import { Separator } from "@/components/ui/separator"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login, loginWithOAuth, isLoading, error, clearError } = useAuthStore()
+  const { login, loginWithOAuth, loginWithMagicLink, isLoading, error, clearError } = useAuthStore()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isMagicLinkSubmitting, setIsMagicLinkSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,6 +44,31 @@ export default function LoginPage() {
   const handleOAuth = (provider: "google" | "github") => {
     clearError()
     loginWithOAuth(provider)
+  }
+
+  const handleMagicLink = async () => {
+    clearError()
+
+    if (!email) {
+      toast.error("Email required", {
+        description: "Enter your email first to receive a magic link.",
+      })
+      return
+    }
+
+    setIsMagicLinkSubmitting(true)
+    try {
+      await loginWithMagicLink(email)
+      toast.success("Magic link sent", {
+        description: "Check your inbox and open the login link.",
+      })
+    } catch {
+      toast.error("Magic link failed", {
+        description: error || "Magic link is unavailable for this backend.",
+      })
+    } finally {
+      setIsMagicLinkSubmitting(false)
+    }
   }
 
   // Effacer l'erreur quand l'utilisateur commence à taper
@@ -119,6 +145,16 @@ export default function LoginPage() {
               GitHub
             </Button>
           </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full hover:bg-violet-50 hover:border-violet-200 transition-all"
+            disabled={isMagicLinkSubmitting || isLoading}
+            onClick={handleMagicLink}
+          >
+            {isMagicLinkSubmitting ? "Sending magic link..." : "Send magic link"}
+          </Button>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -269,6 +305,11 @@ export default function LoginPage() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4 pb-8">
+          <div className="text-xs text-muted-foreground text-center">
+            Backend context: <Link href="/laravel" className="text-red-600 hover:underline">Laravel</Link> ·{' '}
+            <Link href="/symfony" className="text-violet-600 hover:underline">Symfony</Link> ·{' '}
+            <Link href="/hono" className="text-emerald-600 hover:underline">Hono</Link>
+          </div>
           <div className="text-sm text-center text-muted-foreground">
             Don't have an account?{" "}
             <Link href="/auth/register" className="text-violet-600 hover:text-violet-700 font-medium">

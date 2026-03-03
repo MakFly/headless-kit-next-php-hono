@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createEdgeLogger } from "@/lib/logger/edge";
+import {
+  AUTH_BACKEND_COOKIE,
+  getCookieNamesForBackend,
+  normalizeBackend,
+  resolveBackend,
+} from "@/lib/auth/backend-context";
 
 const log = createEdgeLogger("middleware");
 
@@ -25,11 +31,12 @@ export const REFRESH_NEEDED_HEADER = "x-bff-refresh-needed";
  * Note: We can't import from @/lib/config/env in Edge runtime,
  * so we read process.env directly here. Keep in sync with env.ts.
  */
-const COOKIE_NAMES = {
-  ACCESS_TOKEN: process.env.AUTH_COOKIE_NAME || "auth_token",
-  REFRESH_TOKEN: process.env.REFRESH_COOKIE_NAME || "refresh_token",
-  TOKEN_EXPIRES_AT: process.env.TOKEN_EXPIRES_COOKIE_NAME || "token_expires_at",
-} as const;
+function getBackendFromPath(pathname: string): "laravel" | "symfony" | "node" | null {
+  if (pathname.startsWith("/laravel")) return "laravel";
+  if (pathname.startsWith("/symfony")) return "symfony";
+  if (pathname.startsWith("/hono")) return "node";
+  return null;
+}
 
 // Routes that require authentication
 const protectedRoutes = ["/dashboard"];
@@ -38,7 +45,7 @@ const protectedRoutes = ["/dashboard"];
 const authRoutes = ["/auth/login", "/auth/register"];
 
 // API routes that should check for proactive refresh
-const apiRoutes = ["/api/v1/"];
+const apiRoutes = ["/api/v1/", "/api/auth/"];
 
 /**
  * Decode JWT payload without signature verification (Edge-compatible).
@@ -78,7 +85,9 @@ function shouldRefreshProactively(token: string): boolean {
   const remainingSeconds = payload.exp - now;
 
   // Refresh if less than threshold remaining (but not expired)
-  return remainingSeconds > 0 && remainingSeconds < TOKEN_CONFIG.REFRESH_THRESHOLD;
+  return (
+    remainingSeconds > 0 && remainingSeconds < TOKEN_CONFIG.REFRESH_THRESHOLD
+  );
 }
 
 /**
@@ -93,9 +102,28 @@ function isTokenExpired(token: string): boolean {
 }
 
 export function proxy(request: NextRequest) {
-  const token = request.cookies.get(COOKIE_NAMES.ACCESS_TOKEN)?.value;
-  const refreshToken = request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
   const { pathname } = request.nextUrl;
+  const backendFromPath = getBackendFromPath(pathname);
+  const backendFromCookie = normalizeBackend(
+    request.cookies.get(AUTH_BACKEND_COOKIE)?.value,
+  );
+  const activeBackend = backendFromPath || resolveBackend(backendFromCookie);
+  const cookieNames = getCookieNamesForBackend(activeBackend);
+  const token = request.cookies.get(cookieNames.accessToken)?.value;
+  const refreshToken = request.cookies.get(cookieNames.refreshToken)?.value;
+
+  const attachBackendCookie = (response: NextResponse): NextResponse => {
+    if (backendFromPath) {
+      response.cookies.set(AUTH_BACKEND_COOKIE, backendFromPath, {
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+      });
+    }
+
+    return response;
+  };
 
   // For API routes, check if proactive refresh is needed
   if (apiRoutes.some((route) => pathname.startsWith(route))) {
@@ -106,7 +134,7 @@ export function proxy(request: NextRequest) {
       if (shouldRefreshProactively(token)) {
         log.info("Token needs proactive refresh", {
           pathname,
-          hasRefreshToken: !!refreshToken
+          hasRefreshToken: !!refreshToken,
         });
         // Signal to route handler that refresh is needed
         response.headers.set(REFRESH_NEEDED_HEADER, "true");
@@ -119,7 +147,7 @@ export function proxy(request: NextRequest) {
       }
     }
 
-    return response;
+    return attachBackendCookie(response);
   }
 
   // Check if trying to access protected route without token
@@ -128,19 +156,21 @@ export function proxy(request: NextRequest) {
       log.info("Redirecting unauthenticated user to login", { pathname });
       const loginUrl = new URL("/auth/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
+      return attachBackendCookie(NextResponse.redirect(loginUrl));
     }
 
     // If token is expired and no refresh token, redirect to login
     if (isTokenExpired(token) && !refreshToken) {
-      log.info("Token expired without refresh token, redirecting to login", { pathname });
+      log.info("Token expired without refresh token, redirecting to login", {
+        pathname,
+      });
       const loginUrl = new URL("/auth/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       const response = NextResponse.redirect(loginUrl);
       // Clear invalid token
-      response.cookies.delete(COOKIE_NAMES.ACCESS_TOKEN);
-      response.cookies.delete(COOKIE_NAMES.TOKEN_EXPIRES_AT);
-      return response;
+      response.cookies.delete(cookieNames.accessToken);
+      response.cookies.delete(cookieNames.tokenExpiresAt);
+      return attachBackendCookie(response);
     }
   }
 
@@ -148,11 +178,11 @@ export function proxy(request: NextRequest) {
   if (authRoutes.some((route) => pathname.startsWith(route))) {
     if (token && !isTokenExpired(token)) {
       log.debug("Redirecting authenticated user from auth page", { pathname });
-      return NextResponse.redirect(new URL("/", request.url));
+      return attachBackendCookie(NextResponse.redirect(new URL("/", request.url)));
     }
   }
 
-  return NextResponse.next();
+  return attachBackendCookie(NextResponse.next());
 }
 
 export const config = {
@@ -160,5 +190,8 @@ export const config = {
     "/dashboard/:path*",
     "/auth/:path*",
     "/api/v1/:path*",
+    "/laravel/:path*",
+    "/symfony/:path*",
+    "/hono/:path*",
   ],
 };

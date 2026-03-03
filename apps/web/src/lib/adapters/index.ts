@@ -14,6 +14,7 @@ import type { AuthAdapter, BackendType, AdapterConfig } from './types';
 import { LaravelAdapter } from './laravel';
 import { SymfonyAdapter } from './symfony';
 import { NodeAdapter } from './node';
+import { getDefaultBackend, normalizeBackend } from '@/lib/auth/backend-context';
 
 // Re-export types
 export type { AuthAdapter, BackendType, AdapterConfig } from './types';
@@ -48,9 +49,9 @@ export {
  * Get the configured backend type from environment
  */
 export function getBackendType(): BackendType {
-  const backend = process.env.AUTH_BACKEND || 'laravel';
+  const backend = normalizeBackend(process.env.AUTH_BACKEND);
 
-  if (backend !== 'laravel' && backend !== 'symfony' && backend !== 'node') {
+  if (!backend) {
     console.warn(`Unknown AUTH_BACKEND "${backend}", defaulting to "laravel"`);
     return 'laravel';
   }
@@ -86,8 +87,7 @@ export function getAdapterConfig(backend: BackendType): Partial<AdapterConfig> {
 /**
  * Singleton adapter instance
  */
-let adapterInstance: AuthAdapter | null = null;
-let lastBackendType: BackendType | null = null;
+const adapterInstances: Partial<Record<BackendType, AuthAdapter>> = {};
 
 /**
  * Get the auth adapter for the configured backend
@@ -103,32 +103,31 @@ let lastBackendType: BackendType | null = null;
  * const user = await adapter.getUser();
  * ```
  */
-export function getAuthAdapter(): AuthAdapter {
-  const backendType = getBackendType();
+export function getAuthAdapter(backendOverride?: BackendType): AuthAdapter {
+  const backendType = backendOverride ?? getDefaultBackend();
 
-  // Return cached instance if backend hasn't changed
-  if (adapterInstance && lastBackendType === backendType) {
-    return adapterInstance;
+  const cachedAdapter = adapterInstances[backendType];
+  if (cachedAdapter) {
+    return cachedAdapter;
   }
 
   const config = getAdapterConfig(backendType);
 
   switch (backendType) {
     case 'laravel':
-      adapterInstance = new LaravelAdapter(config);
+      adapterInstances[backendType] = new LaravelAdapter(config);
       break;
 
     case 'symfony':
-      adapterInstance = new SymfonyAdapter(config);
+      adapterInstances[backendType] = new SymfonyAdapter(config);
       break;
 
     case 'node':
-      adapterInstance = new NodeAdapter(config);
+      adapterInstances[backendType] = new NodeAdapter(config);
       break;
   }
 
-  lastBackendType = backendType;
-  return adapterInstance;
+  return adapterInstances[backendType] as AuthAdapter;
 }
 
 /**
@@ -161,6 +160,7 @@ export function createAdapter(
  * Reset the adapter singleton (for testing)
  */
 export function resetAdapter(): void {
-  adapterInstance = null;
-  lastBackendType = null;
+  delete adapterInstances.laravel;
+  delete adapterInstances.symfony;
+  delete adapterInstances.node;
 }

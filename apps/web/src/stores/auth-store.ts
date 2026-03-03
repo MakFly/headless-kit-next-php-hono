@@ -7,6 +7,7 @@ import {
   logoutAction,
   getCurrentUserAction,
   getOAuthUrlAction,
+  sendMagicLinkAction,
 } from '@/lib/actions/auth';
 import type { LoginCredentials, RegisterData, OAuthProvider } from '@rbac/types';
 
@@ -24,6 +25,7 @@ type AuthState = {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   loginWithOAuth: (provider: OAuthProvider) => Promise<void>;
+  loginWithMagicLink: (email: string) => Promise<void>;
   clearError: () => void;
 
   // Computed
@@ -97,6 +99,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       window.location.href = url;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'OAuth redirect failed';
+      set({ error: message });
+      throw err;
+    }
+  },
+
+  loginWithMagicLink: async (email) => {
+    try {
+      await sendMagicLinkAction(email);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Magic link failed';
       set({ error: message });
       throw err;
     }

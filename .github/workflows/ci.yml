@@ -174,5 +174,8 @@ jobs:
       - name: Install Composer dependencies
         run: cd apps/api-sf && composer install --no-interaction --prefer-dist
 
+      - name: Run migrations
+        run: cd apps/api-sf && php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
       - name: Run tests
         run: cd apps/api-sf && php bin/phpunit

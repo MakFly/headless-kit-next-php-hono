@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven/setup-bun@v2
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
@@ -37,41 +37,6 @@ jobs:
       - name: Lint (Turborepo)
         run: bun run lint
 
-      - name: Typecheck packages/core
-        run: cd packages/core && bunx tsc --noEmit
-
-      - name: Typecheck packages/bff-nextjs
-        run: cd packages/bff-nextjs && bunx tsc --noEmit
-
-      - name: Typecheck packages/types
-        run: cd packages/types && bunx tsc --noEmit
-
-  test-core:
-    name: Test — @headless/core
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Cache Bun dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Run tests
-        run: cd packages/core && bun test
-
   test-cli:
     name: Test — create-headless-app
     runs-on: ubuntu-latest
@@ -80,7 +45,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven/setup-bun@v2
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
@@ -106,7 +71,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven/setup-bun@v2
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
@@ -131,10 +96,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PHP 8.3
+      - name: Setup PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: "8.4"
           extensions: pdo_sqlite, mbstring, xml
           coverage: none
 
@@ -165,10 +130,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PHP 8.3
+      - name: Setup PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: "8.4"
           extensions: pdo_sqlite, mbstring, xml, intl
           coverage: none
 

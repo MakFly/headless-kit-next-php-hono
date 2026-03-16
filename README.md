@@ -1,335 +1,206 @@
-# Laravel + Next.js RBAC
+# Headless Kit
 
-A secure, production-ready RBAC (Role-Based Access Control) system using a **BFF (Backend For Frontend)** architecture with Laravel API and Next.js frontend.
+A multi-backend headless starter kit with a **BFF (Backend For Frontend)** architecture. Pick your frontend, pick your backend — everything communicates through a secure BFF proxy.
+
+```
+Browser ──→ Next.js BFF (port 3001) ──→ Laravel API  (port 8000)
+                                    ──→ Symfony API  (port 8002)
+                                    ──→ Hono API     (port 8003)
+
+Browser ──→ TanStack Start (port 3003) ──→ (same backends)
+```
 
 ## Architecture
 
-This project implements a BFF pattern where Next.js acts as an intermediary between the browser and Laravel API:
+The frontend **never contacts backends directly**. All requests go through BFF Route Handlers (`/api/v1/*`) that handle:
 
-```
-┌─────────┐       ┌─────────────┐       ┌────────────┐
-│ Browser │──────▶│  Next.js    │──────▶│  Laravel   │
-│         │◀──────│  (BFF)      │◀──────│    API     │
-└─────────┘       └─────────────┘       └────────────┘
-                          │
-                          ├─ HMAC Signing
-                          ├─ Cookie Management
-                          └─ Route Proxying
-```
-
-### Key Benefits
-
-- **Security**: HMAC-signed requests prevent request forgery between BFF and API
-- **No CORS Issues**: Server-to-server communication eliminates browser CORS restrictions
-- **HttpOnly Cookies**: Authentication tokens stored securely, inaccessible to XSS attacks
-- **Type Safety**: Full TypeScript support across the stack
-- **Monorepo**: Unified development experience with Turbo
+- **HMAC signing** — requests are signed with a shared secret to prevent forgery
+- **Cookie management** — auth tokens stored in HttpOnly cookies (XSS-safe)
+- **Token refresh** — proactive (Edge middleware) and reactive (on 401) refresh
+- **Path transformation** — BFF paths mapped to backend-specific routes
+- **CSRF protection** — Origin/Referer validation on mutating methods
 
 ## Tech Stack
 
-| Component | Technology |
-|-----------|------------|
-| **Monorepo** | Turbo + Bun |
-| **Frontend** | Next.js 15 (App Router) + React 19 + TypeScript |
-| **Backend** | Laravel 11 + Sanctum |
-| **UI** | Radix UI + Tailwind CSS + Lucide React |
-| **Security** | HMAC-SHA256 signing |
+| Layer | Technology |
+|-------|------------|
+| **Monorepo** | Turborepo + Bun workspaces |
+| **Frontend** | Next.js 16 (App Router, React 19) / TanStack Start (Vite) |
+| **Backend** | Laravel 12 / Symfony 8 / Hono 4 (Bun) |
+| **Auth** | BetterAuth (Laravel + Symfony) / JWT HS256 (Hono) |
+| **ORM** | Eloquent / Doctrine / Drizzle |
+| **UI** | shadcn/ui + Tailwind CSS + Radix UI |
+| **AI** | Vercel AI SDK v6 (Anthropic, OpenAI, Google, Mistral) |
+| **State** | Zustand (client) / TanStack Query (opt-in) |
+| **Docs** | Astro Starlight |
+| **CLI** | `create-headless-app` scaffolder |
 
-## Project Structure
-
-```
-laravel-nextjs-rbac/
-├── apps/
-│   ├── web/                          # Next.js BFF (port 3001)
-│   │   ├── src/
-│   │   │   ├── app/
-│   │   │   │   ├── api/v1/[...path]/ # BFF Proxy Route Handler
-│   │   │   │   └── (routes)/         # Frontend pages
-│   │   │   └── lib/
-│   │   │       ├── api/
-│   │   │       │   └── auth.ts       # Server Actions
-│   │   │       └── security/
-│   │   │           └── hmac.ts       # HMAC signing logic
-│   │   └── package.json
-│   └── api/                          # Laravel API (port 8000)
-│       ├── app/
-│       │   └── Http/
-│       │       └── Middleware/
-│       │           └── ValidateBffSignature.php
-│       └── bootstrap/app.php
-├── package.json                      # Monorepo root
-├── turbo.json                        # Turbo configuration
-└── README.md
-```
-
-## How the BFF Works
-
-### Request Flow
-
-Every request from the browser goes through the BFF proxy at `/api/v1/[...path]/route.ts`:
+## Monorepo Structure
 
 ```
-1. Browser → /api/v1/auth/login
-              ↓
-2. Next.js BFF Proxy validates request
-              ↓
-3. Generates HMAC signature (X-BFF-Signature)
-              ↓
-4. Forwards to Laravel API with auth token from cookie
-              ↓
-5. Laravel validates HMAC signature
-              ↓
-6. Returns response through BFF to browser
+apps/
+├── web/              # Next.js 16 BFF — port 3001
+├── web-tanstack/     # TanStack Start — port 3003
+├── api-laravel/      # Laravel 12 + BetterAuth — port 8000
+├── api-sf/           # Symfony 8 + BetterAuth (Paseto V4) — port 8002
+├── api-hono/         # Hono 4 + Drizzle + Bun — port 8003
+├── landing/          # Astro landing page — port 4000
+└── docs/             # Astro Starlight docs — port 4001
+
+packages/
+└── create-headless-app/  # CLI scaffolder
 ```
 
-### HMAC Signing
+## Features
 
-The BFF and Laravel share a secret key used to sign requests:
+Each backend implements the same feature set:
 
-**Signature Payload:**
-```
-TIMESTAMP:METHOD:PATH:BODY_HASH
-```
+| Feature | Description |
+|---------|-------------|
+| **Auth** | Register, login, logout, refresh, 2FA (Symfony), password reset |
+| **Shop** | Products, categories, cart, orders, checkout |
+| **Admin** | Dashboard, RBAC (users/roles/permissions), analytics |
+| **SaaS** | Multi-tenant orgs, plans, billing, team, usage |
+| **Support** | Conversations, messages, canned responses, agent queue |
+| **AI Chat** | Multi-provider streaming chat (Next.js only) |
 
-**Headers sent to Laravel:**
-- `X-BFF-Id`: BFF identifier
-- `X-BFF-Timestamp`: Unix timestamp in seconds
-- `X-BFF-Signature`: HMAC-SHA256 signature
+## Prerequisites
 
-**Why HMAC?**
-- Prevents request forgery: only someone with the secret can generate valid signatures
-- Ensures request integrity: any modification invalidates the signature
-- Timestamp prevents replay attacks
-
-### Cookie Authentication
-
-Authentication uses **HttpOnly cookies** for maximum security:
-
-**Login Flow:**
-```
-1. User submits credentials → Server Action
-2. BFF forwards to Laravel /auth/login
-3. Laravel validates and returns access_token
-4. BFF stores token in HttpOnly cookie (auth_token)
-5. Subsequent requests include cookie automatically
-```
-
-**Cookie Attributes:**
-- `httpOnly: true` - Inaccessible to JavaScript (XSS protection)
-- `secure: true` (production) - Only sent over HTTPS
-- `sameSite: 'lax'` - CSRF protection
-- `maxAge: 15 days` - Persistent session
-
-**Critical Rule**: When making fetch requests from Server Actions, **NEVER** use `credentials: 'include'`. This is ignored server-side. Always pass cookies manually:
-
-```typescript
-'use server';
-
-// ❌ WRONG - credentials: 'include' is ignored server-side
-const response = await fetch(url, { credentials: 'include' });
-
-// ✅ CORRECT - pass cookie manually in headers
-const cookieStore = await cookies();
-const authToken = cookieStore.get('auth_token');
-const response = await fetch(url, {
-  headers: { Cookie: `auth_token=${authToken?.value}` }
-});
-```
-
-## Security Features
-
-### 1. Path Validation
-The BFF proxy validates all path segments to prevent SSRF and path traversal attacks:
-
-```typescript
-const VALID_PATH_SEGMENT = /^[a-zA-Z0-9_-]+$/;
-```
-
-### 2. Public Routes
-Certain routes don't require authentication:
-- `/api/v1/auth/login`
-- `/api/v1/auth/register`
-- `/api/v1/auth/providers`
-
-### 3. Host Verification
-The BFF verifies that all proxied requests go to the configured Laravel API host.
-
-### 4. Request Timeout
-All proxied requests have a 30-second timeout to prevent hanging.
-
-## Getting Started
-
-### Prerequisites
-
-- **Node.js** 18+
-- **PHP** 8.2+
+- **Bun** (package manager + Hono runtime)
+- **PHP 8.4+** with `pdo_sqlite`, `mbstring`, `xml`, `intl`
 - **Composer**
-- **Bun** (package manager)
 
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd laravel-nextjs-rbac
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   bun install
-   cd apps/api && composer install
-   ```
-
-3. **Configure environment variables:**
-
-   **Next.js BFF** (`.env.local`):
-   ```env
-   NEXT_PUBLIC_APP_URL=http://localhost:3001
-   LARAVEL_API_URL=http://localhost:8000
-
-   # HMAC Configuration (must match Laravel)
-   BFF_HMAC_SECRET=your-secret-key-here
-   BFF_ID=nextjs-bff-prod
-   ```
-
-   **Laravel API** (`.env`):
-   ```env
-   APP_URL=http://localhost:8000
-   SANCTUM_STATEFUL_DOMAINS=localhost:3001
-
-   # BFF Configuration (must match Next.js)
-   BFF_ID=nextjs-bff-prod
-   BFF_SECRET=your-secret-key-here
-   ```
-
-4. **Generate Laravel app key:**
-   ```bash
-   cd apps/api
-   php artisan key:generate
-   ```
-
-5. **Run database migrations:**
-   ```bash
-   php artisan migrate
-   ```
-
-### Development
-
-Run both applications in development mode:
+## Quick Start
 
 ```bash
-# Terminal 1 - Next.js BFF
-bun run --filter @headless/web dev
+# Install all dependencies
+bun install
 
-# Terminal 2 - Laravel API
-cd apps/api && php artisan serve
+# Pick a frontend + backend combo:
+bun run dev:next-laravel       # Next.js + Laravel
+bun run dev:next-sf            # Next.js + Symfony
+bun run dev:next-hono          # Next.js + Hono
+bun run dev:tanstack-laravel   # TanStack + Laravel
+bun run dev:tanstack-sf        # TanStack + Symfony
+bun run dev:tanstack-hono      # TanStack + Hono
+
+# Or run everything:
+bun run dev:all
 ```
 
-Access the application at:
-- **Frontend**: http://localhost:3001
-- **API**: http://localhost:8000
-
-### Build for Production
+### Backend Setup
 
 ```bash
-# Build all packages
-bun run build
+# Laravel
+cd apps/api-laravel
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
 
-# Build specific app
-bun run --filter @headless/web build
+# Symfony
+cd apps/api-sf
+composer install
+php bin/console doctrine:migrations:migrate
+
+# Hono
+cd apps/api-hono
+bun run db:migrate
+bun run db:seed
 ```
 
-## API Endpoints
+## Environment Variables
 
-### Authentication
+### Next.js BFF (`apps/web/.env.local`)
+
+```env
+NEXT_PUBLIC_APP_URL=http://localhost:3001
+LARAVEL_API_URL=http://localhost:8000
+SYMFONY_API_URL=http://localhost:8002
+NODE_API_URL=http://localhost:8003
+AUTH_BACKEND=laravel          # laravel | symfony | node
+BFF_SECRET=your-secret-key
+```
+
+### Laravel (`apps/api-laravel/.env`)
+
+```env
+APP_URL=http://localhost:8000
+SANCTUM_STATEFUL_DOMAINS=localhost:3001
+```
+
+### Symfony (`apps/api-sf/.env`)
+
+```env
+DATABASE_URL="sqlite:///%kernel.project_dir%/var/data_dev.db"
+BETTER_AUTH_SECRET=change_me_in_production
+FRONTEND_URL=http://localhost:3001
+```
+
+### Hono (`apps/api-hono/.env`)
+
+```env
+PORT=8003
+JWT_SECRET=your-jwt-secret
+FRONTEND_URL=http://localhost:3003
+```
+
+## Auth Comparison
+
+| Backend | Auth Library | Token Format | 2FA | Password Reset |
+|---------|-------------|--------------|-----|----------------|
+| Laravel | BetterAuth | Bearer | No | In progress |
+| Symfony | BetterAuth | Paseto V4 | Yes | Yes |
+| Hono | jose | JWT HS256 | No | No |
+
+### Standardized Auth Endpoints
+
+All backends expose the same contract under `/api/v1/auth/`:
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/v1/auth/login` | POST | Login with email/password |
-| `/api/v1/auth/register` | POST | Register new user |
-| `/api/v1/auth/logout` | POST | Logout user |
-| `/api/v1/auth/me` | GET | Get current user |
-| `/api/v1/auth/providers` | GET | List OAuth providers |
+| `/register` | POST | Sign up |
+| `/login` | POST | Sign in |
+| `/me` | GET | Current user |
+| `/refresh` | POST | Refresh token |
+| `/logout` | POST | Sign out |
 
-### Example Request
+## Tests
 
-```typescript
-// Using Server Actions
-import { login } from '@/lib/api/auth';
+```bash
+# Laravel
+cd apps/api-laravel && php artisan test
 
-async function handleLogin(formData: FormData) {
-  const result = await login(formData);
-  if (result.error) {
-    // Handle error
-  }
-  // Success - cookie is set automatically
-}
+# Symfony (129 tests)
+cd apps/api-sf && php bin/phpunit
+
+# Hono
+cd apps/api-hono && bun test
+
+# TanStack
+cd apps/web-tanstack && bun run test
 ```
 
-## Middleware
+## Build
 
-### Laravel BFF Validation
+```bash
+bun run build          # Build all apps
+bun run lint           # Lint all apps
+```
 
-The Laravel API validates all incoming BFF requests via middleware:
+## API Response Envelope
 
-```php
-// apps/api/app/Http/Middleware/ValidateBffSignature.php
-class ValidateBffSignature
+All backends use the same response format:
+
+```json
 {
-    public function handle(Request $request, Closure $next)
-    {
-        // 1. Extract BFF headers
-        // 2. Reconstruct signature payload
-        // 3. Verify HMAC signature
-        // 4. Check timestamp (replay protection)
-    }
+  "success": true,
+  "data": { "..." },
+  "status": 200,
+  "request_id": "abc123"
 }
 ```
-
-## Troubleshooting
-
-### HMAC Signature Mismatch
-
-**Symptom**: Laravel returns 401/403 with "Invalid signature"
-
-**Solutions**:
-1. Verify `BFF_HMAC_SECRET` matches `BFF_SECRET` exactly
-2. Check system time sync (timestamp validation)
-3. Ensure request body is JSON with sorted keys
-
-### Cookies Not Being Sent
-
-**Symptom**: Authenticated requests return 401
-
-**Solutions**:
-1. Check that `credentials: 'include'` is NOT used in Server Actions
-2. Verify cookie is set with `httpOnly: true`
-3. Check `sameSite` attribute matches domain configuration
-4. Ensure `SANCTUM_STATEFUL_DOMAINS` includes BFF domain
-
-### CORS Issues
-
-**Symptom**: Browser blocks requests with CORS errors
-
-**Solutions**:
-- Should not occur with BFF architecture (server-to-server)
-- If seeing CORS, verify request is going through `/api/v1/` proxy
-
-## Contributing
-
-Contributions are welcome! Please ensure:
-
-1. All tests pass: `bun test`
-2. Code follows existing patterns
-3. Security best practices are maintained
-4. HMAC signing is never bypassed
 
 ## License
 
-MIT License - see LICENSE file for details
-
-## Additional Resources
-
-- [Next.js App Router Documentation](https://nextjs.org/docs/app)
-- [Laravel Sanctum Documentation](https://laravel.com/docs/sanctum)
-- [HMAC Authentication Best Practices](https://www.owlstown.com/resources/hmac)
+MIT

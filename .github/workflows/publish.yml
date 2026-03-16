@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven/setup-bun@v2
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
@@ -44,27 +44,8 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Build packages/types
-        run: cd packages/types && bunx tsc
-
-      - name: Build packages/core
-        run: cd packages/core && bunx tsc
-
-      - name: Build packages/bff-nextjs
-        run: cd packages/bff-nextjs && bunx tsc
-
-      - name: Build packages/create-headless-app
+      - name: Build create-headless-app
         run: cd packages/create-headless-app && bunx tsc
-
-      - name: Publish @headless/core
-        run: cd packages/core && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @headless/bff-nextjs
-        run: cd packages/bff-nextjs && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish create-headless-app
         run: cd packages/create-headless-app && npm publish --access public

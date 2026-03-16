@@ -90,13 +90,13 @@ jobs:
         run: cd apps/api-hono && bun run db:push
         env:
           JWT_SECRET: ci-test-secret-key-at-least-32-characters-long
-          DATABASE_URL: file:./test.db
+          DATABASE_URL: ./test.db
 
       - name: Run tests
         run: cd apps/api-hono && bun test
         env:
           JWT_SECRET: ci-test-secret-key-at-least-32-characters-long
-          DATABASE_URL: file:./test.db
+          DATABASE_URL: ./test.db
 
   test-laravel:
     name: Test — api-laravel
@@ -174,8 +174,8 @@ jobs:
       - name: Install Composer dependencies
         run: cd apps/api-sf && composer install --no-interaction --prefer-dist
 
-      - name: Run migrations
-        run: cd apps/api-sf && php bin/console doctrine:migrations:migrate --no-interaction --env=test
+      - name: Create database schema
+        run: cd apps/api-sf && php bin/console doctrine:schema:create --env=test
 
       - name: Run tests
         run: cd apps/api-sf && php bin/phpunit

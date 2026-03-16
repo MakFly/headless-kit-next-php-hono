@@ -1,5 +1,4 @@
 import path from 'node:path'
-import type { PluginOption } from 'vite'
 import { defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
@@ -8,6 +7,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 import mdx from '@mdx-js/rollup'
 import remarkGfm from 'remark-gfm'
+import type { PluginOption } from 'vite'
 
 const config = defineConfig({
   // @ts-expect-error - nitro extends Vite config with custom options
@@ -30,7 +30,7 @@ const config = defineConfig({
     nitro({
       devErrorHandler: () => {},
     }),
-  ] as PluginOption[],
+  ] as Array<PluginOption>,
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

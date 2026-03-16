@@ -21,7 +21,7 @@ export function ProductPagination({ currentPage, totalPages }: ProductPagination
     return `/shop?${params.toString()}`
   }
 
-  const pages: number[] = []
+  const pages: Array<number> = []
   const start = Math.max(1, currentPage - 2)
   const end = Math.min(totalPages, start + 4)
   for (let i = start; i <= end; i++) {

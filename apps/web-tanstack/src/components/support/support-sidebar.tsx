@@ -1,8 +1,9 @@
 'use client'
 
-import { House, MessageSquare, Inbox, FileText, Star, Headphones } from 'lucide-react'
+import { FileText, Headphones, House, Inbox, MessageSquare, Star } from 'lucide-react'
 import { Link, useLocation } from '@tanstack/react-router'
 
+import type { User } from '@/types'
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
@@ -15,7 +16,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import type { User } from '@/types'
 
 type SupportSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user: User | null

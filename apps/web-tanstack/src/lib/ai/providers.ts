@@ -13,11 +13,11 @@ type AiModelOption = {
 type AiProviderConfig = {
   id: string
   name: string
-  models: AiModelOption[]
+  models: Array<AiModelOption>
   getInstance: (modelId: string) => LanguageModel
 }
 
-export const AI_PROVIDERS: AiProviderConfig[] = [
+export const AI_PROVIDERS: Array<AiProviderConfig> = [
   {
     id: 'anthropic',
     name: 'Anthropic',

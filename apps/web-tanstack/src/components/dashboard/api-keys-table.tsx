@@ -1,5 +1,13 @@
 import { useState, useTransition } from 'react'
 import {
+  CopyIcon,
+  EyeIcon,
+  EyeOffIcon,
+  KeyIcon,
+  PlusIcon,
+  Trash2Icon,
+} from 'lucide-react'
+import {
   Card,
   CardContent,
   CardDescription,
@@ -33,20 +41,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  PlusIcon,
-  CopyIcon,
-  EyeIcon,
-  EyeOffIcon,
-  Trash2Icon,
-  KeyIcon,
-} from 'lucide-react'
 
 type ApiKey = {
   id: string
   name: string
   key: string
-  scopes: string[]
+  scopes: Array<string>
   expiresAt: string | null
   lastUsed: string | null
   createdAt: string
@@ -57,7 +57,7 @@ type ApiKeysTableProps = {
 }
 
 // Mock storage pour les API keys
-let mockApiKeys: ApiKey[] = [
+let mockApiKeys: Array<ApiKey> = [
   {
     id: '1',
     name: 'Production API',
@@ -83,7 +83,7 @@ const SCOPE_COLORS: Record<string, string> = {
 
 export function ApiKeysTable({ userId: _userId }: ApiKeysTableProps) {
   const [isPending, startTransition] = useTransition()
-  const [items, setItems] = useState<ApiKey[]>(mockApiKeys)
+  const [items, setItems] = useState<Array<ApiKey>>(mockApiKeys)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: '',

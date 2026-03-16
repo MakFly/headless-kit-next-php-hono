@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { MessageCircleIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { MessageCircleIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/support/')({
   component: SupportIndexPage,

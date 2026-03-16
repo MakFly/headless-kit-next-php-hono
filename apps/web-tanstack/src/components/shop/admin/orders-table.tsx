@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Download, SlidersHorizontal } from 'lucide-react'
+import type { Order, OrderStatus, PaginatedResponse } from '@/types/shop'
 import {
   getAdminOrdersFn,
   updateOrderStatusFn,
 } from '@/lib/services/admin-service'
-import type { Order, OrderStatus, PaginatedResponse } from '@/types/shop'
-import { formatPrice, formatDate } from '@/components/shop/admin/format'
+import { formatDate, formatPrice } from '@/components/shop/admin/format'
 import { StatusBadge } from '@/components/shop/admin/status-badge'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -31,9 +32,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Download, SlidersHorizontal } from 'lucide-react'
 
-const ORDER_STATUSES: OrderStatus[] = [
+const ORDER_STATUSES: Array<OrderStatus> = [
   'pending',
   'confirmed',
   'processing',
@@ -44,7 +44,7 @@ const ORDER_STATUSES: OrderStatus[] = [
 
 type ColumnKey = 'id' | 'customer' | 'items' | 'total' | 'status' | 'payment' | 'date' | 'actions'
 
-const ALL_COLUMNS: { key: ColumnKey; label: string }[] = [
+const ALL_COLUMNS: Array<{ key: ColumnKey; label: string }> = [
   { key: 'id', label: 'Order ID' },
   { key: 'customer', label: 'Customer' },
   { key: 'items', label: 'Items' },
@@ -55,7 +55,7 @@ const ALL_COLUMNS: { key: ColumnKey; label: string }[] = [
   { key: 'actions', label: 'Actions' },
 ]
 
-function exportCSV(orders: Order[]) {
+function exportCSV(orders: Array<Order>) {
   const headers = ['Order ID', 'Customer', 'Total', 'Status', 'Payment', 'Date']
   const rows = orders.map((o) => [
     o.id.slice(0, 8),

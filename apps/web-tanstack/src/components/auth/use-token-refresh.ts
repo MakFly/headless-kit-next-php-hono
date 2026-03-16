@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { refreshTokenFn } from '@/lib/server/auth'
 import { ApiException } from '@/lib/http'
-import { useAuthStore, getStoredExpiresAt } from '@/stores/auth-store'
+import { getStoredExpiresAt, useAuthStore } from '@/stores/auth-store'
 
 interface UseTokenRefreshOptions {
   onExpired?: () => void

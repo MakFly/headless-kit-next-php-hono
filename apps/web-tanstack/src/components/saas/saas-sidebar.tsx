@@ -1,8 +1,9 @@
 'use client'
 
-import { House, CreditCard, Users, BarChart3, Settings, Rocket } from 'lucide-react'
+import { BarChart3, CreditCard, House, Rocket, Settings, Users } from 'lucide-react'
 import { Link, useLocation } from '@tanstack/react-router'
 
+import type { User } from '@/types'
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
@@ -15,7 +16,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import type { User } from '@/types'
 
 type SaasSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user: User | null

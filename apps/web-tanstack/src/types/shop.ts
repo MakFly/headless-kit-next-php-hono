@@ -27,7 +27,7 @@ export type Product = {
   categoryId: string | null
   category?: Pick<Category, 'id' | 'name' | 'slug'>
   imageUrl: string | null
-  images: string[]
+  images: Array<string>
   status: ProductStatus
   featured: boolean
   createdAt: string
@@ -47,7 +47,7 @@ export type ProductFilters = {
 }
 
 export type PaginatedResponse<T> = {
-  data: T[]
+  data: Array<T>
   pagination: {
     page: number
     perPage: number
@@ -67,7 +67,7 @@ export type CartItem = {
 export type Cart = {
   id: string
   userId: string
-  items: CartItem[]
+  items: Array<CartItem>
   total: number // computed, in cents
 }
 
@@ -91,7 +91,7 @@ export type Order = {
   shippingAddress: ShippingAddress | null
   paymentStatus: PaymentStatus
   notes: string | null
-  items: OrderItem[]
+  items: Array<OrderItem>
   createdAt: string
   updatedAt: string
 }
@@ -146,12 +146,12 @@ export type AdminDashboard = {
   newCustomers: number
   pendingOrders: number
   pendingReviews: number
-  orderChart: { date: string; count: number; revenue: number }[]
+  orderChart: Array<{ date: string; count: number; revenue: number }>
 }
 
 export type RevenueAnalytics = {
   totalRevenue: number
-  revenueByMonth: { month: string; revenue: number }[]
+  revenueByMonth: Array<{ month: string; revenue: number }>
 }
 
 export type TopProduct = {

@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   AuiIf,
   ThreadListItemMorePrimitive,
@@ -13,6 +11,8 @@ import {
   TrashIcon,
 } from 'lucide-react'
 import type { FC } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
 
 export const ThreadList: FC = () => {
   return (

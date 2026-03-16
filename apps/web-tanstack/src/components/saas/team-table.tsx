@@ -1,3 +1,5 @@
+import { TrashIcon } from 'lucide-react'
+import type { TeamMember, TeamRole } from '@/types/saas'
 import {
   Table,
   TableBody,
@@ -26,11 +28,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { TrashIcon } from 'lucide-react'
-import type { TeamMember, TeamRole } from '@/types/saas'
 
 type TeamTableProps = {
-  members: TeamMember[]
+  members: Array<TeamMember>
   onChangeRole: (memberId: string, role: TeamRole) => void
   onRemove: (memberId: string) => void
   isLoading?: boolean

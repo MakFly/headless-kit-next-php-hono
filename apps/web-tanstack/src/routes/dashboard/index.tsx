@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { UserIcon, ShieldIcon, KeyIcon, CalendarIcon, ActivityIcon } from 'lucide-react'
+import { ActivityIcon, CalendarIcon, KeyIcon, ShieldIcon, UserIcon } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useAuthStore } from '@/stores/auth-store'

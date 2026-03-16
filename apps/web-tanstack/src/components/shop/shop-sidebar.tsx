@@ -3,14 +3,15 @@
 import * as React from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import {
-  ShoppingBag,
-  Package,
-  Tag,
-  ShoppingCart,
   ClipboardList,
   CreditCard,
+  Package,
+  ShoppingBag,
+  ShoppingCart,
+  Tag,
 } from 'lucide-react'
 
+import type { User } from '@/types'
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
@@ -23,7 +24,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import type { User } from '@/types'
 
 type ShopSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user: User | null

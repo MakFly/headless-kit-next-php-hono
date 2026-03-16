@@ -10,7 +10,7 @@ export interface Role {
   name: string
   slug: string
   description?: string
-  permissions?: Permission[]
+  permissions?: Array<Permission>
 }
 
 export interface User {
@@ -20,5 +20,5 @@ export interface User {
   emailVerifiedAt?: string
   createdAt: string
   updatedAt: string
-  roles: Role[]
+  roles: Array<Role>
 }

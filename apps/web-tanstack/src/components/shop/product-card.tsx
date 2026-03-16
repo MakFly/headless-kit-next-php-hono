@@ -1,6 +1,6 @@
+import type { Product } from '@/types/shop'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import type { Product } from '@/types/shop'
 
 interface ProductCardProps {
   product: Product

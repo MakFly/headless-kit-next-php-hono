@@ -59,16 +59,16 @@ export type AdapterConfig = {
 }
 
 export type AuthAdapter = {
-  login(credentials: LoginRequest): Promise<AuthResponse>
-  register(data: RegisterRequest): Promise<AuthResponse>
-  logout(): Promise<void>
-  refresh(request?: RefreshTokenRequest): Promise<AuthResponse>
-  getUser(): Promise<NormalizedUser | null>
-  getOAuthProviders(): Promise<string[]>
-  getOAuthUrl(provider: string): Promise<string>
-  storeTokens(tokens: TokenStorage): Promise<void>
-  clearTokens(): Promise<void>
-  getAccessToken(): Promise<string | null>
+  login: (credentials: LoginRequest) => Promise<AuthResponse>
+  register: (data: RegisterRequest) => Promise<AuthResponse>
+  logout: () => Promise<void>
+  refresh: (request?: RefreshTokenRequest) => Promise<AuthResponse>
+  getUser: () => Promise<NormalizedUser | null>
+  getOAuthProviders: () => Promise<Array<string>>
+  getOAuthUrl: (provider: string) => Promise<string>
+  storeTokens: (tokens: TokenStorage) => Promise<void>
+  clearTokens: () => Promise<void>
+  getAccessToken: () => Promise<string | null>
 }
 
 export function toUser(normalized: NormalizedUser): User {

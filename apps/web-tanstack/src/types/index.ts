@@ -6,8 +6,8 @@ export type User = {
   avatar_url?: string
   created_at: string
   updated_at: string
-  roles: Role[]
-  permissions: Permission[]
+  roles: Array<Role>
+  permissions: Array<Permission>
 }
 
 export type Role = {
@@ -15,7 +15,7 @@ export type Role = {
   name: string
   slug: string
   description?: string
-  permissions?: Permission[]
+  permissions?: Array<Permission>
   created_at: string
   updated_at: string
 }
@@ -58,7 +58,7 @@ export type AuthTokens = {
 export type ApiResponse<T = unknown> = {
   data: T
   message?: string
-  errors?: Record<string, string[]>
+  errors?: Record<string, Array<string>>
 }
 
 export function hasPermission(

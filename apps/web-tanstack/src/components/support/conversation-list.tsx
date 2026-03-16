@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
+import type { Conversation, ConversationPriority, ConversationStatus } from '@/types/support'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import type { Conversation, ConversationStatus, ConversationPriority } from '@/types/support'
 
 type ConversationListProps = {
-  conversations: Conversation[]
+  conversations: Array<Conversation>
 }
 
 const statusVariant: Record<ConversationStatus, 'default' | 'secondary' | 'outline' | 'destructive'> = {

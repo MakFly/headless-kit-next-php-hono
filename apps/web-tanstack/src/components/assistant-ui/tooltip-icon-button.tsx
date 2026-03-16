@@ -1,5 +1,6 @@
-import { type ComponentPropsWithRef, forwardRef } from 'react'
+import {  forwardRef } from 'react'
 import { Slot } from 'radix-ui'
+import type {ComponentPropsWithRef} from 'react';
 
 import {
   Tooltip,

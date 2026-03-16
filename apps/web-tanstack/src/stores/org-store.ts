@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 type OrgMembership = {
   id: string
@@ -9,13 +9,13 @@ type OrgMembership = {
 }
 
 type OrgStore = {
-  orgs: OrgMembership[]
+  orgs: Array<OrgMembership>
   activeOrg: OrgMembership | null
   activeOrgRole: 'owner' | 'admin' | 'member' | 'viewer' | null
   isLoading: boolean
   isHydrated: boolean
 
-  setOrgs: (orgs: OrgMembership[]) => void
+  setOrgs: (orgs: Array<OrgMembership>) => void
   setActiveOrg: (org: OrgMembership) => void
   clearOrgs: () => void
   hasOrgPermission: (minRole: 'owner' | 'admin' | 'member' | 'viewer') => boolean

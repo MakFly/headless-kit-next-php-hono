@@ -1,14 +1,14 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getAuthAdapter, getBackendType, getAdapterConfig } from '@/lib/adapters'
 import type {
-  Conversation,
-  ConversationWithMessages,
-  CreateConversation,
-  ConversationStatus,
   AgentQueue,
   CannedResponse,
+  Conversation,
+  ConversationStatus,
+  ConversationWithMessages,
+  CreateConversation,
   CsatRatings,
 } from '@/types/support'
+import { getAdapterConfig, getAuthAdapter, getBackendType } from '@/lib/adapters'
 
 function getApiBaseUrl(): string {
   const backend = getBackendType()
@@ -66,9 +66,9 @@ async function fetchFromApi<T>(
 // ---------------------------------------------------------------------------
 
 export const getConversationsFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Conversation[]> => {
+  async (): Promise<Array<Conversation>> => {
     try {
-      return await fetchFromApi<Conversation[]>('/api/v1/support/conversations')
+      return await fetchFromApi<Array<Conversation>>('/api/v1/support/conversations')
     } catch (error) {
       console.error('[Support Service] Failed to fetch conversations:', error)
       return []
@@ -130,8 +130,8 @@ export const getAgentQueueFn = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AgentQueue> => {
     try {
       const [unassigned, assigned] = await Promise.all([
-        fetchFromApi<Conversation[]>('/api/v1/support/agent/queue'),
-        fetchFromApi<Conversation[]>('/api/v1/support/agent/assigned'),
+        fetchFromApi<Array<Conversation>>('/api/v1/support/agent/queue'),
+        fetchFromApi<Array<Conversation>>('/api/v1/support/agent/assigned'),
       ])
       return {
         unassigned: Array.isArray(unassigned) ? unassigned : [],
@@ -175,9 +175,9 @@ export const updateConversationStatusFn = createServerFn({ method: 'POST' })
 // ---------------------------------------------------------------------------
 
 export const getCannedResponsesFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<CannedResponse[]> => {
+  async (): Promise<Array<CannedResponse>> => {
     try {
-      return await fetchFromApi<CannedResponse[]>('/api/v1/support/agent/canned')
+      return await fetchFromApi<Array<CannedResponse>>('/api/v1/support/agent/canned')
     } catch (error) {
       console.error('[Support Service] Failed to fetch canned responses:', error)
       return []

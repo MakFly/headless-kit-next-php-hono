@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getAuthAdapter, getBackendType, getAdapterConfig } from '@/lib/adapters'
 import type { Order, ShippingAddress } from '@/types/shop'
+import { getAdapterConfig, getAuthAdapter, getBackendType } from '@/lib/adapters'
 
 function getApiBaseUrl(): string {
   const backend = getBackendType()
@@ -54,9 +54,9 @@ async function fetchFromApi<T>(
 }
 
 export const getOrdersFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Order[]> => {
+  async (): Promise<Array<Order>> => {
     try {
-      return await fetchFromApi<Order[]>('/api/v1/orders')
+      return await fetchFromApi<Array<Order>>('/api/v1/orders')
     } catch (error) {
       console.error('[Order Service] Failed to fetch orders:', error)
       return []

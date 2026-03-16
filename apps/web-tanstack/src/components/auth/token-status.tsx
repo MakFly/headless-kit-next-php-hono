@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ClockIcon, RefreshCwIcon } from 'lucide-react'
-import { useAuthStore, getStoredExpiresAt } from '@/stores/auth-store'
+import { getStoredExpiresAt, useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 

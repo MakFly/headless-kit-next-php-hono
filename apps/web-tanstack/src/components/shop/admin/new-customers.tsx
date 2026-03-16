@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { getAdminCustomersFn } from '@/lib/services/admin-service'
+import { Users } from 'lucide-react'
 import type { Customer } from '@/types/shop'
+import { getAdminCustomersFn } from '@/lib/services/admin-service'
 import { formatDate } from '@/components/shop/admin/format'
 import { CardWithIcon } from '@/components/shop/admin/card-with-icon'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Users } from 'lucide-react'
 
 function getInitials(firstName?: string, lastName?: string) {
   const f = firstName?.[0] ?? '?'
@@ -16,7 +16,7 @@ function getInitials(firstName?: string, lastName?: string) {
 }
 
 export function NewCustomers() {
-  const [customers, setCustomers] = useState<Customer[]>([])
+  const [customers, setCustomers] = useState<Array<Customer>>([])
   const [loading, setLoading] = useState(true)
 
   const fetchCustomers = useCallback(async () => {

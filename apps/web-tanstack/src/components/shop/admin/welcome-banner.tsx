@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { House, Code } from 'lucide-react'
+import { Code, House } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { buttonVariants } from '@/components/ui/button'
 

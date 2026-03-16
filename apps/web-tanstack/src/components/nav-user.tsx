@@ -6,6 +6,7 @@ import {
   IconUserCircle,
 } from '@tabler/icons-react'
 
+import { useRouter } from '@tanstack/react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -24,7 +25,6 @@ import {
 } from '@/components/ui/sidebar'
 import { TokenStatus } from '@/components/auth/token-status'
 import { useAuthStore } from '@/stores/auth-store'
-import { useRouter } from '@tanstack/react-router'
 
 export function NavUser({
   user,

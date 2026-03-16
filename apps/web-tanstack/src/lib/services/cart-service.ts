@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getAuthAdapter, getBackendType, getAdapterConfig } from '@/lib/adapters'
 import type { Cart } from '@/types/shop'
+import { getAdapterConfig, getAuthAdapter, getBackendType } from '@/lib/adapters'
 
 function getApiBaseUrl(): string {
   const backend = getBackendType()

@@ -7,10 +7,11 @@ import {
   XCircleIcon,
 } from 'lucide-react'
 import {
-  useScrollLock,
-  type ToolCallMessagePartStatus,
-  type ToolCallMessagePartComponent,
+  
+  
+  useScrollLock
 } from '@assistant-ui/react'
+import type {ToolCallMessagePartComponent, ToolCallMessagePartStatus} from '@assistant-ui/react';
 import {
   Collapsible,
   CollapsibleContent,

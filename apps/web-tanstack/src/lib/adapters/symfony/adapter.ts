@@ -1,18 +1,18 @@
-import type {
-  AdapterConfig,
-  LoginRequest,
-  RegisterRequest,
-  RefreshTokenRequest,
-  AuthResponse,
-  NormalizedUser,
-} from '../types'
-import { BaseAdapter, AdapterError } from '../base-adapter'
+import { AdapterError, BaseAdapter } from '../base-adapter'
 import {
   transformAuthResponse,
   transformMeResponse,
   transformOAuthProviders,
   transformOAuthRedirect,
 } from './transformer'
+import type {
+  AdapterConfig,
+  AuthResponse,
+  LoginRequest,
+  NormalizedUser,
+  RefreshTokenRequest,
+  RegisterRequest,
+} from '../types'
 
 function getAuthPath(prefix: string, path: string): string {
   const base = prefix?.replace(/\/$/, '') || '/auth'
@@ -99,9 +99,9 @@ export class SymfonyAdapter extends BaseAdapter {
     }
   }
 
-  async getOAuthProviders(): Promise<string[]> {
+  async getOAuthProviders(): Promise<Array<string>> {
     try {
-      const response = await this.makeRequest<{ providers: string[] } | string[]>(
+      const response = await this.makeRequest<{ providers: Array<string> } | Array<string>>(
         'GET', this.path.OAUTH_PROVIDERS, { includeAuth: false }
       )
       return transformOAuthProviders(response)

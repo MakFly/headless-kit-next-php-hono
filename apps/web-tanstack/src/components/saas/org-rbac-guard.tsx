@@ -1,5 +1,5 @@
-import { useOrgStore } from '@/stores/org-store'
 import type { ReactNode } from 'react'
+import { useOrgStore } from '@/stores/org-store'
 
 type OrgRbacGuardProps = {
   minRole: 'owner' | 'admin' | 'member' | 'viewer'

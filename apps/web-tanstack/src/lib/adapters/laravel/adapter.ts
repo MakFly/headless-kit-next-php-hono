@@ -1,12 +1,4 @@
-import type {
-  AdapterConfig,
-  LoginRequest,
-  RegisterRequest,
-  RefreshTokenRequest,
-  AuthResponse,
-  NormalizedUser,
-} from '../types'
-import { BaseAdapter, AdapterError } from '../base-adapter'
+import { AdapterError, BaseAdapter } from '../base-adapter'
 import { apiRequestJson } from '../../http/api-request'
 import {
   transformAuthResponse,
@@ -14,6 +6,14 @@ import {
   transformOAuthProviders,
   transformOAuthRedirect,
 } from './transformer'
+import type {
+  AdapterConfig,
+  AuthResponse,
+  LoginRequest,
+  NormalizedUser,
+  RefreshTokenRequest,
+  RegisterRequest,
+} from '../types'
 
 const ENDPOINTS = {
   LOGIN: '/api/v1/auth/login',
@@ -121,8 +121,8 @@ export class LaravelAdapter extends BaseAdapter {
     }
   }
 
-  async getOAuthProviders(): Promise<string[]> {
-    const response = await this.makeRequest<{ data: string[] }>(
+  async getOAuthProviders(): Promise<Array<string>> {
+    const response = await this.makeRequest<{ data: Array<string> }>(
       'GET', ENDPOINTS.OAUTH_PROVIDERS, { includeAuth: false }
     )
     return transformOAuthProviders(response)

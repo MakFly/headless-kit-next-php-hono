@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getAuthAdapter, getBackendType, getAdapterConfig } from '@/lib/adapters'
-import type { Product, Category, PaginatedResponse } from '@/types/shop'
+import type { Category, PaginatedResponse, Product } from '@/types/shop'
+import { getAdapterConfig, getAuthAdapter, getBackendType } from '@/lib/adapters'
 
 function getApiBaseUrl(): string {
   const backend = getBackendType()
@@ -85,9 +85,9 @@ export const getProductBySlugFn = createServerFn({ method: 'GET' })
   })
 
 export const getCategoriesFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Category[]> => {
+  async (): Promise<Array<Category>> => {
     try {
-      return await fetchFromApi<Category[]>('/api/v1/categories')
+      return await fetchFromApi<Array<Category>>('/api/v1/categories')
     } catch (error) {
       console.error('[Shop Service] Failed to fetch categories:', error)
       return []

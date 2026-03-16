@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ShoppingBag, X, Plus, Minus } from 'lucide-react'
+import { Minus, Plus, ShoppingBag, X } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetFooter,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { useCartStore } from '@/stores/cart-store'

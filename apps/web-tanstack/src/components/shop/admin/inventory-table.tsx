@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+import { Save } from 'lucide-react'
+import type { InventoryItem } from '@/types/shop'
 import {
   getAdminInventoryFn,
   updateInventoryFn,
 } from '@/lib/services/admin-service'
-import type { InventoryItem } from '@/types/shop'
 import { StatusBadge } from '@/components/shop/admin/status-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,10 +17,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Save } from 'lucide-react'
 
 export function AdminInventoryTable() {
-  const [items, setItems] = useState<InventoryItem[]>([])
+  const [items, setItems] = useState<Array<InventoryItem>>([])
   const [loading, setLoading] = useState(true)
   const [editedStocks, setEditedStocks] = useState<Record<string, number>>({})
   const [saving, setSaving] = useState<Record<string, boolean>>({})

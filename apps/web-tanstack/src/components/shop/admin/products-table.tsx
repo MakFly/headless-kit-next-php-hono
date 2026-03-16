@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Box, Eye, Package, Plus, Search, Trash2 } from 'lucide-react'
+import type { Category, PaginatedResponse, Product } from '@/types/shop'
 import {
-  getAdminProductsFn,
-  getAdminCategoriesFn,
   deleteProductFn,
+  getAdminCategoriesFn,
+  getAdminProductsFn,
 } from '@/lib/services/admin-service'
-import type { Product, Category, PaginatedResponse } from '@/types/shop'
 import { formatPrice } from '@/components/shop/admin/format'
 import { StatusBadge } from '@/components/shop/admin/status-badge'
 import { Button } from '@/components/ui/button'
@@ -18,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Package, Plus, Search, Trash2, Eye, Box } from 'lucide-react'
 
 type StockFilter = 'all' | 'in_stock' | 'low_stock' | 'out_of_stock'
 type StatusFilter = 'all' | 'active' | 'draft' | 'archived'
@@ -37,7 +37,7 @@ function getStockLabel(qty: number): string {
 
 export function AdminProductsTable() {
   const [data, setData] = useState<PaginatedResponse<Product> | null>(null)
-  const [categories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<Array<Category>>([])
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)

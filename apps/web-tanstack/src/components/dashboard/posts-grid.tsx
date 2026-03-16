@@ -1,5 +1,14 @@
 import { useState, useTransition } from 'react'
 import {
+  EditIcon,
+  EyeIcon,
+  FileTextIcon,
+  LockIcon,
+  PlusIcon,
+  TrashIcon,
+  UserIcon,
+} from 'lucide-react'
+import {
   Card,
   CardContent,
   CardDescription,
@@ -30,15 +39,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import {
-  FileTextIcon,
-  PlusIcon,
-  EditIcon,
-  TrashIcon,
-  EyeIcon,
-  LockIcon,
-  UserIcon,
-} from 'lucide-react'
 
 type Post = {
   id: number
@@ -48,7 +48,7 @@ type Post = {
 }
 
 type PostsGridProps = {
-  posts: Post[]
+  posts: Array<Post>
   permissions: {
     canCreate: boolean
     canUpdate: boolean
@@ -60,7 +60,7 @@ const API_BASE = 'https://jsonplaceholder.typicode.com'
 
 export function PostsGrid({ posts, permissions }: PostsGridProps) {
   const [isPending, startTransition] = useTransition()
-  const [localPosts, setLocalPosts] = useState<Post[]>(posts)
+  const [localPosts, setLocalPosts] = useState<Array<Post>>(posts)
   const [selectedPost, setSelectedPost] = useState<Post | null>(null)
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)

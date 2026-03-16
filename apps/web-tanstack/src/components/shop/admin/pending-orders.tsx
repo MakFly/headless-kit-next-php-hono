@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { getAdminOrdersFn } from '@/lib/services/admin-service'
 import type { Order } from '@/types/shop'
-import { formatPrice, formatDate } from '@/components/shop/admin/format'
+import { getAdminOrdersFn } from '@/lib/services/admin-service'
+import { formatDate, formatPrice } from '@/components/shop/admin/format'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { buttonVariants } from '@/components/ui/button'
@@ -18,7 +18,7 @@ function getInitials(name: string) {
 }
 
 export function PendingOrders() {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<Array<Order>>([])
   const [loading, setLoading] = useState(true)
 
   const fetchOrders = useCallback(async () => {

@@ -6,10 +6,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import type {ChartConfig} from '@/components/ui/chart';
 import {
+  
   ChartContainer,
-  ChartTooltipContent,
-  type ChartConfig,
+  ChartTooltipContent
 } from '@/components/ui/chart'
 
 type ChartDataPoint = {
@@ -19,7 +20,7 @@ type ChartDataPoint = {
 }
 
 type AdminDashboardChartProps = {
-  data: ChartDataPoint[]
+  data: Array<ChartDataPoint>
 }
 
 const chartConfig = {

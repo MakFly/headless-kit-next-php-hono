@@ -1,7 +1,7 @@
-import type { AuthAdapter, BackendType, AdapterConfig } from './types'
 import { LaravelAdapter } from './laravel/adapter'
 import { SymfonyAdapter } from './symfony/adapter'
 import { NodeAdapter } from './node/adapter'
+import type { AdapterConfig, AuthAdapter, BackendType } from './types'
 
 export type { AuthAdapter, BackendType, AdapterConfig } from './types'
 export type {

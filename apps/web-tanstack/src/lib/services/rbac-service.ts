@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getAuthAdapter, getBackendType, getAdapterConfig } from '@/lib/adapters'
 import type { Permission, Role, User } from './rbac-types'
+import { getAdapterConfig, getAuthAdapter, getBackendType } from '@/lib/adapters'
 
 export type { Permission, Role, User } from './rbac-types'
 
@@ -51,9 +51,9 @@ async function fetchFromApi<T>(
 }
 
 export const getRolesFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Role[]> => {
+  async (): Promise<Array<Role>> => {
     try {
-      return await fetchFromApi<Role[]>('/api/v1/roles')
+      return await fetchFromApi<Array<Role>>('/api/v1/roles')
     } catch (error) {
       console.error('[RBAC Service] Failed to fetch roles:', error)
       return []
@@ -62,9 +62,9 @@ export const getRolesFn = createServerFn({ method: 'GET' }).handler(
 )
 
 export const getPermissionsFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Permission[]> => {
+  async (): Promise<Array<Permission>> => {
     try {
-      return await fetchFromApi<Permission[]>('/api/v1/permissions')
+      return await fetchFromApi<Array<Permission>>('/api/v1/permissions')
     } catch (error) {
       console.error('[RBAC Service] Failed to fetch permissions:', error)
       return []
@@ -73,9 +73,9 @@ export const getPermissionsFn = createServerFn({ method: 'GET' }).handler(
 )
 
 export const getUsersFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<User[]> => {
+  async (): Promise<Array<User>> => {
     try {
-      return await fetchFromApi<User[]>('/api/v1/users')
+      return await fetchFromApi<Array<User>>('/api/v1/users')
     } catch (error) {
       console.error('[RBAC Service] Failed to fetch users:', error)
       return []
@@ -95,7 +95,7 @@ export const getUserByIdFn = createServerFn({ method: 'GET' })
   })
 
 export const updateUserRolesFn = createServerFn({ method: 'POST' })
-  .inputValidator((data: { userId: number; roleIds: number[] }) => data)
+  .inputValidator((data: { userId: number; roleIds: Array<number> }) => data)
   .handler(async ({ data }): Promise<User | null> => {
     try {
       return await fetchFromApi<User>(`/api/v1/users/${data.userId}/roles`, {
@@ -114,7 +114,7 @@ export const createRoleFn = createServerFn({ method: 'POST' })
       name: string
       slug: string
       description?: string
-      permissionIds: number[]
+      permissionIds: Array<number>
     }) => data,
   )
   .handler(async ({ data }): Promise<Role | null> => {
@@ -140,7 +140,7 @@ export const updateRoleFn = createServerFn({ method: 'POST' })
       roleId: number
       name?: string
       description?: string
-      permissionIds?: number[]
+      permissionIds?: Array<number>
     }) => data,
   )
   .handler(async ({ data }): Promise<Role | null> => {

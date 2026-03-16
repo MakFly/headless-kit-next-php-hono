@@ -30,7 +30,7 @@ export type Message = {
 }
 
 export type ConversationWithMessages = Conversation & {
-  messages: Message[]
+  messages: Array<Message>
 }
 
 export type CannedResponse = {
@@ -45,8 +45,8 @@ export type CannedResponse = {
 }
 
 export type AgentQueue = {
-  unassigned: Conversation[]
-  assigned: Conversation[]
+  unassigned: Array<Conversation>
+  assigned: Array<Conversation>
   totalOpen: number
 }
 
@@ -80,5 +80,5 @@ export type AiMessage = {
 export type AiProviderOption = {
   id: string
   name: string
-  models: { id: string; name: string; isDefault?: boolean }[]
+  models: Array<{ id: string; name: string; isDefault?: boolean }>
 }

@@ -1,19 +1,18 @@
 import { create } from 'zustand'
-import type { User, PermissionAction, RoleSlug } from '@/types'
+import type { LoginCredentials, OAuthProvider, PermissionAction, RegisterData, RoleSlug, User  } from '@/types'
 import {
   hasPermission as checkHasPermission,
   hasRole as checkHasRole,
   isAdmin as checkIsAdmin,
 } from '@/types'
 import {
-  loginFn,
-  registerFn,
-  logoutFn,
   getCurrentUserFn,
   getOAuthUrlFn,
+  loginFn,
+  logoutFn,
+  registerFn,
 } from '@/lib/server/auth'
 import { COOKIE_NAMES } from '@/lib/config/env'
-import type { LoginCredentials, RegisterData, OAuthProvider } from '@/types'
 
 const getStoredExpiresAt = (): number | null => {
   if (typeof document === 'undefined') return null

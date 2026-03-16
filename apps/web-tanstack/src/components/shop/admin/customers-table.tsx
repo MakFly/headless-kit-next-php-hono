@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Filter, Pencil, Plus, Search, Trash2, X } from 'lucide-react'
+import type { Customer, PaginatedResponse, Segment  } from '@/types/shop'
 import {
-  getAdminCustomersFn,
   deleteCustomerFn,
+  getAdminCustomersFn,
   getSegmentsFn,
 } from '@/lib/services/admin-service'
-import type { Segment } from '@/types/shop'
-import type { Customer, PaginatedResponse } from '@/types/shop'
-import { formatPrice, formatDate } from '@/components/shop/admin/format'
+import { formatDate, formatPrice } from '@/components/shop/admin/format'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -30,12 +30,11 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Plus, Pencil, Trash2, Search, Filter, X } from 'lucide-react'
 
 const AVATAR_COLORS = [
   'bg-blue-500',
@@ -74,7 +73,7 @@ function FilterPanel({
   spentFilter,
   onSpentFilterChange,
 }: {
-  segments: Segment[]
+  segments: Array<Segment>
   selectedSegments: Set<string>
   onToggleSegment: (slug: string) => void
   orderHistory: OrderHistoryFilter
@@ -153,7 +152,7 @@ function FilterPanel({
 
 export function AdminCustomersTable() {
   const [data, setData] = useState<PaginatedResponse<Customer> | null>(null)
-  const [segments, setSegments] = useState<Segment[]>([])
+  const [segments, setSegments] = useState<Array<Segment>>([])
   const [search, setSearch] = useState('')
   const [selectedSegments, setSelectedSegments] = useState<Set<string>>(new Set())
   const [orderHistory, setOrderHistory] = useState<OrderHistoryFilter>('any')

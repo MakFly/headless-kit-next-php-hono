@@ -1,15 +1,25 @@
 import * as React from 'react'
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
+  
+  
+  
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
+import {
+  ArrowUpDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+  ReceiptIcon,
+} from 'lucide-react'
+import type {ColumnDef, ColumnFiltersState, SortingState} from '@tanstack/react-table';
+import type { Invoice, InvoiceStatus } from '@/types/saas'
 import {
   Card,
   CardContent,
@@ -34,18 +44,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  ArrowUpDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
-  ReceiptIcon,
-} from 'lucide-react'
-import type { Invoice, InvoiceStatus } from '@/types/saas'
 
 type InvoicesDataTableProps = {
-  invoices: Invoice[]
+  invoices: Array<Invoice>
 }
 
 const invoiceStatusVariant: Record<
@@ -80,7 +81,7 @@ export function InvoicesDataTable({ invoices }: InvoicesDataTableProps) {
     return invoices.filter((inv) => inv.status === statusFilter)
   }, [invoices, statusFilter])
 
-  const columns: ColumnDef<Invoice>[] = [
+  const columns: Array<ColumnDef<Invoice>> = [
     {
       accessorKey: 'createdAt',
       header: ({ column }) => (

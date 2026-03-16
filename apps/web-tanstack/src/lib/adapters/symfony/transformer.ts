@@ -1,4 +1,4 @@
-import type { NormalizedUser, TokenStorage, AuthResponse } from '../types'
+import type { AuthResponse, NormalizedUser, TokenStorage } from '../types'
 
 type SymfonyUser = {
   id: string
@@ -14,7 +14,7 @@ type SymfonyUser = {
   createdAt?: string
   updated_at?: string
   updatedAt?: string
-  roles?: string[]
+  roles?: Array<string>
 }
 
 type SymfonyAuthResponse = {
@@ -73,11 +73,11 @@ export function transformMeResponse(
   if ('success' in response && 'data' in response) {
     inner = (response as { data: SymfonyMeResponse }).data
   }
-  const user = 'user' in inner ? (inner as { user: SymfonyUser }).user : (inner as SymfonyUser)
+  const user = 'user' in inner ? (inner as { user: SymfonyUser }).user : (inner)
   return transformUser(user)
 }
 
-export function transformOAuthProviders(response: { providers: string[] } | string[]): string[] {
+export function transformOAuthProviders(response: { providers: Array<string> } | Array<string>): Array<string> {
   if (Array.isArray(response)) return response
   return response.providers
 }

@@ -1,15 +1,26 @@
 import * as React from 'react'
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
+  
+  
+  
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
+import {
+  ArrowUpDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+  MoreHorizontalIcon,
+  UsersIcon,
+} from 'lucide-react'
+import type {ColumnDef, ColumnFiltersState, SortingState} from '@tanstack/react-table';
+import type { TeamMember, TeamRole } from '@/types/saas'
 import {
   Card,
   CardContent,
@@ -50,19 +61,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  ArrowUpDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
-  MoreHorizontalIcon,
-  UsersIcon,
-} from 'lucide-react'
-import type { TeamMember, TeamRole } from '@/types/saas'
 
 type TeamDataTableProps = {
-  members: TeamMember[]
+  members: Array<TeamMember>
   onChangeRole: (memberId: string, role: TeamRole) => void
   onRemove: (memberId: string) => void
   isLoading?: boolean
@@ -75,7 +76,7 @@ const roleVariant: Record<TeamRole, 'default' | 'secondary' | 'outline'> = {
   viewer: 'outline',
 }
 
-const ROLE_OPTIONS: { value: TeamRole; label: string }[] = [
+const ROLE_OPTIONS: Array<{ value: TeamRole; label: string }> = [
   { value: 'admin', label: 'Admin' },
   { value: 'member', label: 'Member' },
   { value: 'viewer', label: 'Viewer' },
@@ -192,7 +193,7 @@ export function TeamDataTable({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = React.useState('')
 
-  const columns: ColumnDef<TeamMember>[] = [
+  const columns: Array<ColumnDef<TeamMember>> = [
     {
       id: 'name',
       accessorFn: (row) => row.user?.name ?? '',

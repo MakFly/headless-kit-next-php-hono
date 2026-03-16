@@ -31,7 +31,7 @@ function normalizeStatusCode(value: unknown, fallback = 500): number {
   return fallback
 }
 
-function getStringField(body: Record<string, unknown>, keys: string[]): string | undefined {
+function getStringField(body: Record<string, unknown>, keys: Array<string>): string | undefined {
   for (const key of keys) {
     const value = body[key]
     if (typeof value === 'string' && value.trim()) {

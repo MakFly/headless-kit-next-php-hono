@@ -1,4 +1,4 @@
-import type { NormalizedUser, TokenStorage, AuthResponse } from '../types'
+import type { AuthResponse, NormalizedUser, TokenStorage } from '../types'
 
 type NodeUser = {
   id: string
@@ -88,7 +88,7 @@ export function transformMeResponse(
   return transformUser(user)
 }
 
-export function transformOAuthProviders(response: { providers: string[] } | string[] | { data: string[] }): string[] {
+export function transformOAuthProviders(response: { providers: Array<string> } | Array<string> | { data: Array<string> }): Array<string> {
   if (Array.isArray(response)) return response
   if ('data' in response) return response.data
   return response.providers

@@ -1,17 +1,17 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getAuthAdapter, getBackendType, getAdapterConfig } from '@/lib/adapters'
 import type {
-  OrgMembership,
   CreateOrgData,
-  Subscription,
   Invoice,
+  OrgMembership,
   Plan,
+  SaasDashboard,
+  SaasSettings,
+  Subscription,
   TeamMember,
   TeamRole,
   UsageRecord,
-  SaasSettings,
-  SaasDashboard,
 } from '@/types/saas'
+import { getAdapterConfig, getAuthAdapter, getBackendType } from '@/lib/adapters'
 
 function getApiBaseUrl(): string {
   const backend = getBackendType()
@@ -69,9 +69,9 @@ async function fetchFromApi<T>(
 // ---------------------------------------------------------------------------
 
 export const listOrgsFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<OrgMembership[]> => {
+  async (): Promise<Array<OrgMembership>> => {
     try {
-      return await fetchFromApi<OrgMembership[]>('/api/v1/saas/orgs')
+      return await fetchFromApi<Array<OrgMembership>>('/api/v1/saas/orgs')
     } catch (error) {
       console.error('[SaaS Service] Failed to list orgs:', error)
       return []
@@ -144,16 +144,16 @@ export const cancelSubscriptionFn = createServerFn({ method: 'POST' })
 
 export const getInvoicesFn = createServerFn({ method: 'GET' })
   .inputValidator((data: { orgId: string }) => data)
-  .handler(async ({ data }): Promise<Invoice[]> => {
-    return await fetchFromApi<Invoice[]>(
+  .handler(async ({ data }): Promise<Array<Invoice>> => {
+    return await fetchFromApi<Array<Invoice>>(
       `/api/v1/saas/orgs/${data.orgId}/invoices`,
     )
   })
 
 export const getPlansFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Plan[]> => {
+  async (): Promise<Array<Plan>> => {
     try {
-      return await fetchFromApi<Plan[]>('/api/v1/saas/plans')
+      return await fetchFromApi<Array<Plan>>('/api/v1/saas/plans')
     } catch (error) {
       console.error('[SaaS Service] Failed to fetch plans:', error)
       return []
@@ -167,8 +167,8 @@ export const getPlansFn = createServerFn({ method: 'GET' }).handler(
 
 export const getTeamMembersFn = createServerFn({ method: 'GET' })
   .inputValidator((data: { orgId: string }) => data)
-  .handler(async ({ data }): Promise<TeamMember[]> => {
-    return await fetchFromApi<TeamMember[]>(
+  .handler(async ({ data }): Promise<Array<TeamMember>> => {
+    return await fetchFromApi<Array<TeamMember>>(
       `/api/v1/saas/orgs/${data.orgId}/team`,
     )
   })
@@ -214,8 +214,8 @@ export const removeTeamMemberFn = createServerFn({ method: 'POST' })
 
 export const getUsageFn = createServerFn({ method: 'GET' })
   .inputValidator((data: { orgId: string }) => data)
-  .handler(async ({ data }): Promise<UsageRecord[]> => {
-    return await fetchFromApi<UsageRecord[]>(
+  .handler(async ({ data }): Promise<Array<UsageRecord>> => {
+    return await fetchFromApi<Array<UsageRecord>>(
       `/api/v1/saas/orgs/${data.orgId}/usage`,
     )
   })

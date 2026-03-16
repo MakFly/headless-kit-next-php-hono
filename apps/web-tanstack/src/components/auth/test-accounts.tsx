@@ -13,7 +13,7 @@ export function TestAccounts({
 }: {
   onSelect: (email: string, password: string) => void
 }) {
-  const [accounts, setAccounts] = useState<TestAccount[]>([])
+  const [accounts, setAccounts] = useState<Array<TestAccount>>([])
 
   useEffect(() => {
     fetch('/api/v1/auth/test-accounts')

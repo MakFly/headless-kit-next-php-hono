@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react'
 import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
+import type { RevenueAnalytics, TopProduct } from '@/types/shop'
+import type {ChartConfig} from '@/components/ui/chart';
+import {
   getRevenueAnalyticsFn,
   getTopProductsFn,
 } from '@/lib/services/admin-service'
-import type { RevenueAnalytics, TopProduct } from '@/types/shop'
 import { formatPrice } from '@/components/shop/admin/format'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -16,17 +25,9 @@ import {
 } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
-import {
+  
   ChartContainer,
-  ChartTooltipContent,
-  type ChartConfig,
+  ChartTooltipContent
 } from '@/components/ui/chart'
 
 const chartConfig = {
@@ -38,7 +39,7 @@ const chartConfig = {
 
 export function AdminAnalyticsContent() {
   const [analytics, setAnalytics] = useState<RevenueAnalytics | null>(null)
-  const [topProducts, setTopProducts] = useState<TopProduct[] | null>(null)
+  const [topProducts, setTopProducts] = useState<Array<TopProduct> | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

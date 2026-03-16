@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import { Building2, ChevronsUpDown, Check, Plus } from 'lucide-react'
+import { Building2, Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useOrgStore } from '@/stores/org-store'
 import {
   DropdownMenu,

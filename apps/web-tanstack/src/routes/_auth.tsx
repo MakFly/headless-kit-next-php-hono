@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
-import { AuthBranding } from '@/components/auth/auth-branding'
 import { BoxIcon } from 'lucide-react'
+import { AuthBranding } from '@/components/auth/auth-branding'
 
 export const Route = createFileRoute('/_auth')({
   beforeLoad: ({ context }) => {

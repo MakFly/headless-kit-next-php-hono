@@ -1,6 +1,8 @@
 'use client'
 
-import { ColumnDef } from '@tanstack/react-table'
+import { EditIcon, EyeIcon, MoreHorizontalIcon, TrashIcon } from 'lucide-react'
+import type { ColumnDef } from '@tanstack/react-table'
+import type { Role, User } from '@/lib/services/rbac-types'
 import { DataTable } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -12,15 +14,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { MoreHorizontalIcon, EyeIcon, EditIcon, TrashIcon } from 'lucide-react'
-import type { User, Role } from '@/lib/services/rbac-types'
 
 interface UsersTableProps {
-  users: User[]
-  roles?: Role[]
+  users: Array<User>
+  roles?: Array<Role>
 }
 
-export const userColumns: ColumnDef<User>[] = [
+export const userColumns: Array<ColumnDef<User>> = [
   {
     accessorKey: 'name',
     header: 'Name',

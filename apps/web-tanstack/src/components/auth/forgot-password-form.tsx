@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import { ArrowLeft, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { AuthBranding } from '@/components/auth/auth-branding'
-import { ArrowLeft, Mail } from 'lucide-react'
 
 type ForgotPasswordFormProps = {
   loginPath: string

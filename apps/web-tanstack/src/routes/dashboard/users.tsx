@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { UsersTable } from '@/components/dashboard/users-table'
-import { getUsersFn, getRolesFn } from '@/lib/services/rbac-service'
+import { getRolesFn, getUsersFn } from '@/lib/services/rbac-service'
 import { UsersPageSkeleton } from '@/components/ui/skeletons'
 
 export const Route = createFileRoute('/dashboard/users')({

@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { SendIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { SendIcon } from 'lucide-react'
 
 type ChatInputProps = {
   onSend: (content: string) => Promise<void>

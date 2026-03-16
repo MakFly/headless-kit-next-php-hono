@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import {
-  ShoppingBagIcon,
-  RocketIcon,
-  HeadphonesIcon,
   ChevronRightIcon,
+  HeadphonesIcon,
+  RocketIcon,
+  ShoppingBagIcon,
 } from 'lucide-react'
 
 const presets = [

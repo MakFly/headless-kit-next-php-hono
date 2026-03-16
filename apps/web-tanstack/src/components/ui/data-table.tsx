@@ -2,28 +2,29 @@
 
 import * as React from 'react'
 import {
+  
+  
+  
+  
+  
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type ColumnFiltersState,
-  type PaginationState,
-  type SortingState,
-  type VisibilityState,
+  useReactTable
 } from '@tanstack/react-table'
 import {
+  ArrowDownIcon,
+  ArrowUpDownIcon,
+  ArrowUpIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsLeftIcon,
   ChevronsRightIcon,
-  ArrowUpDownIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
   EyeIcon,
 } from 'lucide-react'
+import type {ColumnDef, ColumnFiltersState, PaginationState, SortingState, VisibilityState} from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -46,14 +47,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export interface DataTableSearchConfig {
   enabled?: boolean
-  keys?: string[]
+  keys?: Array<string>
   placeholder?: string
 }
 
 export interface DataTablePaginationConfig {
   enabled?: boolean
   pageSize?: number
-  pageSizeOptions?: number[]
+  pageSizeOptions?: Array<number>
   serverSide?: boolean
 }
 
@@ -72,12 +73,12 @@ export interface DataTableColumnSortConfig {
 export interface DataTableActionsConfig<TData> {
   enabled?: boolean
   label?: string
-  items?: {
+  items?: Array<{
     label: string
     icon?: React.ReactNode
     onClick: (row: TData) => void
     variant?: 'default' | 'destructive'
-  }[]
+  }>
 }
 
 export interface DataTableEmptyStateConfig {
@@ -95,8 +96,8 @@ export interface DataTableLoadingConfig {
 }
 
 export interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: Array<ColumnDef<TData, TValue>>
+  data: Array<TData>
   search?: DataTableSearchConfig
   pagination?: DataTablePaginationConfig
   columnVisibilityConfig?: DataTableColumnVisibilityConfig

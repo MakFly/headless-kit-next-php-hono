@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { ClipboardListIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ClipboardListIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/shop/orders')({
   component: OrdersPage,

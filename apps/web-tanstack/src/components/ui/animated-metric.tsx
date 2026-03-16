@@ -72,7 +72,7 @@ export function AnimatedMetric({
     }, stepDuration)
 
     return () => clearInterval(interval)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- displayValue intentionally captured once at effect start
+    // displayValue intentionally captured once at effect start
   }, [value, isVisible])
 
   // Format value

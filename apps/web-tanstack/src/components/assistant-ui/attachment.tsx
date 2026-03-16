@@ -1,13 +1,14 @@
-import { type PropsWithChildren, useEffect, useState, type FC } from 'react'
-import { XIcon, PlusIcon, FileText } from 'lucide-react'
+import {   useEffect, useState } from 'react'
+import { FileText, PlusIcon, XIcon } from 'lucide-react'
 import {
   AttachmentPrimitive,
   ComposerPrimitive,
   MessagePrimitive,
-  useAuiState,
   useAui,
+  useAuiState,
 } from '@assistant-ui/react'
 import { useShallow } from 'zustand/shallow'
+import type {FC, PropsWithChildren} from 'react';
 import {
   Tooltip,
   TooltipContent,
@@ -15,11 +16,11 @@ import {
 } from '@/components/ui/tooltip'
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { TooltipIconButton } from '@/components/assistant-ui/tooltip-icon-button'
 import { cn } from '@/lib/utils'
 

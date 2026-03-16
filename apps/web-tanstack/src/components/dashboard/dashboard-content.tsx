@@ -1,3 +1,15 @@
+import {
+  CheckCircleIcon,
+  FileTextIcon,
+  KeyIcon,
+  SettingsIcon,
+  ShieldIcon,
+  UserIcon,
+  UsersIcon,
+  XCircleIcon,
+} from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import type { User } from '@/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -10,19 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  ShieldIcon,
-  UserIcon,
-  KeyIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  UsersIcon,
-  SettingsIcon,
-  FileTextIcon,
-} from 'lucide-react'
 import { hasPermission, isAdmin } from '@/types'
-import { Link } from '@tanstack/react-router'
-import type { User } from '@/types'
 
 type DashboardContentProps = {
   user: User

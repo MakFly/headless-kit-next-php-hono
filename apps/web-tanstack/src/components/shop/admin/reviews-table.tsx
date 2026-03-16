@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
+import { CheckCircle2, XCircle } from 'lucide-react'
+import type { PaginatedResponse, Review, ReviewStatus } from '@/types/shop'
 import {
-  getAdminReviewsFn,
-  moderateReviewFn,
   bulkApproveReviewsFn,
   bulkRejectReviewsFn,
+  getAdminReviewsFn,
+  moderateReviewFn,
 } from '@/lib/services/admin-service'
-import type { Review, ReviewStatus, PaginatedResponse } from '@/types/shop'
 import { formatDate } from '@/components/shop/admin/format'
 import { StatusBadge } from '@/components/shop/admin/status-badge'
 import { StarRating } from '@/components/shop/admin/star-rating'
@@ -35,9 +36,8 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
-import { CheckCircle2, XCircle } from 'lucide-react'
 
-const REVIEW_STATUSES: (ReviewStatus | 'all')[] = [
+const REVIEW_STATUSES: Array<ReviewStatus | 'all'> = [
   'all',
   'pending',
   'approved',

@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Search, X, ArrowRight, LoaderIcon } from 'lucide-react'
-import { getProductsFn } from '@/lib/services/shop-service'
+import { ArrowRight, LoaderIcon, Search, X } from 'lucide-react'
 import type { Product } from '@/types/shop'
+import { getProductsFn } from '@/lib/services/shop-service'
 
 type SearchSuggestionsProps = {
   onClose: () => void
@@ -21,7 +21,7 @@ const trendingSearches = ['Linen', 'Cashmere', 'Summer collection', 'Silk', 'Org
 export function SearchSuggestions({ onClose }: SearchSuggestionsProps) {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<Product[]>([])
+  const [results, setResults] = useState<Array<Product>>([])
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)

@@ -1,17 +1,37 @@
 import * as React from 'react'
 import { useTransition } from 'react'
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
+  
+  
+  
+  
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
+import {
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+  EyeIcon,
+  MoreHorizontalIcon,
+  PencilIcon,
+  PlusIcon,
+  SettingsIcon,
+  ShieldIcon,
+  ShieldMinusIcon,
+  ShieldPlusIcon,
+  TrashIcon,
+  UserIcon,
+  XIcon,
+} from 'lucide-react'
+import type {ColumnDef, ColumnFiltersState, SortingState, VisibilityState} from '@tanstack/react-table';
+import type { Permission, Role, User } from '@/types'
 import {
   Card,
   CardContent,
@@ -54,29 +74,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  MoreHorizontalIcon,
-  ShieldPlusIcon,
-  ShieldMinusIcon,
-  ShieldIcon,
-  UserIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
-  CheckIcon,
-  XIcon,
-  EyeIcon,
-  PencilIcon,
-  TrashIcon,
-  PlusIcon,
-  SettingsIcon,
-} from 'lucide-react'
-import type { User, Role, Permission } from '@/types'
 
 type UsersDataTableProps = {
-  users: (User & { roles: Role[] })[]
-  roles: (Role & { permissions: Permission[] })[]
+  users: Array<User & { roles: Array<Role> }>
+  roles: Array<Role & { permissions: Array<Permission> }>
   pagination?: {
     currentPage: number
     lastPage: number
@@ -116,8 +117,8 @@ const getActionIcon = (action: string) => {
   }
 }
 
-const groupPermissionsByResource = (permissions: Permission[]) => {
-  const groups: Record<string, Permission[]> = {}
+const groupPermissionsByResource = (permissions: Array<Permission>) => {
+  const groups: Record<string, Array<Permission>> = {}
   permissions.forEach((permission) => {
     const [resource] = permission.slug.split('.')
     if (!groups[resource]) {
@@ -128,7 +129,7 @@ const groupPermissionsByResource = (permissions: Permission[]) => {
   return groups
 }
 
-function RolePermissionsDisplay({ role }: { role: Role & { permissions: Permission[] } }) {
+function RolePermissionsDisplay({ role }: { role: Role & { permissions: Array<Permission> } }) {
   const groups = groupPermissionsByResource(role.permissions ?? [])
   const resources = Object.keys(groups).sort()
 
@@ -168,7 +169,7 @@ function RolePermissionsDisplay({ role }: { role: Role & { permissions: Permissi
 
 export function UsersDataTable({ users, roles, pagination, onAssignRole, onRemoveRole }: UsersDataTableProps) {
   const [isPending, startTransition] = useTransition()
-  const [selectedUser, setSelectedUser] = React.useState<(User & { roles: Role[] }) | null>(null)
+  const [selectedUser, setSelectedUser] = React.useState<(User & { roles: Array<Role> }) | null>(null)
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [dialogMode, setDialogMode] = React.useState<'assign' | 'remove'>('assign')
   const [selectedRole, setSelectedRole] = React.useState<string>('')
@@ -179,7 +180,7 @@ export function UsersDataTable({ users, roles, pagination, onAssignRole, onRemov
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  const columns: ColumnDef<User & { roles: Role[] }>[] = [
+  const columns: Array<ColumnDef<User & { roles: Array<Role> }>> = [
     {
       accessorKey: 'name',
       header: 'User',
@@ -294,7 +295,7 @@ export function UsersDataTable({ users, roles, pagination, onAssignRole, onRemov
     },
   })
 
-  const openAssignDialog = (user: User & { roles: Role[] }) => {
+  const openAssignDialog = (user: User & { roles: Array<Role> }) => {
     setSelectedUser(user)
     setDialogMode('assign')
     setSelectedRole('')
@@ -302,7 +303,7 @@ export function UsersDataTable({ users, roles, pagination, onAssignRole, onRemov
     setDialogOpen(true)
   }
 
-  const openRemoveDialog = (user: User & { roles: Role[] }) => {
+  const openRemoveDialog = (user: User & { roles: Array<Role> }) => {
     setSelectedUser(user)
     setDialogMode('remove')
     setSelectedRole('')

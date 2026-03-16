@@ -2,10 +2,10 @@ import { create } from 'zustand'
 import { toast } from 'sonner'
 import type { Cart, CartItem } from '@/types/shop'
 import {
-  getCartFn,
   addToCartFn,
-  updateCartItemFn,
+  getCartFn,
   removeCartItemFn,
+  updateCartItemFn,
 } from '@/lib/services/cart-service'
 
 type CartState = {
@@ -21,7 +21,7 @@ type CartState = {
 
   // Derived
   itemCount: number
-  items: CartItem[]
+  items: Array<CartItem>
   total: number
 }
 

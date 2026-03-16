@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { getAdminReviewsFn } from '@/lib/services/admin-service'
+import { MessageCircle } from 'lucide-react'
 import type { Review } from '@/types/shop'
+import { getAdminReviewsFn } from '@/lib/services/admin-service'
 import { CardWithIcon } from '@/components/shop/admin/card-with-icon'
 import { StarRating } from '@/components/shop/admin/star-rating'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { MessageCircle } from 'lucide-react'
 
 function getInitials(firstName?: string, lastName?: string) {
   const f = firstName?.[0] ?? '?'
@@ -16,7 +16,7 @@ function getInitials(firstName?: string, lastName?: string) {
 }
 
 export function PendingReviews() {
-  const [reviews, setReviews] = useState<Review[]>([])
+  const [reviews, setReviews] = useState<Array<Review>>([])
   const [loading, setLoading] = useState(true)
 
   const fetchReviews = useCallback(async () => {

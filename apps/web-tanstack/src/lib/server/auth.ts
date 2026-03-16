@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie } from '@tanstack/react-start/server'
-import { getAuthAdapter, toUser, COOKIE_NAMES } from '../adapters'
+import { COOKIE_NAMES, getAuthAdapter, toUser } from '../adapters'
 import { ApiException } from '../http'
 
 function getExpiresInFromCookie(): number | null {

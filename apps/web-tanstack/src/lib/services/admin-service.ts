@@ -1,20 +1,20 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getAuthAdapter, getBackendType, getAdapterConfig } from '@/lib/adapters'
 import type {
   AdminDashboard,
-  Product,
+  Category,
+  Customer,
+  InventoryItem,
   Order,
   OrderStatus,
-  Customer,
+  PaginatedResponse,
+  Product,
+  RevenueAnalytics,
   Review,
   ReviewStatus,
-  Category,
-  RevenueAnalytics,
-  TopProduct,
-  InventoryItem,
-  PaginatedResponse,
   Segment,
+  TopProduct,
 } from '@/types/shop'
+import { getAdapterConfig, getAuthAdapter, getBackendType } from '@/lib/adapters'
 
 function getApiBaseUrl(): string {
   const backend = getBackendType()
@@ -247,7 +247,7 @@ export const moderateReviewFn = createServerFn({ method: 'POST' })
   })
 
 export const bulkApproveReviewsFn = createServerFn({ method: 'POST' })
-  .inputValidator((data: { ids: string[] }) => data)
+  .inputValidator((data: { ids: Array<string> }) => data)
   .handler(async ({ data }): Promise<void> => {
     await fetchFromApi<void>('/api/v1/admin/reviews/bulk-approve', {
       method: 'POST',
@@ -256,7 +256,7 @@ export const bulkApproveReviewsFn = createServerFn({ method: 'POST' })
   })
 
 export const bulkRejectReviewsFn = createServerFn({ method: 'POST' })
-  .inputValidator((data: { ids: string[] }) => data)
+  .inputValidator((data: { ids: Array<string> }) => data)
   .handler(async ({ data }): Promise<void> => {
     await fetchFromApi<void>('/api/v1/admin/reviews/bulk-reject', {
       method: 'POST',
@@ -275,8 +275,8 @@ export const getRevenueAnalyticsFn = createServerFn({ method: 'GET' }).handler(
 )
 
 export const getTopProductsFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<TopProduct[]> => {
-    return await fetchFromApi<TopProduct[]>('/api/v1/admin/analytics/top-products')
+  async (): Promise<Array<TopProduct>> => {
+    return await fetchFromApi<Array<TopProduct>>('/api/v1/admin/analytics/top-products')
   },
 )
 
@@ -285,8 +285,8 @@ export const getTopProductsFn = createServerFn({ method: 'GET' }).handler(
 // ---------------------------------------------------------------------------
 
 export const getAdminInventoryFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<InventoryItem[]> => {
-    return await fetchFromApi<InventoryItem[]>('/api/v1/admin/inventory')
+  async (): Promise<Array<InventoryItem>> => {
+    return await fetchFromApi<Array<InventoryItem>>('/api/v1/admin/inventory')
   },
 )
 
@@ -307,8 +307,8 @@ export const updateInventoryFn = createServerFn({ method: 'POST' })
 // ---------------------------------------------------------------------------
 
 export const getAdminCategoriesFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Category[]> => {
-    return await fetchFromApi<Category[]>('/api/v1/categories')
+  async (): Promise<Array<Category>> => {
+    return await fetchFromApi<Array<Category>>('/api/v1/categories')
   },
 )
 
@@ -317,7 +317,7 @@ export const getAdminCategoriesFn = createServerFn({ method: 'GET' }).handler(
 // ---------------------------------------------------------------------------
 
 export const getSegmentsFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Segment[]> => {
-    return await fetchFromApi<Segment[]>('/api/v1/admin/segments')
+  async (): Promise<Array<Segment>> => {
+    return await fetchFromApi<Array<Segment>>('/api/v1/admin/segments')
   },
 )

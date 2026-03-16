@@ -6,15 +6,15 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import { useEffect, useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import appCss from '../styles.css?url'
+import type { RouterContext } from '@/types/router'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from '@/components/theme-provider'
 import { getCurrentUserFn } from '@/lib/server/auth'
 import { useAuthStore } from '@/stores/auth-store'
 import { useTokenRefresh } from '@/components/auth/use-token-refresh'
-import type { RouterContext } from '@/types/router'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({

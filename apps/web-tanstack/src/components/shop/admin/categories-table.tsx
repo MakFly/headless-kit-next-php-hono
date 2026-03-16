@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getAdminCategoriesFn } from '@/lib/services/admin-service'
 import type { Category } from '@/types/shop'
+import { getAdminCategoriesFn } from '@/lib/services/admin-service'
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function AdminCategoriesTable() {
-  const [categories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<Array<Category>>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

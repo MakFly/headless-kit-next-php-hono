@@ -1,5 +1,12 @@
 import { useState, useTransition } from 'react'
 import {
+  CheckCircle2Icon,
+  CircleIcon,
+  PencilIcon,
+  PlusIcon,
+  Trash2Icon,
+} from 'lucide-react'
+import {
   Card,
   CardContent,
   CardDescription,
@@ -26,13 +33,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  PlusIcon,
-  CheckCircle2Icon,
-  CircleIcon,
-  PencilIcon,
-  Trash2Icon,
-} from 'lucide-react'
 
 type Todo = {
   id: number
@@ -42,7 +42,7 @@ type Todo = {
 }
 
 type TodosTableProps = {
-  todos: Todo[]
+  todos: Array<Todo>
   userId: number
 }
 
@@ -50,7 +50,7 @@ const API_BASE = 'https://jsonplaceholder.typicode.com'
 
 export function TodosTable({ todos, userId }: TodosTableProps) {
   const [isPending, startTransition] = useTransition()
-  const [items, setItems] = useState<Todo[]>(todos)
+  const [items, setItems] = useState<Array<Todo>>(todos)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Todo | null>(null)
   const [formData, setFormData] = useState({ title: '', completed: false })

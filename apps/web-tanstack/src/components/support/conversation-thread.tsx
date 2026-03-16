@@ -1,7 +1,7 @@
+import type { ConversationWithMessages } from '@/types/support'
 import { AiChatThread } from '@/components/support/ai-chat-thread'
 import { MessageBubble } from '@/components/support/message-bubble'
 import { ChatInput } from '@/components/support/chat-input'
-import type { ConversationWithMessages } from '@/types/support'
 
 type ConversationThreadProps = {
   conversation: ConversationWithMessages

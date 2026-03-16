@@ -1,18 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 import {
+  deleteCookie,
   getCookie,
   setCookie,
-  deleteCookie,
 } from '@tanstack/react-start/server'
+import type {AdapterConfig, BackendType} from '@/lib/adapters';
 import {
-  getAdapterConfig,
-  type BackendType,
-  type AdapterConfig,
+  
+  
+  getAdapterConfig
 } from '@/lib/adapters'
 import { ApiException, apiRequest, readResponseBody } from '@/lib/http'
 import {
-  TOKEN_CONFIG,
   COOKIE_NAMES,
+  TOKEN_CONFIG,
   calculateExpirationTimestamp,
   formatExpirationForCookie,
   shouldRefreshByTimestamp,
@@ -101,7 +102,7 @@ function asRecord(value: unknown): Record<string, unknown> {
     : {}
 }
 
-function validatePathSegments(segments: string[]): void {
+function validatePathSegments(segments: Array<string>): void {
   for (const segment of segments) {
     if (!segment) {
       throw new ApiException('Invalid path: empty segment', {

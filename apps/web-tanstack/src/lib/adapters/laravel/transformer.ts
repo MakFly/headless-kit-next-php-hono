@@ -1,4 +1,4 @@
-import type { NormalizedUser, TokenStorage, AuthResponse } from '../types'
+import type { AuthResponse, NormalizedUser, TokenStorage } from '../types'
 
 type LaravelUser = {
   id: number
@@ -79,7 +79,7 @@ export function transformMeResponse(response: LaravelMeResponse): NormalizedUser
   return transformUser(response.data)
 }
 
-export function transformOAuthProviders(response: { data: string[] }): string[] {
+export function transformOAuthProviders(response: { data: Array<string> }): Array<string> {
   return response.data
 }
 

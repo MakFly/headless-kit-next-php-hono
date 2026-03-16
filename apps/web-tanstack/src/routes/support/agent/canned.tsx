@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { MessageSquareTextIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { MessageSquareTextIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/support/agent/canned')({
   component: CannedResponsesPage,

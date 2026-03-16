@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 type SizeSelectorProps = {
-  sizes?: string[]
+  sizes?: Array<string>
   onChange?: (size: string) => void
 }
 

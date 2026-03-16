@@ -1,6 +1,9 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ShoppingBag, Search, User, Menu, X } from 'lucide-react'
+import { Menu, Search, ShoppingBag, User, X } from 'lucide-react'
+import { SearchSuggestions } from './search-suggestions'
+import { CartSheet } from './cart-sheet'
+import type { User as UserType } from '@/types'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -13,9 +16,6 @@ import {
 import { useCartStore } from '@/stores/cart-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { isAdmin } from '@/types'
-import type { User as UserType } from '@/types'
-import { SearchSuggestions } from './search-suggestions'
-import { CartSheet } from './cart-sheet'
 
 type ShopNavbarProps = {
   initialUser?: UserType | null

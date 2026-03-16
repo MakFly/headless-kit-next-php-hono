@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils'
 import type { Message } from '@/types/support'
+import { cn } from '@/lib/utils'
 
 type MessageBubbleProps = {
   message: Message

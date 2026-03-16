@@ -19,7 +19,7 @@ export type Plan = {
   slug: string
   priceMonthly: number // cents
   priceYearly: number // cents
-  features: string[]
+  features: Array<string>
   limits: PlanLimits
 }
 
@@ -89,7 +89,7 @@ export type SaasDashboard = {
   apiCallsThisMonth: number
   storageUsed: number // MB
   currentPlan: Plan | null
-  recentActivity: ActivityEntry[]
+  recentActivity: Array<ActivityEntry>
 }
 
 export type ActivityEntry = {

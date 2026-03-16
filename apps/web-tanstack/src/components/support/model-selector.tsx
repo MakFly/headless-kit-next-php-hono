@@ -1,3 +1,4 @@
+import { Bot } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -9,7 +10,6 @@ import {
 } from '@/components/ui/select'
 import { useAiPreferencesStore } from '@/stores/ai-preferences-store'
 import { AI_PROVIDER_OPTIONS } from '@/lib/ai/provider-options'
-import { Bot } from 'lucide-react'
 
 export function ModelSelector() {
   const { selectedProvider, selectedModel, setProvider, setModel } = useAiPreferencesStore()

@@ -1,5 +1,5 @@
 import { createRouter } from '@tanstack/react-router'
-import { QueryClient, QueryCache } from '@tanstack/react-query'
+import { QueryCache, QueryClient } from '@tanstack/react-query'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { routeTree } from './routeTree.gen'
 import { refreshTokenFn } from './lib/server/auth'

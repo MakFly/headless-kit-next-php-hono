@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { ShoppingBag, Minus, Plus } from 'lucide-react'
+import { Minus, Plus, ShoppingBag } from 'lucide-react'
 import { SizeSelector } from './size-selector'
+import { Button } from '@/components/ui/button'
 import { useCartStore } from '@/stores/cart-store'
 
 type ProductActionsProps = {

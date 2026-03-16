@@ -1,6 +1,8 @@
 'use client'
 
-import { ColumnDef } from '@tanstack/react-table'
+import { EditIcon, EyeIcon, MoreHorizontalIcon, TrashIcon } from 'lucide-react'
+import type { ColumnDef } from '@tanstack/react-table'
+import type { Permission, Role } from '@/lib/services/rbac-types'
 import { DataTable } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -12,19 +14,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { MoreHorizontalIcon, EyeIcon, EditIcon, TrashIcon } from 'lucide-react'
-import type { Role, Permission } from '@/lib/services/rbac-types'
 
 export interface RoleWithPermissions extends Role {
-  permissions: Permission[]
+  permissions: Array<Permission>
 }
 
 interface RolesTableProps {
-  roles: Role[]
-  permissions?: Permission[]
+  roles: Array<Role>
+  permissions?: Array<Permission>
 }
 
-export const roleColumns: ColumnDef<Role>[] = [
+export const roleColumns: Array<ColumnDef<Role>> = [
   {
     accessorKey: 'name',
     header: 'Role',

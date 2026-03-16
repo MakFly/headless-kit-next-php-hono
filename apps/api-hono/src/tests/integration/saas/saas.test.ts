@@ -220,7 +220,7 @@ describe('SaaS Endpoints', () => {
       const res = await adminApp.request('/api/v1/saas/team/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'test@test.com', role: 'member' }),
+        body: JSON.stringify({ email: 'user@example.com', role: 'member' }),
       });
 
       expect(res.status).toBe(409);

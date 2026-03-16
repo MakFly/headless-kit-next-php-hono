@@ -87,7 +87,7 @@ jobs:
         run: bun install
 
       - name: Setup database
-        run: cd apps/api-hono && bun run db:push
+        run: cd apps/api-hono && bun run db:push && bun run db:seed
         env:
           JWT_SECRET: ci-test-secret-key-at-least-32-characters-long
           DATABASE_URL: ./test.db

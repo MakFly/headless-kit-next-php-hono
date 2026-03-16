@@ -86,8 +86,17 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Setup database
+        run: cd apps/api-hono && bun run db:push
+        env:
+          JWT_SECRET: ci-test-secret-key-at-least-32-characters-long
+          DATABASE_URL: file:./test.db
+
       - name: Run tests
         run: cd apps/api-hono && bun test
+        env:
+          JWT_SECRET: ci-test-secret-key-at-least-32-characters-long
+          DATABASE_URL: file:./test.db
 
   test-laravel:
     name: Test — api-laravel
@@ -115,10 +124,24 @@ jobs:
         run: cd apps/api-laravel && composer install --no-interaction --prefer-dist
 
       - name: Copy .env
-        run: cd apps/api-laravel && cp .env.example .env || true
+        run: cd apps/api-laravel && cp .env.example .env
+
+      - name: Configure CI environment
+        run: |
+          cd apps/api-laravel
+          sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/' .env
+          sed -i '/DB_HOST/d; /DB_PORT/d; /DB_DATABASE=rbac_app/d; /DB_USERNAME/d; /DB_PASSWORD/d' .env
+          echo "DB_DATABASE=:memory:" >> .env
+          echo "BETTER_AUTH_SECRET=$(openssl rand -hex 32)" >> .env
+          echo "SESSION_DRIVER=array" >> .env
+          echo "CACHE_STORE=array" >> .env
+          echo "QUEUE_CONNECTION=sync" >> .env
 
       - name: Generate application key
-        run: cd apps/api-laravel && php artisan key:generate --force || true
+        run: cd apps/api-laravel && php artisan key:generate --force
+
+      - name: Run migrations
+        run: cd apps/api-laravel && php artisan migrate --force
 
       - name: Run tests
         run: cd apps/api-laravel && php artisan test
@@ -144,6 +167,9 @@ jobs:
           key: ${{ runner.os }}-composer-symfony-${{ hashFiles('apps/api-sf/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-symfony-
+
+      - name: Setup environment
+        run: cd apps/api-sf && cp .env.example .env
 
       - name: Install Composer dependencies
         run: cd apps/api-sf && composer install --no-interaction --prefer-dist

@@ -1,0 +1,27 @@
+FROM oven/bun:1-alpine AS base
+WORKDIR /app
+
+# Install dependencies
+FROM base AS deps
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile
+
+# Build the application
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN bun run build
+
+# Production runner
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 app && \
+    adduser --system --uid 1001 app
+
+COPY --from=builder --chown=app:app /app/.output ./.output
+
+USER app
+EXPOSE 3003
+CMD ["bun", ".output/server/index.mjs"]

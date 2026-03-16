@@ -1,0 +1,135 @@
+---
+title: Shop Module
+description: Products, categories, cart, orders, and reviews.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The Shop module provides a complete e-commerce backend: product catalog, categories, shopping cart, order management, and product reviews. It is implemented across all 3 backends using Vertical Slice Architecture.
+
+## API Endpoints
+
+### Products
+
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| `GET` | `/api/v1/shop/products` | No | List products (paginated, filterable) |
+| `GET` | `/api/v1/shop/products/{id}` | No | Show product with reviews |
+
+### Categories
+
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| `GET` | `/api/v1/shop/categories` | No | List all categories |
+| `GET` | `/api/v1/shop/categories/{id}` | No | Show category with products |
+
+### Cart
+
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| `GET` | `/api/v1/cart` | Yes | Get current user's cart |
+| `POST` | `/api/v1/cart/items` | Yes | Add item to cart |
+| `PATCH` | `/api/v1/cart/items/{id}` | Yes | Update item quantity |
+| `DELETE` | `/api/v1/cart/items/{id}` | Yes | Remove item from cart |
+
+### Orders
+
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| `POST` | `/api/v1/orders` | Yes | Create order from cart |
+| `GET` | `/api/v1/orders` | Yes | List user's orders |
+| `GET` | `/api/v1/orders/{id}` | Yes | Show order details |
+
+## Backend Implementation
+
+<Tabs>
+  <TabItem label="Laravel">
+    ```
+    app/Features/
+    ├── Shop/
+    │   ├── Actions/ListProducts.php
+    │   ├── Actions/ShowProduct.php
+    │   ├── Actions/ListCategories.php
+    │   ├── Actions/ShowCategory.php
+    │   └── routes.php
+    ├── Cart/
+    │   ├── Actions/ShowCart.php
+    │   ├── Actions/AddItem.php
+    │   ├── Actions/UpdateItem.php
+    │   ├── Actions/RemoveItem.php
+    │   ├── Formatters/CartFormatter.php
+    │   └── routes.php
+    └── Orders/
+        ├── Actions/CreateOrder.php
+        ├── Actions/ListOrders.php
+        ├── Actions/ShowOrder.php
+        ├── Formatters/OrderFormatter.php
+        └── routes.php
+    ```
+
+    Shared models: `Product`, `Category`, `Cart`, `CartItem`, `Order`, `OrderItem`, `Review` in `app/Shared/Models/`.
+  </TabItem>
+  <TabItem label="Symfony">
+    ```
+    src/Feature/
+    ├── Shop/
+    │   ├── Controller/ListProductsController.php
+    │   ├── Controller/ShowProductController.php
+    │   ├── Controller/ListCategoriesController.php
+    │   ├── Controller/ShowCategoryController.php
+    │   └── Repository/ProductRepository.php
+    ├── Cart/
+    │   ├── Controller/ShowCartController.php
+    │   ├── Controller/AddItemController.php
+    │   ├── Controller/UpdateItemController.php
+    │   ├── Controller/RemoveItemController.php
+    │   └── Repository/CartRepository.php
+    └── Orders/
+        ├── Controller/CreateOrderController.php
+        ├── Controller/ListOrdersController.php
+        ├── Controller/ShowOrderController.php
+        └── Repository/OrderRepository.php
+    ```
+
+    Shared entities in `src/Shared/Entity/`.
+  </TabItem>
+  <TabItem label="Hono">
+    ```
+    src/features/
+    ├── shop/
+    │   ├── shop.schemas.ts
+    │   ├── shop.repository.ts
+    │   ├── shop.service.ts
+    │   ├── shop.handlers.ts
+    │   └── shop.routes.ts
+    ├── cart/
+    │   ├── cart.schemas.ts
+    │   ├── cart.repository.ts
+    │   ├── cart.service.ts
+    │   ├── cart.handlers.ts
+    │   └── cart.routes.ts
+    └── orders/
+        ├── orders.schemas.ts
+        ├── orders.repository.ts
+        ├── orders.service.ts
+        ├── orders.handlers.ts
+        └── orders.routes.ts
+    ```
+  </TabItem>
+</Tabs>
+
+## Frontend Services
+
+Both frontends provide service modules for the Shop:
+
+| Frontend | Service File | Functions |
+| -------- | ------------ | --------- |
+| Next.js | `src/lib/actions/shop/` | Server actions using BFF client |
+| TanStack Start | `src/lib/services/shop-service.ts` | Client-side fetch via BFF proxy |
+
+## Related
+
+- [Admin Module](/modules/admin/) — Product and order management
+- [Vertical Slice Architecture](/architecture/vertical-slice/) — How features are organized

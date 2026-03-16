@@ -75,7 +75,7 @@ import {
   SettingsIcon,
 } from 'lucide-react';
 import { assignRoleAction, removeRoleAction } from '@/lib/actions/rbac';
-import type { User, Role, Permission } from '@rbac/types';
+import type { User, Role, Permission } from '@/types';
 
 type UsersDataTableProps = {
   users: (User & { roles: Role[] })[];

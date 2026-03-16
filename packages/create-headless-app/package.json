@@ -1,0 +1,28 @@
+{
+  "name": "create-headless-app",
+  "version": "0.1.0",
+  "description": "Create a new Headless Kit application",
+  "type": "module",
+  "bin": {
+    "create-headless-app": "./bin/create-headless-app.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

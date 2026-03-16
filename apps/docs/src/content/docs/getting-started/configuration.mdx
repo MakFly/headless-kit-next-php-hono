@@ -1,0 +1,152 @@
+---
+title: Configuration
+description: Environment variables and configuration options for Headless Kit.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Frontend Configuration
+
+<Tabs>
+  <TabItem label="Next.js (Recommended)">
+    File: `apps/web/.env.local`
+
+    | Variable | Default | Description |
+    | -------- | ------- | ----------- |
+    | `NEXT_PUBLIC_APP_URL` | `http://localhost:3001` | Public URL of the Next.js app |
+    | `AUTH_BACKEND` | `laravel` | Active backend: `laravel`, `symfony`, or `hono` |
+    | `LARAVEL_API_URL` | `http://localhost:8000` | Laravel backend URL |
+    | `SYMFONY_API_URL` | `http://localhost:8002` | Symfony backend URL |
+    | `HONO_API_URL` | `http://localhost:8003` | Hono backend URL |
+    | `BFF_SECRET` | -- | HMAC shared secret (must match Laravel's) |
+    | `BFF_ID` | `nextjs-bff` | Identifier sent in HMAC headers |
+
+    Example `.env.local`:
+
+    ```bash
+    NEXT_PUBLIC_APP_URL=http://localhost:3001
+    AUTH_BACKEND=laravel
+    LARAVEL_API_URL=http://localhost:8000
+    SYMFONY_API_URL=http://localhost:8002
+    HONO_API_URL=http://localhost:8003
+    BFF_SECRET=your-secret-key-min-32-chars
+    BFF_ID=nextjs-bff
+    ```
+  </TabItem>
+  <TabItem label="TanStack Start">
+    File: `apps/web-tanstack/.env`
+
+    | Variable | Default | Description |
+    | -------- | ------- | ----------- |
+    | `VITE_API_URL` | `http://localhost:8003` | Backend API URL |
+    | `VITE_APP_URL` | `http://localhost:3003` | Public URL of the TanStack app |
+
+    Example `.env`:
+
+    ```bash
+    VITE_API_URL=http://localhost:8003
+    VITE_APP_URL=http://localhost:3003
+    ```
+
+    <Aside type="note">
+      TanStack Start uses Vite environment variables (prefixed with `VITE_`). Unlike Next.js, there is no separate `AUTH_BACKEND` variable -- the backend URL is set directly via `VITE_API_URL`.
+    </Aside>
+  </TabItem>
+</Tabs>
+
+## Backend Configuration
+
+<Tabs>
+  <TabItem label="Laravel">
+    File: `apps/api-laravel/.env`
+
+    | Variable | Default | Description |
+    | -------- | ------- | ----------- |
+    | `APP_URL` | `http://localhost:8000` | Laravel app URL |
+    | `APP_KEY` | -- | Laravel encryption key (generate with `php artisan key:generate`) |
+    | `DB_CONNECTION` | `sqlite` | Database driver |
+    | `DB_DATABASE` | `database/database.sqlite` | Database path |
+    | `BFF_SECRET` | -- | HMAC shared secret (must match BFF's) |
+    | `BFF_ID` | `nextjs-bff` | Expected BFF identifier |
+    | `SANCTUM_STATEFUL_DOMAINS` | `localhost:3001` | Domains allowed for stateful auth |
+    | `FRONTEND_URL` | `http://localhost:3001` | Frontend URL for CORS |
+    | `GOOGLE_CLIENT_ID` | -- | Google OAuth client ID |
+    | `GOOGLE_CLIENT_SECRET` | -- | Google OAuth client secret |
+    | `GITHUB_CLIENT_ID` | -- | GitHub OAuth client ID |
+    | `GITHUB_CLIENT_SECRET` | -- | GitHub OAuth client secret |
+  </TabItem>
+  <TabItem label="Symfony">
+    File: `apps/api-sf/.env.local`
+
+    | Variable | Default | Description |
+    | -------- | ------- | ----------- |
+    | `DATABASE_URL` | `sqlite:///%kernel.project_dir%/var/data_dev.db` | Database DSN |
+    | `BETTER_AUTH_SECRET` | -- | Secret for Paseto V4 token signing |
+    | `FRONTEND_URL` | `http://localhost:3001` | Frontend URL for CORS |
+    | `GOOGLE_CLIENT_ID` | -- | Google OAuth client ID |
+    | `GOOGLE_CLIENT_SECRET` | -- | Google OAuth client secret |
+    | `GITHUB_CLIENT_ID` | -- | GitHub OAuth client ID |
+    | `GITHUB_CLIENT_SECRET` | -- | GitHub OAuth client secret |
+  </TabItem>
+  <TabItem label="Hono">
+    File: `apps/api-hono/.env`
+
+    | Variable | Default | Description |
+    | -------- | ------- | ----------- |
+    | `PORT` | `8003` | Server port |
+    | `JWT_SECRET` | -- | Secret for HS256 JWT signing |
+    | `FRONTEND_URL` | `http://localhost:3003` | Frontend URL for CORS |
+    | `DATABASE_URL` | `file:./dev.db` | SQLite database path |
+  </TabItem>
+</Tabs>
+
+## Backend Selection
+
+The active backend is determined by the `AUTH_BACKEND` environment variable in the Next.js BFF. You can also switch backends at runtime using a cookie:
+
+```typescript
+// The BFF proxy reads the active backend from:
+// 1. The 'auth_backend' cookie (runtime switching)
+// 2. The AUTH_BACKEND environment variable (default)
+```
+
+This means you can run all three backends simultaneously and switch between them per-user or per-request.
+
+## HMAC Configuration
+
+HMAC signing is used between the BFF and Laravel to ensure request authenticity. Both sides must share the same secret.
+
+<Aside type="caution">
+  The `BFF_SECRET` must be at least 32 characters long and identical on both the Next.js BFF and the Laravel backend. Symfony and Hono do not currently require HMAC.
+</Aside>
+
+The signature includes:
+- Timestamp (prevents replay attacks)
+- HTTP method
+- Request path
+- SHA-256 hash of the request body (with sorted keys for determinism)
+
+```
+signature = HMAC-SHA256(secret, "timestamp:METHOD:/path:bodyHash")
+```
+
+Headers sent on every BFF-to-Laravel request:
+
+| Header | Description |
+| ------ | ----------- |
+| `X-BFF-Id` | Identifier of the BFF instance |
+| `X-BFF-Timestamp` | Unix timestamp of the request |
+| `X-BFF-Signature` | HMAC-SHA256 signature |
+
+## Cookie Configuration
+
+The BFF stores auth tokens in HttpOnly cookies. Cookie names are derived from the active backend to allow multi-backend sessions:
+
+| Cookie | HttpOnly | Purpose |
+| ------ | -------- | ------- |
+| `auth_token_{backend}` | Yes | Access token |
+| `refresh_token_{backend}` | Yes | Refresh token |
+| `token_expires_at_{backend}` | No | Expiration timestamp (readable by client JS for proactive refresh) |
+| `auth_backend` | Yes | Active backend identifier |
+
+The `token_expires_at` cookie is intentionally **not** HttpOnly so that client-side JavaScript can check whether a proactive refresh is needed before making API calls.

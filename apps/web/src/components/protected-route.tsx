@@ -23,7 +23,7 @@ export function ProtectedRoute({
 
   useEffect(() => {
     if (isHydrated && !isAuthenticated) {
-      router.push("/auth/login");
+      router.push("/dashboard/auth/login");
     }
   }, [isHydrated, isAuthenticated, router]);
 

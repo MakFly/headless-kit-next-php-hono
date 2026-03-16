@@ -1,247 +1,241 @@
-# Symfony API avec BetterAuth
+# API Symfony — Backend PHP
 
-## Vue d'ensemble
+## Stack
 
-API Symfony 8 utilisant **BetterAuth** pour l'authentification stateless avec tokens Paseto V4.
+- **Framework**: Symfony 8
+- **Auth**: BetterAuth (betterauth/symfony-bundle) — Paseto V4 tokens
+- **ORM**: Doctrine ORM (attributes)
+- **CRUD layer**: API Platform 4 (34 operations across 13 resources)
+- **DB**: SQLite (dev/test), PostgreSQL (prod)
+- **Docs**: API Platform OpenAPI
 
-## Stack technique
-
-- **Symfony** : 8.0
-- **BetterAuth** : dev-main (authentification)
-- **Doctrine ORM** : Base de données
-- **API Platform** : Documentation OpenAPI (préfixe `/api/v1`)
-- **Nelmio CORS** : Gestion CORS
-
-## Commandes
-
-```bash
-# Serveur de développement (port 8002)
-symfony server:start --port=8002 --no-tls
-
-# Tests
-php bin/phpunit
-php bin/phpunit tests/Functional/Auth/
-
-# Cache
-php bin/console cache:clear
-
-# Base de données
-php bin/console doctrine:schema:create
-php bin/console doctrine:migrations:migrate
-
-# BetterAuth - Ajouter des contrôleurs
-php bin/console better-auth:add-controller --list
-php bin/console better-auth:add-controller auth
-```
-
-## Configuration BetterAuth
-
-Fichier : `config/packages/better_auth.yaml`
-
-```yaml
-better_auth:
-    mode: api                    # Stateless avec tokens Paseto V4
-    secret: '%env(BETTER_AUTH_SECRET)%'
-    token:
-        lifetime: 3600           # Access token: 1 heure
-        refresh_lifetime: 2592000 # Refresh token: 30 jours
-    two_factor:
-        enabled: true
-    magic_link:
-        enabled: true
-    email_verification:
-        enabled: true
-    password_reset:
-        enabled: true
-```
-
-## Endpoints d'authentification
-
-### Routes BetterAuth natives (`/auth/*`)
-
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/auth/register` | Inscription |
-| POST | `/auth/login` | Connexion |
-| GET | `/auth/me` | Utilisateur courant (token requis) |
-| POST | `/auth/refresh` | Rafraîchir le token |
-| POST | `/auth/logout` | Déconnexion |
-| GET | `/auth/2fa/status` | Statut 2FA |
-| POST | `/auth/2fa/setup` | Configurer 2FA |
-| POST | `/auth/password/forgot` | Demande reset password |
-| POST | `/auth/password/reset` | Reset password |
-| GET | `/auth/oauth/providers` | Providers OAuth disponibles |
-
-### Routes personnalisées (`/api/v1/auth/*`)
-
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/api/v1/auth/register` | Inscription |
-| POST | `/api/v1/auth/login` | Connexion |
-| POST | `/api/v1/auth/login/2fa` | Login avec 2FA |
-| GET | `/api/v1/auth/me` | Utilisateur courant |
-| POST | `/api/v1/auth/refresh` | Rafraîchir le token |
-| POST | `/api/v1/auth/logout` | Déconnexion |
-| POST | `/api/v1/auth/revoke-all` | Révoquer toutes les sessions |
-| POST | `/api/v1/auth/password/forgot` | Demande reset password |
-| POST | `/api/v1/auth/password/reset` | Reset password |
-| POST | `/api/v1/auth/password/verify-token` | Vérifier token reset |
-
-## Format des requêtes/réponses
-
-### Register
-```bash
-curl -X POST http://localhost:8002/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"SecurePass123!","name":"User"}'
-```
-
-### Login
-```bash
-curl -X POST http://localhost:8002/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"SecurePass123!"}'
-```
-
-Réponse :
-```json
-{
-  "user": {"id": "...", "email": "user@example.com", "name": "User"},
-  "access_token": "v4.public.xxx",
-  "refresh_token": "xxx",
-  "expires_in": 3600,
-  "token_type": "Bearer"
-}
-```
-
-### Requête authentifiée
-```bash
-curl -X GET http://localhost:8002/api/v1/auth/me \
-  -H "Authorization: Bearer v4.public.xxx"
-```
-
-### Refresh token
-```bash
-curl -X POST http://localhost:8002/api/v1/auth/refresh \
-  -H "Content-Type: application/json" \
-  -d '{"refreshToken":"xxx"}'
-```
-
-## Structure des fichiers
+## Architecture — Vertical Slice Architecture + API Platform hybrid
 
 ```
-apps/api-sf/
-├── config/
-│   ├── packages/
-│   │   ├── better_auth.yaml    # Config BetterAuth
-│   │   ├── api_platform.yaml   # API Platform (prefix: /api/v1)
-│   │   ├── doctrine.yaml       # Config Doctrine
-│   │   ├── nelmio_cors.yaml    # Config CORS
-│   │   └── security.yaml       # Config Security
-│   └── routes/
-│       └── api_platform.yaml   # Routes API Platform
-├── src/
-│   ├── Controller/
-│   │   └── Api/
-│   │       └── V1/
-│   │           ├── AuthController.php      # Auth personnalisé
-│   │           └── PasswordController.php  # Password reset
-│   └── Entity/                 # Entités Doctrine (générées par BetterAuth)
-│       ├── User.php
-│       ├── Session.php
-│       ├── RefreshToken.php
-│       └── ...
-├── tests/
-│   └── Functional/
-│       └── Auth/
-│           ├── AuthenticationTest.php    # Tests auth natifs
-│           ├── ApiV1AuthTest.php         # Tests /api/v1/auth/*
-│           ├── PasswordResetTest.php     # Tests password reset
-│           └── EndpointAccessTest.php    # Tests accessibilité
-└── var/
-    └── data_dev.db             # SQLite (développement)
+src/
+├── Feature/
+│   ├── Auth/
+│   │   ├── Controller/          # 11 invokable controllers
+│   │   │   ├── RegisterController.php
+│   │   │   ├── LoginController.php
+│   │   │   ├── Login2faController.php
+│   │   │   ├── MeController.php
+│   │   │   ├── RefreshController.php
+│   │   │   ├── LogoutController.php
+│   │   │   ├── RevokeAllController.php
+│   │   │   ├── TestAccountsController.php
+│   │   │   ├── ForgotPasswordController.php
+│   │   │   ├── ResetPasswordController.php
+│   │   │   └── VerifyResetTokenController.php
+│   │   ├── DTO/
+│   │   └── Service/
+│   │       └── AuthService.php
+│   ├── Cart/
+│   │   ├── Controller/          # 4 controllers (ShowCart, AddItem, UpdateItem, RemoveItem)
+│   │   └── Repository/
+│   ├── Orders/
+│   │   ├── Controller/          # 1 controller (CreateOrder) — List/Show via API Platform
+│   │   └── Repository/
+│   ├── Admin/
+│   │   ├── Controller/
+│   │   │   ├── Rbac/            # 6 controllers (ListRoles, AssignRole, etc.)
+│   │   │   └── Shop/            # 8 controllers (Dashboard, RevenueAnalytics, TopProducts,
+│   │   │                        #   Inventory, UpdateInventory, UpdateOrderStatus,
+│   │   │                        #   BulkApproveReviews, BulkRejectReviews)
+│   │   └── Service/
+│   │       └── SegmentQueryService.php
+│   ├── Saas/
+│   │   ├── Controller/          # 10 controllers (Dashboard, GetSubscription, Subscribe,
+│   │   │                        #   Cancel, InviteTeamMember, ChangeTeamRole, RemoveTeamMember,
+│   │   │                        #   GetUsage, GetSettings, UpdateSettings)
+│   │   └── Service/
+│   │       └── OrgLoader.php
+│   └── Support/
+│       └── Controller/          # 8 controllers (CreateConversation, SendMessage, Rate,
+│                                #   AgentQueue, AgentAssigned, Assign, UpdateStatus, RatingStats)
+├── Shared/
+│   ├── Entity/                  # ALL Doctrine entities — #[ApiResource] on CRUD entities
+│   ├── Repository/              # Shared repos
+│   ├── Security/                # Voters, traits
+│   ├── Service/
+│   │   └── ApiResponseService.php
+│   ├── ApiPlatform/
+│   │   ├── Serializer/          # Normalizers, EnvelopeSubscriber
+│   │   ├── Doctrine/            # ORM extensions (filters, pagination)
+│   │   └── State/               # Custom state providers/processors
+│   └── EventSubscriber/
+│       └── ApiExceptionSubscriber.php
 ```
 
-## Création de contrôleurs personnalisés
+## Hybrid approach: when to use API Platform vs invokable controllers
 
-**IMPORTANT** : Symfony utilise l'auto-discovery des contrôleurs via `config/routes.yaml`.
-Ne pas créer de fichier yaml séparé pour les routes - les attributs `#[Route]` suffisent.
+| Use API Platform | Use invokable controller |
+|-----------------|--------------------------|
+| CRUD (list, show, create, update, delete) | Business logic (subscribe, invite, assign) |
+| Standard filtering + pagination | Multi-step operations |
+| Resource serialization with Groups | Aggregations / analytics |
+| Read-only public resources | Mutations with side-effects |
 
-### Exemple de contrôleur
+## Convention — Invokable controllers
+
+Each endpoint = 1 invokable controller with `__invoke()` and `#[Route]`:
 
 ```php
-// src/Controller/Api/V1/MonController.php
-namespace App\Controller\Api\V1;
+<?php
 
+declare(strict_types=1);
+
+namespace App\Feature\Cart\Controller;
+
+use App\Shared\Service\ApiResponseService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/v1/mon-endpoint', name: 'api_v1_mon_')]
-class MonController extends AbstractController
+#[Route('/api/v1/cart', name: 'api_v1_cart_show', methods: ['GET'])]
+class ShowCartController extends AbstractController
 {
-    #[Route('', methods: ['GET'])]
-    public function index(): JsonResponse
+    public function __construct(
+        private readonly ApiResponseService $apiResponse,
+    ) {
+    }
+
+    public function __invoke(): JsonResponse
     {
-        return $this->json(['data' => []]);
+        // Implementation
+        return $this->apiResponse->success($data);
     }
 }
 ```
 
-**Note** : Le préfixe `/api/v1` doit être dans l'attribut `#[Route]` du contrôleur, pas dans un fichier yaml séparé.
+## Convention — API Platform resources
 
-## Variables d'environnement
+Routes use relative `uriTemplate` — the `/api/v1` prefix is applied by `config/routes/api_platform.yaml`.
+Add `#[Groups]` on **properties**, not on getters.
 
-```env
-APP_ENV=dev
-APP_SECRET=xxx
-DATABASE_URL="sqlite:///%kernel.project_dir%/var/data_dev.db"
-BETTER_AUTH_SECRET=change_me_in_production_32_chars_min
-FRONTEND_URL=http://localhost:3000
-MAILER_DSN=null://null
+```php
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+#[ApiResource(
+    operations: [
+        new GetCollection(uriTemplate: '/products'),
+        new Get(uriTemplate: '/products/{id}'),
+    ],
+    normalizationContext: ['groups' => ['product:read']],
+)]
+#[ORM\Entity]
+class Product
+{
+    #[Groups(['product:read'])]
+    private string $name;
+}
 ```
 
-## Tests
+The `EnvelopeSubscriber` wraps all API Platform responses in the standard envelope:
+`{success: bool, data: mixed, status: int, request_id: string}`
 
-52 tests fonctionnels couvrent l'authentification :
+## Convention — Entity namespace
 
-- Registration (valid, duplicate, invalid email, weak password)
-- Login (valid, invalid password, non-existent user, 2FA)
-- Token verification (valid, invalid, missing)
-- Refresh token
-- Logout
-- Revoke all sessions
-- Password forgot/reset/verify-token
-- 2FA status
-- OAuth providers
+All entities live in `App\Shared\Entity\`. Doctrine mapping configured in `config/packages/doctrine.yaml`:
+
+```yaml
+doctrine:
+    orm:
+        mappings:
+            App:
+                type: attribute
+                dir: '%kernel.project_dir%/src/Shared/Entity'
+                prefix: 'App\Shared\Entity'
+```
+
+## Convention — BetterAuth services override
+
+```yaml
+BetterAuth\Symfony\Security\BetterAuthUserProvider:
+    arguments:
+        $userClass: 'App\Shared\Entity\User'
+
+BetterAuth\Symfony\Service\UserIdConverter:
+    arguments:
+        $userClass: 'App\Shared\Entity\User'
+```
+
+## API Platform resources (34 operations)
+
+| Resource | Operations |
+|----------|-----------|
+| Product | GetCollection, Get, Post, Patch, Delete (5) |
+| Category | GetCollection, Get (2) |
+| Review | GetCollection, Get, Post (3) |
+| Order | GetCollection, Get (2) — read only, CreateOrder via controller |
+| Plan | GetCollection, Get (2) |
+| Organization | GetCollection, Get, Patch (3) |
+| Subscription | Get (1) |
+| Invoice | GetCollection (1) |
+| TeamMember | GetCollection, Get, Patch, Delete (4) |
+| UsageRecord | GetCollection (1) |
+| Conversation | GetCollection, Get, Patch (3) |
+| ChatMessage | GetCollection, Post (2) |
+| CannedResponse | GetCollection, Get, Post, Patch, Delete (5) |
+
+## Commands
 
 ```bash
-# Tous les tests
-php bin/phpunit
-
-# Tests auth uniquement
-php bin/phpunit tests/Functional/Auth/
-
-# Test spécifique
-php bin/phpunit --filter=testLoginWithValidCredentials
-
-# Tests API v1
-php bin/phpunit --filter=ApiV1AuthTest
+symfony server:start --port=8002 --no-tls  # Dev server
+php bin/phpunit                             # Run all tests (129)
+php bin/phpunit tests/Functional/Auth/      # Auth tests only
+php bin/phpunit --filter=testListProducts   # Specific test
+php bin/console cache:clear                 # Clear cache
+php bin/console doctrine:migrations:migrate # Run migrations
+php bin/console doctrine:schema:validate    # Validate schema
 ```
 
-## Sécurité
+## Feature slices
 
-- **Tokens Paseto V4** : Cryptographiquement sécurisés, non-JWT
-- **Firewalls** :
-  - Routes `/auth/*` publiques (BetterAuth natif)
-  - Routes `/api/v1/auth/(register|login|password|refresh)` publiques
-  - Routes `/api/*` protégées (IS_AUTHENTICATED_FULLY)
-- **CORS** : Configuré pour `http://localhost:3000`
-- **Password hashing** : Argon2id (auto)
+| Feature | Prefix | Firewall | Controllers |
+|---------|--------|----------|-------------|
+| Auth | `/api/v1/auth` | public | 11 invokable controllers |
+| Shop | `/api/v1` | public | 0 controllers (API Platform only) |
+| Cart | `/api/v1/cart` | authenticated | 4 controllers |
+| Orders | `/api/v1/orders` | authenticated | 1 controller + 2 AP ops |
+| Admin/Rbac | `/api/v1/admin` | authenticated+ROLE_ADMIN | 6 controllers |
+| Admin/Shop | `/api/v1/admin` | authenticated+ROLE_ADMIN | 8 controllers |
+| Saas | `/api/v1/saas` | authenticated | 10 controllers |
+| Support | `/api/v1/support` | authenticated | 8 controllers |
 
-## Notes importantes
+## Key config files
 
-1. **Mode API** : Pas de sessions côté serveur, tout est basé sur les tokens
-2. **Refresh token** : Le body attend `refreshToken` (camelCase), pas `refresh_token`
-3. **Response format** : Les tokens sont retournés en snake_case (`access_token`, `refresh_token`)
-4. **Routes** : Symfony auto-découvre les contrôleurs, pas besoin de yaml pour les routes personnalisées
+- `config/packages/security.yaml` — Firewalls, user provider (`App\Shared\Entity\User`)
+- `config/packages/doctrine.yaml` — Entity mapping (`src/Shared/Entity/`)
+- `config/packages/better_auth.yaml` — BetterAuth (Paseto V4, 2FA, magic link)
+- `config/packages/api_platform.yaml` — API Platform (formats, pagination, serializer groups)
+- `config/routes/api_platform.yaml` — Mounts API Platform under `/api/v1` prefix
+- `config/services.yaml` — Auto-wiring + BetterAuth service overrides
+
+## Security
+
+- **Tokens**: Paseto V4 (not JWT) — cryptographically secure
+- **Firewalls**: Public auth routes, protected API routes (IS_AUTHENTICATED_FULLY)
+- **Password**: Argon2id (auto)
+- **CORS**: Nelmio CORS for frontend origin
+- **Refresh token**: Body expects `refreshToken` (camelCase)
+
+## Response format
+
+All responses (both invokable controllers and API Platform) use the same envelope:
+
+```json
+{
+  "success": true,
+  "data": { ... },
+  "status": 200,
+  "request_id": "abc123"
+}
+```
+
+Collections also include: `"meta": { "page": 1, "per_page": 20, "total": 100, "last_page": 5 }`
+
+Error: `{ "success": false, "error": { "code": "...", "message": "..." }, "status": 500 }`

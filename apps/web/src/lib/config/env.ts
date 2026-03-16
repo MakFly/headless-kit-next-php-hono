@@ -69,12 +69,6 @@ export const env = {
   /** Laravel API base URL */
   LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8000',
 
-  /** HMAC secret for BFF-to-Laravel signing */
-  BFF_HMAC_SECRET: process.env.BFF_HMAC_SECRET || process.env.BFF_SECRET,
-
-  /** BFF identifier for Laravel */
-  BFF_ID: process.env.BFF_ID || 'nextjs-bff',
-
   // =========================================================================
   // Symfony API Configuration
   // =========================================================================
@@ -111,13 +105,6 @@ export const COOKIE_NAMES = {
  */
 export function validateEnv(): void {
   const warnings: string[] = [];
-
-  // Check for default secrets in production
-  if (env.isProduction) {
-    if (!process.env.BFF_HMAC_SECRET && !process.env.BFF_SECRET) {
-      warnings.push('BFF_HMAC_SECRET is not set in production');
-    }
-  }
 
   if (warnings.length > 0) {
     console.warn('[env] Configuration warnings:');

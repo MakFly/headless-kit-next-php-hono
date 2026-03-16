@@ -1,0 +1,47 @@
+name: CLI Smoke Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/create-headless-app/**"
+
+concurrency:
+  group: smoke-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke-test:
+    name: Smoke Test — create-headless-app (${{ matrix.backend }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        backend: [laravel, symfony, hono]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build CLI
+        run: cd packages/create-headless-app && bunx tsc
+
+      - name: Run CLI test suite (${{ matrix.backend }})
+        run: cd packages/create-headless-app && bun test
+        env:
+          TEST_BACKEND: ${{ matrix.backend }}

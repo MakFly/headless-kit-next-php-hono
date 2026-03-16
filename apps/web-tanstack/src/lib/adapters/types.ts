@@ -1,4 +1,4 @@
-import type { User } from '@rbac/types'
+import type { User } from '@/types'
 
 export type BackendType = 'laravel' | 'symfony' | 'node'
 
@@ -55,8 +55,6 @@ export type AuthResponse = {
 export type AdapterConfig = {
   baseUrl: string
   timeout?: number
-  secret?: string
-  bffId?: string
   authPrefix?: string
 }
 

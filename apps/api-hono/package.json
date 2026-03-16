@@ -1,5 +1,5 @@
 {
-  "name": "@rbac/api-hono",
+  "name": "@headless/api-hono",
   "version": "0.1.0",
   "private": true,
   "type": "module",

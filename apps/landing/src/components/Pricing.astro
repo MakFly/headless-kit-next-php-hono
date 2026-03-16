@@ -1,0 +1,114 @@
+---
+const plans = [
+  {
+    name: "Open Source",
+    price: "Free",
+    period: "",
+    description: "Everything you need to get started with Headless Kit.",
+    features: [
+      "All domain modules (Auth, Shop, SaaS, Support)",
+      "3 backend templates (Laravel, Symfony, Hono)",
+      "BFF pattern with HMAC signing",
+      "CLI with 4 presets",
+      "Community support via GitHub",
+    ],
+    cta: "Get Started",
+    href: "#quickstart",
+    highlighted: false,
+  },
+  {
+    name: "Pro",
+    price: "$99",
+    period: "one-time",
+    description: "Premium modules and templates for production apps.",
+    features: [
+      "Everything in Open Source",
+      "Stripe integration",
+      "AI Assistant (assistant-ui)",
+      "Premium starter templates",
+      "Priority support via email",
+    ],
+    cta: "Buy Pro License",
+    href: "#",
+    highlighted: true,
+  },
+  {
+    name: "Enterprise",
+    price: "Contact",
+    period: "",
+    description: "Custom solutions for teams with specific requirements.",
+    features: [
+      "Everything in Pro",
+      "Custom backend integrations",
+      "Dedicated support channel",
+      "SLA guarantees",
+      "Architecture consulting",
+    ],
+    cta: "Contact Sales",
+    href: "mailto:hello@headlesskit.dev",
+    highlighted: false,
+  },
+];
+---
+
+<section id="pricing" class="py-24 md:py-32">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mb-16 text-center">
+      <h2 class="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+        Simple, <span class="gradient-text">transparent pricing</span>
+      </h2>
+      <p class="mx-auto max-w-2xl text-lg text-text-muted">
+        Start free with the open-source core. Upgrade when you need premium features.
+      </p>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+      {plans.map((plan) => (
+        <div
+          class={`relative rounded-xl border p-8 transition-all ${
+            plan.highlighted
+              ? "border-violet-primary/50 bg-surface-card shadow-xl shadow-violet-primary/10"
+              : "border-border-subtle bg-surface-card hover:border-violet-primary/30"
+          }`}
+        >
+          {plan.highlighted && (
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-violet-primary px-4 py-1 text-xs font-semibold text-white">
+              Most Popular
+            </div>
+          )}
+
+          <h3 class="mb-2 text-xl font-bold">{plan.name}</h3>
+          <div class="mb-4">
+            <span class="text-4xl font-extrabold">{plan.price}</span>
+            {plan.period && (
+              <span class="ml-1 text-sm text-text-muted">{plan.period}</span>
+            )}
+          </div>
+          <p class="mb-6 text-sm text-text-muted">{plan.description}</p>
+
+          <ul class="mb-8 space-y-3">
+            {plan.features.map((feature) => (
+              <li class="flex items-start gap-2.5 text-sm">
+                <svg class="mt-0.5 h-4 w-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-text-muted">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <a
+            href={plan.href}
+            class={`block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all ${
+              plan.highlighted
+                ? "bg-violet-primary text-white hover:bg-violet-600 hover:shadow-lg hover:shadow-violet-primary/25"
+                : "border border-border-subtle bg-surface-card-hover text-white hover:border-violet-primary/40"
+            }`}
+          >
+            {plan.cta}
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

@@ -53,7 +53,7 @@ import {
   ChevronRightIcon,
 } from 'lucide-react';
 import { assignRoleAction, removeRoleAction } from '@/lib/actions/rbac';
-import type { User, Role, Permission } from '@rbac/types';
+import type { User, Role, Permission } from '@/types';
 
 type UsersTableProps = {
   users: (User & { roles: Role[] })[];

@@ -7,8 +7,9 @@
 
 'use server';
 
-import type { User, Role, Permission } from '@rbac/types';
+import type { User, Role, Permission } from '@/types';
 import { bffGet, bffPost, bffDelete } from '../_shared/bff-client';
+import { unwrapEnvelope } from '../_shared/envelope';
 
 /**
  * User with roles
@@ -27,8 +28,8 @@ export type UserWithRolesAndPermissions = User & {
  * Get list of users with their roles
  */
 export async function getUsersAction(): Promise<UserWithRoles[]> {
-  const response = await bffGet<{ data: UserWithRoles[] }>('/api/v1/users');
-  return response.data;
+  const response = await bffGet<unknown>('/api/v1/users');
+  return unwrapEnvelope<UserWithRoles[]>(response);
 }
 
 /**
@@ -37,10 +38,8 @@ export async function getUsersAction(): Promise<UserWithRoles[]> {
 export async function getUserAction(
   userId: number
 ): Promise<UserWithRolesAndPermissions> {
-  const response = await bffGet<{ data: UserWithRolesAndPermissions }>(
-    `/api/v1/admin/users/${userId}`
-  );
-  return response.data;
+  const response = await bffGet<unknown>(`/api/v1/admin/users/${userId}`);
+  return unwrapEnvelope<UserWithRolesAndPermissions>(response);
 }
 
 /**
@@ -50,10 +49,10 @@ export async function assignRoleAction(
   userId: number,
   roleSlug: string
 ): Promise<{ message: string; data: UserWithRoles }> {
-  const response = await bffPost<{
-    message: string;
-    data: UserWithRoles;
-  }>(`/api/v1/admin/users/${userId}/roles`, { role: roleSlug });
+  const response = await bffPost<{ message: string; data: UserWithRoles }>(
+    `/api/v1/admin/users/${userId}/roles`,
+    { role: roleSlug }
+  );
   return response;
 }
 

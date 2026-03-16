@@ -1,88 +1,87 @@
 'use client'
 
-import { ShieldIcon } from 'lucide-react'
+import * as React from 'react'
+import { Link, useLocation } from '@tanstack/react-router'
 import {
-  LayoutDashboardIcon,
-  UsersIcon,
-  ShieldCheckIcon,
-  SettingsIcon,
-  HelpCircleIcon,
+  Shell,
+  House,
+  DollarSign,
+  Images,
+  Bookmark,
+  Users,
+  MessageSquareText,
 } from 'lucide-react'
 
-import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import type { User } from '@rbac/types'
+import type { User } from '@/types'
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user: User | null
 }
 
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
-  const isAdmin = user?.roles?.some((r) => r.slug === 'admin') ?? false
+const navItems = [
+  { title: 'Dashboard', href: '/dashboard', icon: House, exact: true },
+  { title: 'Orders', href: '/dashboard/orders', icon: DollarSign, exact: false },
+  { title: 'Products', href: '/dashboard/products', icon: Images, exact: false },
+  { title: 'Categories', href: '/dashboard/categories', icon: Bookmark, exact: false },
+  { title: 'Customers', href: '/dashboard/customers', icon: Users, exact: false },
+  { title: 'Reviews', href: '/dashboard/reviews', icon: MessageSquareText, exact: false },
+]
 
-  const navItems = [
-    {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: LayoutDashboardIcon,
-    },
-    ...(isAdmin
-      ? [
-          {
-            title: 'Users',
-            url: '/dashboard/users',
-            icon: UsersIcon,
-          },
-          {
-            title: 'Roles',
-            url: '/dashboard/roles',
-            icon: ShieldCheckIcon,
-          },
-        ]
-      : []),
-    {
-      title: 'Settings',
-      url: '/dashboard/settings',
-      icon: SettingsIcon,
-    },
-    {
-      title: 'Aide',
-      url: '/dashboard/help',
-      icon: HelpCircleIcon,
-    },
-  ]
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
+  const location = useLocation()
+  const pathname = location.pathname
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar variant="floating" collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-            >
-              <a href="/dashboard">
-                <ShieldIcon className="size-5! text-[var(--neon)]" />
-                <span className="font-mono text-base font-semibold">
-                  RBAC Panel
-                </span>
-              </a>
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
+              <Link to="/dashboard">
+                <Shell className="!size-5" />
+                <span className="text-base font-semibold">Headless Kit</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
-        <NavMain items={navItems} />
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => {
+                const isActive = item.exact
+                  ? pathname === item.href
+                  : pathname.startsWith(item.href)
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link to={item.href}>
+                        <item.icon />
+                        {item.title}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser
           user={{

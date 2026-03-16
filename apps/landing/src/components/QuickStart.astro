@@ -1,0 +1,75 @@
+---
+---
+
+<section id="quickstart" class="relative border-y border-border-subtle bg-surface-dark py-24 md:py-32">
+  <div class="pointer-events-none absolute inset-0">
+    <div class="absolute bottom-0 left-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-violet-primary/8 blur-[100px]"></div>
+  </div>
+
+  <div class="relative mx-auto max-w-6xl px-6">
+    <div class="mb-16 text-center">
+      <h2 class="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+        Up and running in <span class="gradient-text">30 seconds</span>
+      </h2>
+      <p class="mx-auto max-w-2xl text-lg text-text-muted">
+        One command to scaffold your project. Pick a frontend and a backend, and start building.
+      </p>
+    </div>
+
+    <div class="glow mx-auto max-w-2xl">
+      <div class="code-block">
+        <div class="flex items-center gap-2 border-b border-border-subtle px-4 py-3">
+          <span class="h-3 w-3 rounded-full bg-red-500/60"></span>
+          <span class="h-3 w-3 rounded-full bg-yellow-500/60"></span>
+          <span class="h-3 w-3 rounded-full bg-green-500/60"></span>
+          <span class="ml-3 text-xs text-text-muted">Terminal</span>
+        </div>
+        <pre><code><span class="text-text-muted"># Create a new project</span>
+<span class="text-text-muted">$</span> <span class="text-violet-300">bunx</span> <span class="text-white">create-headless-app</span> <span class="text-amber-300">my-app</span>
+
+<span class="text-text-muted">? Choose a preset</span>
+<span class="text-violet-300">  ● E-commerce</span>  <span class="text-text-muted">— Shop, Cart, Orders, Admin</span>
+<span class="text-text-muted">  ○ SaaS        — Orgs, Billing, Teams, Admin</span>
+<span class="text-text-muted">  ○ Admin       — Dashboard, RBAC, Analytics</span>
+<span class="text-text-muted">  ○ Landing     — Minimal auth setup</span>
+
+<span class="text-text-muted">? Frontend</span>
+<span class="text-violet-300">  ● Next.js</span> <span class="text-text-muted">— App Router + shadcn/ui</span>
+<span class="text-text-muted">  ○ TanStack Start — Vite + TanStack Router</span>
+
+<span class="text-text-muted">? Backend</span>
+<span class="text-violet-300">  ● Laravel</span>
+<span class="text-text-muted">  ○ Symfony</span>
+<span class="text-text-muted">  ○ Hono</span>
+
+<span class="text-emerald-400">✓ Project created!</span>
+
+<span class="text-text-muted">$</span> <span class="text-violet-300">cd</span> <span class="text-white">my-app</span> <span class="text-text-muted">&&</span> <span class="text-violet-300">bun</span> <span class="text-white">install</span> <span class="text-text-muted">&&</span> <span class="text-violet-300">bun run</span> <span class="text-white">dev</span></code></pre>
+      </div>
+    </div>
+
+    <!-- Preset grid -->
+    <div class="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-lg border border-border-subtle bg-surface-card p-4 text-center transition-all hover:border-violet-primary/30">
+        <div class="mb-2 text-2xl">🛒</div>
+        <h4 class="text-sm font-semibold">E-commerce</h4>
+        <p class="mt-1 text-xs text-text-muted">Shop, Cart, Orders, Admin</p>
+      </div>
+      <div class="rounded-lg border border-border-subtle bg-surface-card p-4 text-center transition-all hover:border-violet-primary/30">
+        <div class="mb-2 text-2xl">🏢</div>
+        <h4 class="text-sm font-semibold">SaaS</h4>
+        <p class="mt-1 text-xs text-text-muted">Orgs, Billing, Teams</p>
+      </div>
+      <div class="rounded-lg border border-border-subtle bg-surface-card p-4 text-center transition-all hover:border-violet-primary/30">
+        <div class="mb-2 text-2xl">⚙️</div>
+        <h4 class="text-sm font-semibold">Admin</h4>
+        <p class="mt-1 text-xs text-text-muted">Dashboard, RBAC, Analytics</p>
+      </div>
+      <div class="rounded-lg border border-border-subtle bg-surface-card p-4 text-center transition-all hover:border-violet-primary/30">
+        <div class="mb-2 text-2xl">🚀</div>
+        <h4 class="text-sm font-semibold">Landing</h4>
+        <p class="mt-1 text-xs text-text-muted">Minimal auth setup</p>
+      </div>
+    </div>
+  </div>
+</section>

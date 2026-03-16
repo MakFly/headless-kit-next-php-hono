@@ -1,0 +1,133 @@
+---
+title: Installation
+description: Set up Headless Kit using the CLI or manually.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Prerequisites
+
+- [Bun](https://bun.sh) v1.1+
+- Node.js 20+ (for Next.js)
+- PHP 8.3+ and Composer (only if using Laravel or Symfony)
+
+## CLI Install (Recommended)
+
+<Steps>
+
+1. **Scaffold the project**
+
+   ```bash
+   bunx create-headless-app my-app
+   ```
+
+2. **Answer the prompts**
+
+   The CLI will ask you to choose:
+   - A **frontend** (Next.js or TanStack Start)
+   - A **backend** (Laravel, Symfony, Hono, or all three)
+   - Whether to install dependencies automatically
+
+   Next.js is the recommended frontend with the most mature BFF proxy implementation. TanStack Start is a great alternative for teams preferring Vite and TanStack Router.
+
+3. **Install dependencies**
+
+   ```bash
+   cd my-app
+   bun install
+   ```
+
+4. **Configure environment variables**
+
+   Copy the example `.env` files and fill in secrets:
+
+   ```bash
+   # Frontend (pick the one you chose)
+   cp apps/web/.env.example apps/web/.env.local              # if using Next.js
+   cp apps/web-tanstack/.env.example apps/web-tanstack/.env  # if using TanStack Start
+
+   # Backend (pick the one(s) you chose)
+   cp apps/api-laravel/.env.example apps/api-laravel/.env   # if using Laravel
+   cp apps/api-sf/.env.example apps/api-sf/.env.local       # if using Symfony
+   cp apps/api-hono/.env.example apps/api-hono/.env         # if using Hono
+   ```
+
+   See the [Configuration](/getting-started/configuration/) page for every variable.
+
+5. **Start development**
+
+   ```bash
+   bun run dev
+   ```
+
+   This uses Turborepo to start all apps in parallel.
+
+</Steps>
+
+## Manual Setup
+
+If you prefer to clone the repository directly:
+
+```bash
+git clone https://github.com/headless-kit/headless-kit.git my-app
+cd my-app
+bun install
+```
+
+Then follow steps 4 and 5 above.
+
+## Backend-Specific Setup
+
+<Tabs>
+  <TabItem label="Laravel">
+    ```bash
+    cd apps/api-laravel
+    composer install
+    cp .env.example .env
+    php artisan key:generate
+    php artisan migrate --seed
+    php artisan serve --port=8000
+    ```
+  </TabItem>
+  <TabItem label="Symfony">
+    ```bash
+    cd apps/api-sf
+    composer install
+    cp .env .env.local
+    php bin/console doctrine:migrations:migrate
+    php bin/console doctrine:fixtures:load
+    symfony server:start --port=8002 --no-tls
+    ```
+  </TabItem>
+  <TabItem label="Hono">
+    ```bash
+    cd apps/api-hono
+    bun install
+    bun run db:migrate
+    bun run db:seed
+    bun run dev
+    ```
+    Hono runs on port 8003 by default.
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  You only need to set up the backend(s) you plan to use. The BFF proxy automatically routes to whichever backend is configured in `AUTH_BACKEND`.
+</Aside>
+
+## Verify the Setup
+
+Once everything is running, open the URL for the frontend you selected:
+
+- **Next.js**: [http://localhost:3001](http://localhost:3001)
+- **TanStack Start**: [http://localhost:3003](http://localhost:3003)
+
+Navigate to `/auth/login` to confirm auth is working.
+
+| Service          | URL                          |
+| ---------------- | ---------------------------- |
+| Next.js BFF      | http://localhost:3001        |
+| TanStack Start   | http://localhost:3003        |
+| Laravel API      | http://localhost:8000        |
+| Symfony API      | http://localhost:8002        |
+| Hono API         | http://localhost:8003        |

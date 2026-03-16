@@ -1,0 +1,3 @@
+# Module: support-chat — frontend/tanstack template
+
+Template files will be populated from the reference monorepo implementation.

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { User, PermissionAction, RoleSlug } from '@rbac/types';
-import { hasPermission as checkHasPermission, hasRole as checkHasRole, isAdmin as checkIsAdmin } from '@rbac/types';
+import type { User, PermissionAction, RoleSlug } from '@/types';
+import { hasPermission as checkHasPermission, hasRole as checkHasRole, isAdmin as checkIsAdmin } from '@/types';
 import {
   loginAction,
   registerAction,
@@ -9,7 +9,7 @@ import {
   getOAuthUrlAction,
   sendMagicLinkAction,
 } from '@/lib/actions/auth';
-import type { LoginCredentials, RegisterData, OAuthProvider } from '@rbac/types';
+import type { LoginCredentials, RegisterData, OAuthProvider } from '@/types';
 
 type AuthState = {
   user: User | null;

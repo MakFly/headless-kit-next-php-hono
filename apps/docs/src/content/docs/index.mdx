@@ -1,0 +1,59 @@
+---
+title: Headless Kit
+description: Full-stack starter kit with Next.js or TanStack Start BFF and swappable PHP/Hono backends.
+template: splash
+hero:
+  tagline: Ship authenticated full-stack apps faster. Pick a frontend, pick a backend, get auth, RBAC, and a secure BFF out of the box.
+  actions:
+    - text: Get Started
+      link: /getting-started/installation/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/headless-kit/headless-kit
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What is Headless Kit?
+
+Headless Kit is an opinionated starter kit that pairs a **BFF** (Backend-for-Frontend) with your choice of backend: **Laravel**, **Symfony**, or **Hono**. Choose between **Next.js** (recommended) or **TanStack Start** as your frontend -- both implement the same secure BFF proxy pattern. You get production-ready domain modules (Auth, Shop, SaaS, Support), role-based access control, and a secure proxy layer from day one.
+
+<CardGrid stagger>
+  <Card title="BFF Security Layer" icon="shield">
+    Every request flows through a BFF proxy (Next.js or TanStack Start) that handles HttpOnly cookies, HMAC signing, CSRF protection, and automatic token refresh. Your frontend never talks to backends directly.
+  </Card>
+  <Card title="Two Frontend Options" icon="rocket">
+    **Next.js** (recommended) with App Router and React Server Components, or **TanStack Start** with Vite and TanStack Router. Both implement the same BFF proxy pattern with the same backends.
+  </Card>
+  <Card title="Swap Backends Freely" icon="random">
+    Laravel, Symfony, or Hono -- pick the one that fits your team. All three expose the same auth API contract, so switching backends requires zero frontend changes.
+  </Card>
+  <Card title="Auth + RBAC Built In" icon="lock">
+    Login, registration, token refresh, 2FA, OAuth (Google/GitHub), roles, and granular permissions are wired up across every backend.
+  </Card>
+  <Card title="Domain Modules" icon="seti:typescript">
+    7 production-ready modules: Auth, Shop, Cart, Orders, Admin, SaaS, and Support. Each is a complete vertical slice across all backends.
+  </Card>
+  <Card title="CLI Scaffolding" icon="rocket">
+    `bunx create-headless-app` with 4 presets (E-commerce, SaaS, Admin, Landing) and module selection. Pick your stack and start building in seconds.
+  </Card>
+</CardGrid>
+
+## Quick Start
+
+```bash
+bunx create-headless-app my-app
+cd my-app
+bun install
+bun run dev
+```
+
+The CLI scaffolds the full monorepo with your choice of **preset** (E-commerce, SaaS, Admin, Landing), **frontend** (Next.js or TanStack Start), and **backend** (Laravel, Symfony, Hono).
+
+## Next Steps
+
+- [Installation](/getting-started/installation/) -- full setup instructions
+- [BFF Pattern](/architecture/bff-pattern/) -- understand the proxy architecture
+- [Authentication](/guides/authentication/) -- login, register, and token management
+- [TanStack Start Guide](/guides/tanstack-start/) -- using TanStack Start as your frontend

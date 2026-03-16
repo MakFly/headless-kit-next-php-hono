@@ -1,4 +1,4 @@
-import type { User } from '@rbac/types'
+import type { User } from '@/types'
 import type { QueryClient } from '@tanstack/react-query'
 
 export type RouterContext = {

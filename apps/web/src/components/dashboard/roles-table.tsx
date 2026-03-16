@@ -42,7 +42,7 @@ import {
   createRoleAction,
   updateRolePermissionsAction,
 } from '@/lib/actions/rbac';
-import type { Role, Permission } from '@rbac/types';
+import type { Role, Permission } from '@/types';
 
 type RolesTableProps = {
   roles: (Role & { permissions: Permission[] })[];

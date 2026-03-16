@@ -7,7 +7,6 @@
 
 import { getBackendType } from './index';
 import type { BackendType } from './types';
-import { generateSignature } from '../security/hmac';
 
 /**
  * Backend proxy configuration
@@ -19,14 +18,6 @@ export type ProxyConfig = {
    * Transform the BFF path to the backend path
    */
   transformPath: (bffPath: string) => string;
-  /**
-   * Get additional headers for the request (HMAC, etc.)
-   */
-  getSignatureHeaders: (
-    method: string,
-    path: string,
-    body?: unknown
-  ) => { headers: Record<string, string>; normalizedBody?: string };
   /**
    * Public routes that don't require authentication
    */
@@ -42,26 +33,22 @@ export type ProxyConfig = {
  * Routes: /api/v1/auth/* (configurable via LARAVEL_AUTH_PREFIX)
  */
 function getLaravelConfig(): ProxyConfig {
-  const authPrefix = process.env.LARAVEL_AUTH_PREFIX || '/api/v1/auth';
+  const authPrefix = process.env.LARAVEL_AUTH_PREFIX || '/api/auth';
 
   return {
     baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8000',
     timeout: 30000,
     transformPath: (bffPath: string) => {
-      // /api/v1/* in BFF maps to /api/v1/* in Laravel (1:1 mapping)
+      // /api/v1/auth/* in BFF maps to /api/auth/* in Laravel (no v1 prefix for auth)
+      if (bffPath.startsWith('/api/v1/auth/')) {
+        return bffPath.replace('/api/v1/auth/', `${authPrefix}/`);
+      }
+      // /api/v1/me → /api/auth/me
+      if (bffPath === '/api/v1/me') {
+        return `${authPrefix}/me`;
+      }
+      // Other /api/v1/* routes pass through (RBAC, admin, etc.)
       return bffPath;
-    },
-    getSignatureHeaders: (method: string, path: string, body?: unknown) => {
-      const hmacResult = generateSignature(method, path, body);
-      const headers: Record<string, string> = {
-        'X-BFF-Id': hmacResult['X-BFF-Id'],
-        'X-BFF-Timestamp': hmacResult['X-BFF-Timestamp'],
-        'X-BFF-Signature': hmacResult['X-BFF-Signature'],
-      };
-      return {
-        headers,
-        normalizedBody: hmacResult.normalizedBody,
-      };
     },
     publicRoutes: [
       `${authPrefix}/login`,
@@ -69,6 +56,12 @@ function getLaravelConfig(): ProxyConfig {
       `${authPrefix}/refresh`,
       `${authPrefix}/providers`,
       `${authPrefix}/oauth/providers`,
+      `${authPrefix}/test-accounts`,
+      // Shop public routes
+      '/api/v1/products',
+      '/api/v1/categories',
+      // SaaS public routes
+      '/api/v1/saas/plans',
     ],
   };
 }
@@ -97,15 +90,17 @@ function getSymfonyConfig(): ProxyConfig {
       // Other routes pass through
       return bffPath;
     },
-    getSignatureHeaders: () => {
-      // Symfony uses Bearer token only, no HMAC
-      return { headers: {} };
-    },
     publicRoutes: [
       `${authPrefix}/login`,
       `${authPrefix}/register`,
       `${authPrefix}/refresh`,
       `${authPrefix}/oauth/providers`,
+      `${authPrefix}/test-accounts`,
+      // Shop public routes
+      '/api/v1/products',
+      '/api/v1/categories',
+      // SaaS public routes
+      '/api/v1/saas/plans',
     ],
   };
 }
@@ -133,15 +128,17 @@ function getNodeConfig(): ProxyConfig {
       // Other routes pass through
       return bffPath.replace('/api/v1/', '/api/');
     },
-    getSignatureHeaders: () => {
-      // Node.js uses Bearer token only, no HMAC
-      return { headers: {} };
-    },
     publicRoutes: [
       `${authPrefix}/login`,
       `${authPrefix}/register`,
       `${authPrefix}/refresh`,
       `${authPrefix}/oauth/providers`,
+      `${authPrefix}/test-accounts`,
+      // Shop public routes
+      '/api/v1/products',
+      '/api/v1/categories',
+      // SaaS public routes
+      '/api/v1/saas/plans',
     ],
   };
 }

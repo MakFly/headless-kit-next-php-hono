@@ -9,14 +9,21 @@
     "vite": "^7.3.1"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev:next-laravel": "concurrently -n next,laravel -c cyan,magenta \"turbo run dev --filter=@headless/web\" \"cd apps/api-laravel && php artisan serve --port=8000\"",
+    "dev:next-hono": "concurrently -n next,hono -c cyan,green \"turbo run dev --filter=@headless/web\" \"turbo run dev --filter=@headless/api-hono\"",
+    "dev:next-sf": "concurrently -n next,symfony -c cyan,yellow \"turbo run dev --filter=@headless/web\" \"cd apps/api-sf && symfony server:start --port=8002 --no-tls\"",
+    "dev:tanstack-laravel": "concurrently -n tanstack,laravel -c cyan,magenta \"turbo run dev --filter=@headless/web-tanstack\" \"cd apps/api-laravel && php artisan serve --port=8000\"",
+    "dev:tanstack-hono": "concurrently -n tanstack,hono -c cyan,green \"turbo run dev --filter=@headless/web-tanstack\" \"turbo run dev --filter=@headless/api-hono\"",
+    "dev:tanstack-sf": "concurrently -n tanstack,symfony -c cyan,yellow \"turbo run dev --filter=@headless/web-tanstack\" \"cd apps/api-sf && symfony server:start --port=8002 --no-tls\"",
+    "dev:all": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
-    "prod": "turbo run build --force && turbo run start",
     "lint": "turbo run lint",
+    "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "prettier": "^3.4.0",
     "shadcn": "^3.8.5",
     "turbo": "^2.3.0"

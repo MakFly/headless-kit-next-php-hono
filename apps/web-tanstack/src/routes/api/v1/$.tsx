@@ -15,6 +15,7 @@ import {
   COOKIE_NAMES,
   calculateExpirationTimestamp,
   formatExpirationForCookie,
+  shouldRefreshByTimestamp,
 } from '@/lib/services/token-service'
 
 const SAFE_PATH_SEGMENT = /^[a-zA-Z0-9_-]+$/
@@ -159,39 +160,6 @@ function transformPath(backend: BackendType, bffPath: string): string {
   return bffPath
 }
 
-function getSignatureHeaders(
-  backend: BackendType,
-  method: string,
-  path: string,
-  body: unknown,
-): { headers: Record<string, string>; normalizedBody?: string } {
-  if (backend !== 'laravel') return { headers: {} }
-
-  const secret = process.env.BFF_HMAC_SECRET || process.env.BFF_SECRET
-  const bffId = process.env.BFF_ID || 'tanstack-bff'
-
-  if (!secret) return { headers: {} }
-
-  const timestamp = Math.floor(Date.now() / 1000).toString()
-  const bodyStr = body ? JSON.stringify(body) : ''
-  const signaturePayload = `${timestamp}${method}${path}${bodyStr}`
-
-  const nodeCrypto = require('crypto')
-  const signature = nodeCrypto
-    .createHmac('sha256', secret)
-    .update(signaturePayload)
-    .digest('hex')
-
-  return {
-    headers: {
-      'X-BFF-Timestamp': timestamp,
-      'X-BFF-Signature': `sha256=${signature}`,
-      'X-BFF-ID': bffId,
-    },
-    normalizedBody: bodyStr || undefined,
-  }
-}
-
 function getRefreshEndpoint(backend: BackendType): string {
   switch (backend) {
     case 'laravel':
@@ -229,18 +197,11 @@ async function attemptTokenRefresh(
 
     if (backend === 'laravel') {
       const body = { refresh_token: refreshToken }
-      const { headers: signatureHeaders, normalizedBody } = getSignatureHeaders(
-        backend,
-        'POST',
-        refreshPath,
-        body,
-      )
-      Object.assign(headers, signatureHeaders)
 
       const response = await apiRequest(refreshUrl.toString(), {
         method: 'POST',
         headers,
-        body: normalizedBody || JSON.stringify(body),
+        body: JSON.stringify(body),
         timeoutMs: config.timeout || 30000,
       })
 
@@ -342,11 +303,13 @@ function isPublicRoute(path: string): boolean {
     '/api/v1/auth/register',
     '/api/v1/auth/refresh',
     '/api/v1/auth/providers',
+    '/api/v1/auth/test-accounts',
     '/api/v1/auth/{provider}/redirect',
     '/api/auth/login',
     '/api/auth/register',
     '/api/auth/refresh',
     '/api/auth/providers',
+    '/api/auth/test-accounts',
     '/api/auth/{provider}/redirect',
   ]
   return publicPaths.some((p) => {
@@ -399,15 +362,22 @@ async function handleBffRequest(request: Request): Promise<Response> {
       } catch {}
     }
 
-    const { headers: signatureHeaders, normalizedBody } = getSignatureHeaders(
-      backend,
-      method,
-      backendPath,
-      body,
-    )
-
-    const authToken = getCookie(COOKIE_NAMES.ACCESS_TOKEN) ?? undefined
+    let authToken = getCookie(COOKIE_NAMES.ACCESS_TOKEN) ?? undefined
     const refreshToken = getCookie(COOKIE_NAMES.REFRESH_TOKEN) ?? undefined
+
+    // Proactive token refresh: check if token expires soon
+    const tokenExpiresAt = getCookie(COOKIE_NAMES.TOKEN_EXPIRES_AT) ?? undefined
+
+    if (authToken && tokenExpiresAt && refreshToken && !backendPath.includes('/refresh')) {
+      const shouldRefresh = shouldRefreshByTimestamp(tokenExpiresAt)
+      if (shouldRefresh) {
+        const newTokens = await attemptTokenRefresh(backend, config, refreshToken, requestId)
+        if (newTokens) {
+          authToken = newTokens.accessToken
+          await storeTokens(newTokens.accessToken, newTokens.refreshToken, newTokens.expiresIn)
+        }
+      }
+    }
 
     if (!authToken && !isPublicRoute(backendPath)) {
       return jsonErrorResponse('No auth token found', 401, 'UNAUTHORIZED', undefined, requestId)
@@ -417,7 +387,6 @@ async function handleBffRequest(request: Request): Promise<Response> {
       'Content-Type': 'application/json',
       Accept: 'application/json',
       [REQUEST_ID_HEADER]: requestId,
-      ...signatureHeaders,
     }
 
     if (authToken) {
@@ -429,12 +398,8 @@ async function handleBffRequest(request: Request): Promise<Response> {
       headers: requestHeaders,
     }
 
-    if (method !== 'GET' && method !== 'HEAD') {
-      if (normalizedBody !== undefined) {
-        options.body = normalizedBody
-      } else if (body) {
-        options.body = JSON.stringify(body)
-      }
+    if (method !== 'GET' && method !== 'HEAD' && body) {
+      options.body = JSON.stringify(body)
     }
 
     url.searchParams.forEach((value, key) => {

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { SidebarInset, SidebarProvider } from './ui/sidebar'
 import { AppSidebar } from './app-sidebar'
 import { SiteHeader } from './site-header'
-import type { User } from '@rbac/types'
+import type { User } from '@/types'
 
 export function AppLayout({
   children,
@@ -22,7 +22,7 @@ export function AppLayout({
       }
       defaultOpen={true}
     >
-      <AppSidebar variant="inset" user={user} />
+      <AppSidebar user={user} />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

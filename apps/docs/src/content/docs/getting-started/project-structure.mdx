@@ -1,0 +1,122 @@
+---
+title: Project Structure
+description: How the Headless Kit monorepo is organized.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Directory Overview
+
+```
+headless-kit/
+├── apps/
+│   ├── web/              # Next.js 16 App Router (BFF) -- port 3001
+│   ├── web-tanstack/     # TanStack Start + Vite -- port 3003
+│   ├── api-laravel/      # Laravel 12 + BetterAuth -- port 8000
+│   ├── api-sf/           # Symfony 8 + BetterAuth -- port 8002
+│   ├── api-hono/         # Hono + Drizzle + Bun -- port 8003
+│   ├── docs/             # This documentation site (Starlight)
+│   └── landing/          # Marketing landing page
+│
+├── packages/
+│   └── create-headless-app/  # CLI scaffolding tool
+│
+├── package.json          # Root workspace config
+├── turbo.json            # Turborepo pipeline config
+└── bun.lock              # Lockfile
+```
+
+## Apps
+
+Headless Kit ships with two frontend options. Both implement the same BFF proxy pattern -- pick the one that fits your team.
+
+<Tabs>
+  <TabItem label="Next.js (Recommended)">
+    ### `apps/web` -- Next.js BFF
+
+    The primary frontend. It runs on port 3001 and acts as the Backend-for-Frontend:
+
+    - **App Router** with server components and server actions
+    - **Route Handlers** at `/api/v1/[...path]` that proxy requests to the active backend
+    - **Middleware** that handles auth redirects and proactive token refresh
+    - BFF proxy logic in `src/app/api/v1/[...path]/route.ts`
+    - Works with all three backends (Laravel, Symfony, Hono)
+
+    ```
+    apps/web/
+    ├── src/
+    │   ├── app/                    # App Router pages and layouts
+    │   │   └── api/v1/[...path]/   # BFF proxy catch-all route
+    │   ├── lib/
+    │   │   └── bff.ts              # BFF client for server actions
+    │   └── middleware.ts           # Auth middleware
+    ├── .env.local                  # Environment variables
+    └── package.json
+    ```
+  </TabItem>
+  <TabItem label="TanStack Start">
+    ### `apps/web-tanstack` -- TanStack Start BFF
+
+    An alternative frontend using TanStack Start + Vite on port 3003:
+
+    - **File-based routing** with TanStack Router
+    - **SSR** with `Route.useRouteContext()` for hydrated auth state
+    - **Zustand** for client-side auth mutations
+    - Built-in BFF proxy at `/api/v1/$` catch-all route
+    - Works with the Hono backend by default
+
+    ```
+    apps/web-tanstack/
+    ├── src/
+    │   ├── routes/                 # File-based routes (TanStack Router)
+    │   │   └── api/v1/$.tsx        # BFF proxy catch-all route
+    │   ├── stores/
+    │   │   └── auth-store.ts       # Zustand auth state
+    │   └── router.tsx              # Router configuration
+    ├── .env                        # Environment variables (Vite)
+    └── package.json
+    ```
+  </TabItem>
+</Tabs>
+
+### `apps/api-laravel` -- Laravel Backend
+
+Full-featured PHP backend on port 8000:
+
+- BetterAuth for authentication (Bearer tokens)
+- HMAC request signing verification
+- RBAC with roles, permissions, and middleware
+- OAuth (Google, GitHub), 2FA, magic links
+
+### `apps/api-sf` -- Symfony Backend
+
+PHP backend on port 8002:
+
+- BetterAuth with Paseto V4 tokens
+- Symfony voters for RBAC
+- OAuth and 2FA support
+- SQLite database by default
+
+### `apps/api-hono` -- Hono Backend
+
+Lightweight TypeScript backend on port 8003:
+
+- JWT auth with `jose` library
+- Drizzle ORM with SQLite
+- Minimal feature set (no 2FA, no OAuth)
+
+## Packages
+
+### `packages/create-headless-app`
+
+The CLI tool (`bunx create-headless-app`) that scaffolds new projects with interactive prompts for preset, frontend, backend, modules, and database selection. See the [CLI guide](/cli/getting-started/) for details.
+
+## Key Files
+
+| File | Purpose |
+| ---- | ------- |
+| `apps/web/src/app/api/v1/[...path]/route.ts` | BFF proxy entry point |
+| `apps/web/src/middleware.ts` | Auth middleware |
+| `apps/web/.env.local` | Frontend environment variables |
+| `apps/web/src/lib/adapters/` | Backend adapter implementations |
+| `apps/web/src/lib/actions/_shared/bff-client.ts` | BFF client for server actions |

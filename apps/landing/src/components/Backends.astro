@@ -1,0 +1,125 @@
+---
+const features = [
+  { name: "Auth", laravel: "BetterAuth", symfony: "BetterAuth", hono: "JWT" },
+  { name: "Tokens", laravel: "Bearer", symfony: "Paseto V4", hono: "HS256" },
+  { name: "2FA", laravel: true, symfony: true, hono: false },
+  { name: "OAuth", laravel: "Google, GitHub", symfony: "Google, GitHub", hono: false },
+  { name: "RBAC", laravel: "Full", symfony: "Full", hono: false },
+  { name: "Password Reset", laravel: true, symfony: true, hono: false },
+  { name: "Shop", laravel: true, symfony: true, hono: true },
+  { name: "Cart + Orders", laravel: true, symfony: true, hono: true },
+  { name: "Admin", laravel: true, symfony: true, hono: true },
+  { name: "SaaS", laravel: true, symfony: true, hono: true },
+  { name: "Support", laravel: true, symfony: true, hono: true },
+  { name: "Database", laravel: "SQLite / PG", symfony: "SQLite / PG", hono: "SQLite" },
+  { name: "Architecture", laravel: "VSA", symfony: "VSA", hono: "VSA" },
+];
+
+function renderCell(value: string | boolean) {
+  if (value === true) return "Yes";
+  if (value === false) return "\u2014";
+  return value;
+}
+
+function cellClass(value: string | boolean) {
+  if (value === false) return "text-text-muted";
+  return "text-white";
+}
+---
+
+<section id="backends" class="py-24 md:py-32">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mb-16 text-center">
+      <h2 class="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+        <span class="gradient-text">Pick your stack</span>, start building
+      </h2>
+      <p class="mx-auto max-w-2xl text-lg text-text-muted">
+        Two frontends, three backends. Pick what fits your team.
+      </p>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="border-b border-border-subtle">
+            <th class="py-4 pr-6 text-left text-sm font-medium text-text-muted">Feature</th>
+            <th class="px-6 py-4 text-left text-sm font-medium">
+              <span class="text-amber-400">Laravel</span>
+            </th>
+            <th class="px-6 py-4 text-left text-sm font-medium">
+              <span class="text-sky-400">Symfony</span>
+            </th>
+            <th class="px-6 py-4 text-left text-sm font-medium">
+              <span class="text-emerald-400">Hono</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {features.map((feature) => (
+            <tr class="border-b border-border-subtle/50 transition-colors hover:bg-surface-card/50">
+              <td class="py-3.5 pr-6 text-sm font-medium text-text-muted">{feature.name}</td>
+              <td class={`px-6 py-3.5 text-sm ${cellClass(feature.laravel)}`}>
+                {renderCell(feature.laravel)}
+              </td>
+              <td class={`px-6 py-3.5 text-sm ${cellClass(feature.symfony)}`}>
+                {renderCell(feature.symfony)}
+              </td>
+              <td class={`px-6 py-3.5 text-sm ${cellClass(feature.hono)}`}>
+                {renderCell(feature.hono)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Frontend comparison -->
+    <div class="mt-16">
+      <h3 class="mb-6 text-center text-xl font-semibold">
+        <span class="gradient-text">Frontend</span> comparison
+      </h3>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-subtle">
+              <th class="py-4 pr-6 text-left text-sm font-medium text-text-muted"></th>
+              <th class="px-6 py-4 text-left text-sm font-medium">
+                <span class="text-indigo-400">Next.js</span>
+              </th>
+              <th class="px-6 py-4 text-left text-sm font-medium">
+                <span class="text-pink-400">TanStack Start</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-border-subtle/50 transition-colors hover:bg-surface-card/50">
+              <td class="py-3.5 pr-6 text-sm font-medium text-text-muted">Router</td>
+              <td class="px-6 py-3.5 text-sm text-white">App Router</td>
+              <td class="px-6 py-3.5 text-sm text-white">TanStack Router</td>
+            </tr>
+            <tr class="border-b border-border-subtle/50 transition-colors hover:bg-surface-card/50">
+              <td class="py-3.5 pr-6 text-sm font-medium text-text-muted">SSR</td>
+              <td class="px-6 py-3.5 text-sm text-white">React Server Components</td>
+              <td class="px-6 py-3.5 text-sm text-white">Route Context</td>
+            </tr>
+            <tr class="border-b border-border-subtle/50 transition-colors hover:bg-surface-card/50">
+              <td class="py-3.5 pr-6 text-sm font-medium text-text-muted">State</td>
+              <td class="px-6 py-3.5 text-sm text-white">Zustand</td>
+              <td class="px-6 py-3.5 text-sm text-white">Zustand</td>
+            </tr>
+            <tr class="border-b border-border-subtle/50 transition-colors hover:bg-surface-card/50">
+              <td class="py-3.5 pr-6 text-sm font-medium text-text-muted">Bundler</td>
+              <td class="px-6 py-3.5 text-sm text-white">Webpack / Turbopack</td>
+              <td class="px-6 py-3.5 text-sm text-white">Vite</td>
+            </tr>
+            <tr class="border-b border-border-subtle/50 transition-colors hover:bg-surface-card/50">
+              <td class="py-3.5 pr-6 text-sm font-medium text-text-muted">Port</td>
+              <td class="px-6 py-3.5 text-sm text-white">3001</td>
+              <td class="px-6 py-3.5 text-sm text-white">3003</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

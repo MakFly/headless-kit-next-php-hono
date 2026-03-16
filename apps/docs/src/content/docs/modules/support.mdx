@@ -1,0 +1,100 @@
+---
+title: Support Module
+description: Conversations, messages, canned responses, agent queue, and ratings.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The Support module provides a help desk system: conversation threads, real-time messaging, canned responses for agents, agent queue and assignment, and customer satisfaction ratings.
+
+## API Endpoints
+
+### Conversations (Customer)
+
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| `GET` | `/api/v1/support/conversations` | Yes | List user's conversations |
+| `POST` | `/api/v1/support/conversations` | Yes | Create new conversation |
+| `GET` | `/api/v1/support/conversations/{id}` | Yes | Show conversation with messages |
+| `POST` | `/api/v1/support/conversations/{id}/messages` | Yes | Send message |
+| `POST` | `/api/v1/support/conversations/{id}/rate` | Yes | Rate conversation |
+
+### Agent Queue
+
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| `GET` | `/api/v1/support/agent/queue` | Agent | Unassigned conversations |
+| `GET` | `/api/v1/support/agent/assigned` | Agent | Agent's assigned conversations |
+| `POST` | `/api/v1/support/agent/conversations/{id}/assign` | Agent | Assign to self |
+| `PATCH` | `/api/v1/support/agent/conversations/{id}/status` | Agent | Update status (open/resolved/closed) |
+
+### Canned Responses
+
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| `GET` | `/api/v1/support/canned-responses` | Agent | List canned responses |
+| `POST` | `/api/v1/support/canned-responses` | Agent | Create canned response |
+| `PUT` | `/api/v1/support/canned-responses/{id}` | Agent | Update canned response |
+| `DELETE` | `/api/v1/support/canned-responses/{id}` | Agent | Delete canned response |
+
+### Analytics
+
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| `GET` | `/api/v1/support/ratings/stats` | Agent | Satisfaction rating stats |
+
+## Backend Implementation
+
+<Tabs>
+  <TabItem label="Laravel">
+    ```
+    app/Features/Support/
+    ├── Actions/              # ~15 actions
+    │   ├── ListConversations.php
+    │   ├── CreateConversation.php
+    │   ├── ShowConversation.php
+    │   ├── SendMessage.php
+    │   ├── RateConversation.php
+    │   ├── AgentQueue.php
+    │   ├── AgentAssigned.php
+    │   ├── AssignConversation.php
+    │   ├── UpdateConversationStatus.php
+    │   ├── ListCannedResponses.php
+    │   ├── CreateCannedResponse.php
+    │   ├── UpdateCannedResponse.php
+    │   ├── DeleteCannedResponse.php
+    │   └── RatingsStats.php
+    ├── Formatters/
+    │   ├── ConversationFormatter.php
+    │   └── CannedResponseFormatter.php
+    └── routes.php
+    ```
+  </TabItem>
+  <TabItem label="Symfony">
+    ```
+    src/Feature/Support/
+    ├── Controller/           # One invokable controller per action
+    └── Service/
+        └── ConversationAccessChecker.php
+    ```
+  </TabItem>
+  <TabItem label="Hono">
+    ```
+    src/features/support/
+    ├── support.schemas.ts
+    ├── support.repository.ts
+    ├── support.service.ts
+    ├── support.handlers.ts
+    └── support.routes.ts
+    ```
+  </TabItem>
+</Tabs>
+
+## Frontend
+
+| Frontend | Location |
+| -------- | -------- |
+| Next.js | `src/lib/actions/support/`, `src/app/(support)/` |
+| TanStack Start | `src/lib/services/support-service.ts`, `src/routes/support/` |

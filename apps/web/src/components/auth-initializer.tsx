@@ -1,6 +1,6 @@
 import { ZustandHydration } from './zustand-hydration';
 import { getCurrentUserAction } from '@/lib/actions/auth';
-import type { User } from '@rbac/types';
+import type { User } from '@/types';
 
 type AuthInitializerProps = {
   children: React.ReactNode;

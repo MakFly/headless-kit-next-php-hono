@@ -1,0 +1,146 @@
+---
+title: Symfony Backend
+description: Symfony 8 backend with BetterAuth, Paseto V4 tokens, and VSA.
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Overview
+
+The Symfony backend (`apps/api-sf`) runs on port 8002 and uses **Vertical Slice Architecture** with invokable controllers organized under `src/Feature/`.
+
+| Feature | Details |
+| ------- | ------- |
+| Auth | BetterAuth (Paseto V4 tokens) |
+| Architecture | VSA (`src/Feature/`, `src/Shared/`) |
+| Modules | Auth, Shop, Cart, Orders, Admin, SaaS, Support |
+| Database | SQLite (dev) / PostgreSQL (prod) |
+| 2FA | TOTP via BetterAuth |
+| OAuth | Google, GitHub |
+| RBAC | Voter-based |
+
+## Setup
+
+<Steps>
+
+1. **Install PHP dependencies**
+
+   ```bash
+   cd apps/api-sf
+   composer install
+   ```
+
+2. **Configure environment**
+
+   ```bash
+   cp .env .env.local
+   ```
+
+   Set `BETTER_AUTH_SECRET` and `FRONTEND_URL`.
+
+3. **Run migrations**
+
+   ```bash
+   php bin/console doctrine:migrations:migrate
+   ```
+
+4. **Start the server**
+
+   ```bash
+   symfony server:start --port=8002 --no-tls
+   ```
+
+</Steps>
+
+## Project Structure
+
+```
+src/
+├── Feature/
+│   ├── Auth/
+│   │   ├── Controller/       # Login, Register, Me, Refresh, Logout, 2FA, Password Reset
+│   │   └── Service/          # RateLimiterService
+│   ├── Shop/
+│   │   ├── Controller/       # ListProducts, ShowProduct, ListCategories, ShowCategory
+│   │   └── Repository/       # ProductRepository, CategoryRepository
+│   ├── Cart/
+│   │   ├── Controller/       # ShowCart, AddItem, UpdateItem, RemoveItem
+│   │   └── Repository/       # CartRepository
+│   ├── Orders/
+│   │   ├── Controller/       # CreateOrder, ListOrders, ShowOrder
+│   │   └── Repository/       # OrderRepository
+│   ├── Admin/
+│   │   ├── Controller/
+│   │   │   ├── Rbac/         # ListRoles, CreateRole, Permissions, UserRoles
+│   │   │   └── Shop/         # Products, Orders, Customers, Reviews, Segments CRUD
+│   │   └── Service/          # SegmentQueryService
+│   ├── Saas/
+│   │   ├── Controller/       # Plans, Subscriptions, Invoices, Team, Usage, Settings, Orgs
+│   │   └── Service/          # OrgLoader
+│   └── Support/
+│       ├── Controller/       # Conversations, Messages, CannedResponses, AgentQueue, Ratings
+│       └── Service/          # ConversationAccessChecker
+│
+├── Shared/
+│   ├── Entity/               # User, Role, Permission, Product, Category, Cart, Order, etc.
+│   └── Service/              # Mailer, Storage
+```
+
+Each controller is an **invokable class** (single `__invoke` method) with route attributes:
+
+```php
+#[Route('/api/v1/shop/products', methods: ['GET'])]
+class ListProductsController
+{
+    public function __invoke(ProductRepository $repo): JsonResponse
+    {
+        return $this->json($repo->findAllPaginated());
+    }
+}
+```
+
+## Authentication
+
+BetterAuth endpoints under `/api/v1/auth/`:
+
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| `POST` | `/api/v1/auth/login` | Login with email/password |
+| `POST` | `/api/v1/auth/register` | Create new account |
+| `GET` | `/api/v1/auth/me` | Get current user |
+| `POST` | `/api/v1/auth/refresh` | Refresh access token |
+| `POST` | `/api/v1/auth/logout` | Invalidate session |
+
+### Paseto V4 Tokens
+
+Symfony uses Paseto V4 tokens instead of JWT — no algorithm confusion attacks, modern cryptography (Ed25519, XChaCha20-Poly1305).
+
+### Response Format
+
+Flat structure (no `data` envelope):
+
+```json
+{
+  "user": { "id": "uuid", "name": "John Doe", "email": "john@example.com", "roles": [...] },
+  "access_token": "v4.public.eyJ...",
+  "refresh_token": "abc...",
+  "expires_in": 3600,
+  "token_type": "Bearer"
+}
+```
+
+## RBAC
+
+Authorization via Symfony voters:
+
+```php
+$this->denyAccessUnlessGranted('ROLE_CHECK', 'admin');
+$this->denyAccessUnlessGranted('PERMISSION_CHECK', 'users:manage');
+```
+
+## Testing
+
+```bash
+cd apps/api-sf
+php bin/phpunit
+```

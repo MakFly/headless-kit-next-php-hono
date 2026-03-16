@@ -1,0 +1,116 @@
+---
+title: Adapter Pattern
+description: How Headless Kit adapters normalize backend-specific responses.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+Each backend (Laravel, Symfony, Hono) has slightly different response formats. The **adapter pattern** normalizes these differences so the frontend code works identically regardless of which backend is active.
+
+Adapters live inside each frontend app, not in a separate package:
+
+```
+apps/web/src/lib/adapters/
+├── index.ts              # Adapter factory (resolves active backend)
+├── types.ts              # AuthAdapter interface, response types
+├── proxy-config.ts       # Backend URL configuration
+├── laravel/
+│   ├── adapter.ts        # LaravelAdapter implementation
+│   └── transformer.ts    # Unwraps Laravel's `data` envelope
+├── symfony/
+│   └── transformer.ts    # Handles flat responses
+└── node/
+    └── transformer.ts    # Handles camelCase fields (Hono)
+```
+
+## AuthAdapter Interface
+
+Every backend adapter implements a common interface for authentication operations:
+
+```typescript
+// apps/web/src/lib/adapters/types.ts
+type AuthAdapter = {
+  login(credentials: LoginRequest): Promise<AuthResponse>;
+  register(data: RegisterRequest): Promise<AuthResponse>;
+  logout(): Promise<void>;
+  refresh(request?: RefreshTokenRequest): Promise<AuthResponse>;
+  getUser(): Promise<NormalizedUser | null>;
+};
+```
+
+## Transformers
+
+Each backend has a transformer that normalizes its response format:
+
+<Tabs>
+  <TabItem label="Laravel">
+    Laravel wraps responses in a `data` envelope:
+
+    ```typescript
+    // apps/web/src/lib/adapters/laravel/transformer.ts
+    // Input:  { data: { user: {...}, access_token: "..." } }
+    // Output: { user: {...}, tokens: { access_token: "..." } }
+    ```
+  </TabItem>
+  <TabItem label="Symfony">
+    Symfony uses flat responses with snake_case:
+
+    ```typescript
+    // apps/web/src/lib/adapters/symfony/transformer.ts
+    // Input:  { user: {...}, access_token: "v4.public.eyJ..." }
+    // Output: { user: {...}, tokens: { access_token: "..." } }
+    ```
+  </TabItem>
+  <TabItem label="Hono">
+    Hono uses camelCase:
+
+    ```typescript
+    // apps/web/src/lib/adapters/node/transformer.ts
+    // Input:  { user: {...}, accessToken: "eyJ..." }
+    // Output: { user: {...}, tokens: { access_token: "..." } }
+    ```
+  </TabItem>
+</Tabs>
+
+## BFF Client
+
+Server Actions use the BFF client to communicate with the backend through the proxy:
+
+```typescript
+// apps/web/src/lib/actions/_shared/bff-client.ts
+import { bffGet, bffPost } from '../_shared/bff-client';
+
+// In a server action:
+'use server';
+const result = await bffPost('/api/v1/auth/login', { email, password });
+```
+
+The BFF client:
+- Reads the `auth_token` cookie and forwards it as a Bearer token
+- Handles 401 responses with automatic token refresh
+- Throws `BffActionError` on failure
+
+<Aside type="caution">
+  Never use `fetch()` directly in server actions. Always use the BFF client. `credentials: 'include'` is ignored in Node.js server-side contexts.
+</Aside>
+
+## BFF Proxy Route
+
+The proxy route at `apps/web/src/app/api/v1/[...path]/route.ts` handles all API proxying:
+
+- Validates CSRF for mutating requests
+- Adds HMAC signature headers (for Laravel)
+- Forwards the Bearer token from cookies
+- Handles token refresh on 401 responses
+- Stores new tokens in HttpOnly cookies
+
+## Adding a Custom Backend
+
+To support a new backend:
+
+1. Create a new transformer in `apps/web/src/lib/adapters/custom/transformer.ts`
+2. Register it in the adapter factory (`apps/web/src/lib/adapters/index.ts`)
+3. Add the backend URL to your environment variables
+4. See the [Custom Adapter guide](/guides/custom-adapter/) for a full walkthrough

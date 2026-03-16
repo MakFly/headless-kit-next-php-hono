@@ -1,0 +1,204 @@
+/**
+ * Base adapter class for all backend auth adapters
+ *
+ * Provides common functionality for cookie management and HTTP requests
+ */
+
+import { cookies } from 'next/headers';
+import type {
+  AuthAdapter,
+  AdapterConfig,
+  LoginRequest,
+  RegisterRequest,
+  RefreshTokenRequest,
+  AuthResponse,
+  NormalizedUser,
+  TokenStorage,
+} from './types';
+import {
+  TOKEN_CONFIG,
+  calculateExpirationTimestamp,
+  formatExpirationForCookie,
+} from '../services/token-service';
+import { AdapterError } from './errors';
+import { apiRequestJson } from '../http/api-request';
+import {
+  AUTH_BACKEND_COOKIE,
+  getCookieNamesForBackend,
+  resolveBackend,
+} from '@/lib/auth/backend-context';
+
+// Re-export AdapterError for backwards compatibility
+export { AdapterError } from './errors';
+
+/**
+ * Base cookie configuration
+ */
+const BASE_COOKIE_CONFIG = {
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+};
+
+export const COOKIE_NAMES = {
+  BACKEND: AUTH_BACKEND_COOKIE,
+};
+
+/**
+ * Default request timeout in milliseconds
+ */
+const DEFAULT_TIMEOUT = 30000;
+
+/**
+ * Base adapter class
+ */
+export abstract class BaseAdapter implements AuthAdapter {
+  protected config: AdapterConfig;
+
+  constructor(config: AdapterConfig) {
+    this.config = {
+      timeout: DEFAULT_TIMEOUT,
+      ...config,
+    };
+  }
+
+  /**
+   * Make an HTTP request to the backend
+   */
+  protected async makeRequest<T>(
+    method: string,
+    path: string,
+    options: {
+      body?: unknown;
+      headers?: Record<string, string>;
+      includeAuth?: boolean;
+    } = {}
+  ): Promise<T> {
+    const { body, headers = {}, includeAuth = true } = options;
+
+    const url = `${this.config.baseUrl}${path}`;
+    const requestHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...headers,
+    };
+
+    // Add auth header if needed
+    if (includeAuth) {
+      const authHeaders = await this.getAuthHeaders();
+      Object.assign(requestHeaders, authHeaders);
+    }
+
+    try {
+      return await apiRequestJson<T>(url, {
+        method,
+        headers: requestHeaders,
+        body: body == null ? undefined : JSON.stringify(body),
+        timeoutMs: this.config.timeout,
+      });
+    } catch (error) {
+      if (error instanceof AdapterError) {
+        throw error;
+      }
+      throw AdapterError.fromUnknown(error);
+    }
+  }
+
+  /**
+   * Get headers for authenticated requests
+   */
+  protected async getAuthHeaders(): Promise<Record<string, string>> {
+    const token = await this.getAccessToken();
+    if (token) {
+      return { Authorization: `Bearer ${token}` };
+    }
+    return {};
+  }
+
+  /**
+   * Store tokens in HttpOnly cookies
+   */
+  async storeTokens(tokens: TokenStorage): Promise<void> {
+    const cookieStore = await cookies();
+    const cookieNames = await this.getCookieNames();
+
+    const expiresIn = tokens.expires_in || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE;
+
+    if (tokens.access_token) {
+      cookieStore.set({
+        name: cookieNames.accessToken,
+        value: tokens.access_token,
+        ...BASE_COOKIE_CONFIG,
+        httpOnly: true,
+        maxAge: expiresIn,
+      });
+
+      const expiresAt = calculateExpirationTimestamp(expiresIn);
+      cookieStore.set({
+        name: cookieNames.tokenExpiresAt,
+        value: formatExpirationForCookie(expiresAt),
+        ...BASE_COOKIE_CONFIG,
+        httpOnly: false,
+        maxAge: expiresIn,
+      });
+    }
+
+    if (tokens.refresh_token) {
+      cookieStore.set({
+        name: cookieNames.refreshToken,
+        value: tokens.refresh_token,
+        ...BASE_COOKIE_CONFIG,
+        httpOnly: true,
+        maxAge: TOKEN_CONFIG.REFRESH_TOKEN_MAX_AGE,
+      });
+    }
+  }
+
+  /**
+   * Clear all auth tokens
+   */
+  async clearTokens(): Promise<void> {
+    const cookieStore = await cookies();
+    const cookieNames = await this.getCookieNames();
+
+    cookieStore.delete(cookieNames.accessToken);
+    cookieStore.delete(cookieNames.refreshToken);
+    cookieStore.delete(cookieNames.tokenExpiresAt);
+  }
+
+  /**
+   * Get access token from cookie
+   */
+  async getAccessToken(): Promise<string | null> {
+    const cookieStore = await cookies();
+    const cookieNames = await this.getCookieNames();
+    const token = cookieStore.get(cookieNames.accessToken);
+    return token?.value ?? null;
+  }
+
+  /**
+   * Get refresh token from cookie
+   */
+  protected async getRefreshToken(): Promise<string | null> {
+    const cookieStore = await cookies();
+    const cookieNames = await this.getCookieNames();
+    const token = cookieStore.get(cookieNames.refreshToken);
+    return token?.value ?? null;
+  }
+
+  protected async getCookieNames() {
+    const cookieStore = await cookies();
+    const backend = resolveBackend(cookieStore.get(AUTH_BACKEND_COOKIE)?.value);
+
+    return getCookieNamesForBackend(backend);
+  }
+
+  // Abstract methods to be implemented by each adapter
+  abstract login(credentials: LoginRequest): Promise<AuthResponse>;
+  abstract register(data: RegisterRequest): Promise<AuthResponse>;
+  abstract logout(): Promise<void>;
+  abstract refresh(request?: RefreshTokenRequest): Promise<AuthResponse>;
+  abstract getUser(): Promise<NormalizedUser | null>;
+  abstract getOAuthProviders(): Promise<string[]>;
+  abstract getOAuthUrl(provider: string): Promise<string>;
+}

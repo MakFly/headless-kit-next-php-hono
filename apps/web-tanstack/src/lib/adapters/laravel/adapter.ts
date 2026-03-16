@@ -7,7 +7,6 @@ import type {
   NormalizedUser,
 } from '../types'
 import { BaseAdapter, AdapterError } from '../base-adapter'
-import { generateSignature, BFF_SECRET, BFF_ID } from '../../security/hmac'
 import { apiRequestJson } from '../../http/api-request'
 import {
   transformAuthResponse,
@@ -26,24 +25,14 @@ const ENDPOINTS = {
   OAUTH_REDIRECT: (provider: string) => `/api/v1/auth/${provider}/redirect`,
 }
 
-export type LaravelAdapterConfig = AdapterConfig & {
-  secret: string
-  bffId: string
-}
-
 export class LaravelAdapter extends BaseAdapter {
-  protected override config: LaravelAdapterConfig
-
-  constructor(config: Partial<LaravelAdapterConfig> = {}) {
-    const fullConfig: LaravelAdapterConfig = {
+  constructor(config: Partial<AdapterConfig> = {}) {
+    const fullConfig: AdapterConfig = {
       baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8000',
       timeout: 30000,
-      secret: config.secret || BFF_SECRET,
-      bffId: config.bffId || BFF_ID,
       ...config,
     }
     super(fullConfig)
-    this.config = fullConfig
   }
 
   protected override async makeRequest<T>(
@@ -57,13 +46,10 @@ export class LaravelAdapter extends BaseAdapter {
   ): Promise<T> {
     const { body, headers = {}, includeAuth = true } = options
 
-    const { normalizedBody, ...hmacHeaders } = generateSignature(method, path, body)
-
     const url = `${this.config.baseUrl}${path}`
     const requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      ...hmacHeaders,
       ...headers,
     }
 
@@ -76,7 +62,7 @@ export class LaravelAdapter extends BaseAdapter {
       return await apiRequestJson<T>(url, {
         method,
         headers: requestHeaders,
-        body: normalizedBody,
+        body: body ? JSON.stringify(body) : undefined,
         timeoutMs: this.config.timeout,
       })
     } catch (error) {

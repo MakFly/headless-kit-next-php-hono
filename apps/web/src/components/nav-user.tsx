@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import type { Route } from "next"
 import {
   BellIcon,
   CreditCardIcon,
@@ -32,6 +34,7 @@ import {
 export function NavUser({
   user,
   logout,
+  logoutRedirect = "/",
 }: {
   user: {
     name: string
@@ -39,8 +42,15 @@ export function NavUser({
     avatar?: string
   }
   logout?: () => void
+  logoutRedirect?: string
 }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await logout?.()
+    router.push(logoutRedirect as Route)
+  }
 
   // Generate initials from name
   const getInitials = (name: string) => {
@@ -110,7 +120,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

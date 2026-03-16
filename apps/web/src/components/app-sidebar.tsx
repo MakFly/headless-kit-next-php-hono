@@ -2,113 +2,51 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
-  ShieldIcon,
-  UsersIcon,
-  KeyIcon,
-  LayoutDashboardIcon,
-  SettingsIcon,
-  LogOutIcon,
+  Shell,
+  House,
+  DollarSign,
+  Images,
+  Bookmark,
+  Users,
+  MessageSquareText,
 } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useAuthStore } from "@/stores/auth-store"
-import type { User, PermissionAction } from "@rbac/types"
-import {
-  hasPermission as checkHasPermission,
-  isAdmin as checkIsAdmin,
-} from "@rbac/types"
+import type { User } from "@/types"
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   initialUser?: User | null
 }
 
+const navItems = [
+  { title: "Dashboard", href: "/dashboard", icon: House, exact: true },
+  { title: "Orders", href: "/dashboard/orders", icon: DollarSign, exact: false },
+  { title: "Products", href: "/dashboard/products", icon: Images, exact: false },
+  { title: "Categories", href: "/dashboard/categories", icon: Bookmark, exact: false },
+  { title: "Customers", href: "/dashboard/customers", icon: Users, exact: false },
+  { title: "Reviews", href: "/dashboard/reviews", icon: MessageSquareText, exact: false },
+]
+
 export function AppSidebar({ initialUser, ...props }: AppSidebarProps) {
+  const pathname = usePathname()
   const { user: storeUser, isHydrated, logout } = useAuthStore()
 
-  // Utiliser le user du store si hydraté, sinon le user initial (SSR)
   const user = isHydrated ? storeUser : initialUser
 
-  // Helpers de permissions qui fonctionnent avec le user actuel (SSR ou hydraté)
-  const userHasPermission = (resource: string, action: PermissionAction) => {
-    if (!user) return false
-    return checkHasPermission(user, resource, action)
-  }
-
-  const userIsAdmin = () => {
-    if (!user) return false
-    return checkIsAdmin(user)
-  }
-
-  // Items statiques (toujours visibles, ne dépendent pas des permissions)
-  const staticNavItems = [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboardIcon,
-    },
-  ]
-
-  // Items conditionnels (dépendent des permissions utilisateur)
-  // Calculés immédiatement avec initialUser (SSR) ou storeUser (client)
-  const conditionalNavItems = user
-    ? [
-        {
-          title: "Users",
-          url: "#",
-          icon: UsersIcon,
-          items: [
-            { title: "All Users", url: "/dashboard/users" },
-            { title: "Permissions", url: "/dashboard/permissions" },
-          ],
-          show: userHasPermission("users", "read") || userIsAdmin(),
-        },
-        {
-          title: "Roles",
-          url: "#",
-          icon: ShieldIcon,
-          items: [
-            { title: "Manage Roles", url: "/dashboard/roles" },
-            { title: "Role Permissions", url: "/dashboard/roles/permissions" },
-          ],
-          show: userIsAdmin(),
-        },
-        {
-          title: "API Keys",
-          url: "/dashboard/api-keys",
-          icon: KeyIcon,
-          show: userHasPermission("api", "manage") || userIsAdmin(),
-        },
-      ].filter((item) => item.show !== false)
-    : []
-
-  // Items secondaires statiques (toujours visibles)
-  const navSecondary = [
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Logout",
-      url: "#",
-      icon: LogOutIcon,
-      action: logout,
-    },
-  ]
-
-  // User data pour NavUser
   const userData = user
     ? {
         name: user.name,
@@ -118,26 +56,14 @@ export function AppSidebar({ initialUser, ...props }: AppSidebarProps) {
     : null
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      {/* Header - TOUJOURS visible immédiatement */}
+    <Sidebar variant="floating" collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1"
-            >
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <Link href="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg">
-                  <ShieldIcon className="size-4" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold text-base">RBAC</span>
-                  <span className="text-xs text-muted-foreground">
-                    Admin Panel
-                  </span>
-                </div>
+                <Shell className="!size-5" />
+                <span className="text-base font-semibold">Headless Kit</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -145,21 +71,31 @@ export function AppSidebar({ initialUser, ...props }: AppSidebarProps) {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Items statiques avec Quick Create - TOUJOURS visibles */}
-        <NavMain items={staticNavItems} showQuickCreate={true} />
-
-        {/* Items conditionnels - Visibles immédiatement si user (SSR ou hydraté) */}
-        {conditionalNavItems.length > 0 && (
-          <NavMain items={conditionalNavItems} showQuickCreate={false} />
-        )}
-
-        {/* Secondary nav - TOUJOURS visible */}
-        <NavSecondary items={navSecondary} className="mt-auto" />
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => {
+                const isActive = item.exact
+                  ? pathname === item.href
+                  : pathname.startsWith(item.href)
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link href={item.href}>
+                        <item.icon />
+                        {item.title}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer - Affiche le user si disponible */}
       <SidebarFooter>
-        {userData && <NavUser user={userData} logout={logout} />}
+        {userData && <NavUser user={userData} logout={logout} logoutRedirect="/dashboard/auth/login" />}
       </SidebarFooter>
     </Sidebar>
   )

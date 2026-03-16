@@ -1,0 +1,169 @@
+---
+title: OAuth
+description: Setting up Google and GitHub OAuth login.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Supported Providers
+
+Headless Kit supports two OAuth providers out of the box:
+
+| Provider | Laravel | Symfony | Hono |
+| -------- | ------- | ------- | ---- |
+| Google | Yes | Yes | No |
+| GitHub | Yes | Yes | No |
+
+<Aside>
+  OAuth is not available on the Hono backend. Use Laravel or Symfony if you need social login.
+</Aside>
+
+## OAuth Flow
+
+The OAuth flow goes through the BFF to keep tokens secure:
+
+```
+1. Client clicks "Login with Google"
+2. Client calls GET /api/v1/auth/oauth/google
+3. BFF proxies to backend, which returns the OAuth redirect URL
+4. Client redirects browser to Google's consent screen
+5. Google redirects back to backend callback URL
+6. Backend exchanges code for user info, creates/links account
+7. Backend redirects to frontend with auth tokens
+8. BFF stores tokens in HttpOnly cookies
+```
+
+## Backend Configuration
+
+<Tabs>
+  <TabItem label="Laravel">
+    Add OAuth credentials to `apps/api-laravel/.env`:
+
+    ```bash
+    GOOGLE_CLIENT_ID=your-google-client-id
+    GOOGLE_CLIENT_SECRET=your-google-client-secret
+    GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/oauth/google/callback
+
+    GITHUB_CLIENT_ID=your-github-client-id
+    GITHUB_CLIENT_SECRET=your-github-client-secret
+    GITHUB_REDIRECT_URI=http://localhost:8000/api/auth/oauth/github/callback
+    ```
+  </TabItem>
+  <TabItem label="Symfony">
+    Add OAuth credentials to `apps/api-sf/.env.local`:
+
+    ```bash
+    GOOGLE_CLIENT_ID=your-google-client-id
+    GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+    GITHUB_CLIENT_ID=your-github-client-id
+    GITHUB_CLIENT_SECRET=your-github-client-secret
+    ```
+  </TabItem>
+</Tabs>
+
+### Getting OAuth Credentials
+
+#### Google
+
+<Steps>
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a project or select an existing one
+3. Navigate to **APIs & Services > Credentials**
+4. Click **Create Credentials > OAuth Client ID**
+5. Set the application type to **Web Application**
+6. Add `http://localhost:8000/api/auth/oauth/google/callback` as an authorized redirect URI
+7. Copy the Client ID and Client Secret
+
+</Steps>
+
+#### GitHub
+
+<Steps>
+
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Click **New OAuth App**
+3. Set the **Authorization callback URL** to `http://localhost:8000/api/auth/oauth/github/callback`
+4. Copy the Client ID and generate a Client Secret
+
+</Steps>
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| `GET` | `/api/v1/auth/oauth/providers` | List configured providers |
+| `GET` | `/api/v1/auth/oauth/{provider}` | Get redirect URL |
+| `GET` | `/api/v1/auth/oauth/{provider}/callback` | Handle callback (backend-only) |
+
+### List Providers
+
+```typescript
+const providers = await bff.get('/api/v1/auth/oauth/providers');
+// ["google", "github"]
+```
+
+Only providers with valid credentials configured are returned.
+
+### Get Redirect URL
+
+```typescript
+const { url } = await bff.get('/api/v1/auth/oauth/google');
+// Redirect the browser to this URL
+window.location.href = url;
+```
+
+## Frontend Implementation
+
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+
+export function OAuthButtons() {
+  const [providers, setProviders] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch('/api/v1/auth/oauth/providers')
+      .then(res => res.json())
+      .then(data => setProviders(data));
+  }, []);
+
+  const handleOAuth = async (provider: string) => {
+    const res = await fetch(`/api/v1/auth/oauth/${provider}`);
+    const { url } = await res.json();
+    window.location.href = url;
+  };
+
+  return (
+    <div>
+      {providers.map(provider => (
+        <button key={provider} onClick={() => handleOAuth(provider)}>
+          Continue with {provider.charAt(0).toUpperCase() + provider.slice(1)}
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+## Adding New Providers
+
+To add a new OAuth provider (e.g., Twitter, Discord):
+
+<Tabs>
+  <TabItem label="Laravel">
+    1. Install the Socialite driver if needed
+    2. Add the provider configuration to `config/services.php`
+    3. Register the provider in your BetterAuth configuration
+    4. Add environment variables for the client ID/secret
+  </TabItem>
+  <TabItem label="Symfony">
+    1. Install the OAuth client bundle for the provider
+    2. Configure the provider in `config/packages/better_auth.yaml`
+    3. Add environment variables for the client ID/secret
+  </TabItem>
+</Tabs>
+
+The BFF proxy does not need any changes -- it forwards OAuth requests transparently to whichever backend is active.

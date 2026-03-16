@@ -5,9 +5,6 @@
  * (Laravel, Symfony, or Node.js) based on AUTH_BACKEND environment variable.
  *
  * Features:
- * - Laravel: Uses HMAC signing for server-to-server auth
- * - Symfony: Uses Bearer token (BetterAuth)
- * - Node.js: Uses Bearer token (generic)
  * - 401 Interceptor: Automatic token refresh on 401 responses
  * - Proactive Refresh: Refresh tokens before they expire
  */
@@ -232,47 +229,7 @@ async function attemptTokenRefresh(
       [REQUEST_ID_HEADER]: requestId,
     };
 
-    // Add HMAC for Laravel
-    if (backend === 'laravel') {
-      const body = { refresh_token: refreshToken };
-      const { headers: signatureHeaders, normalizedBody } = config.getSignatureHeaders(
-        'POST',
-        refreshPath,
-        body
-      );
-      Object.assign(headers, signatureHeaders);
-
-      const response = await apiRequest(refreshUrl.toString(), {
-        method: 'POST',
-        headers,
-        body: normalizedBody || JSON.stringify(body),
-        timeoutMs: config.timeout,
-      });
-
-      if (!response.ok) {
-        log.warn('Token refresh failed', { status: response.status, backend });
-        return null;
-      }
-
-      const data = asRecord(await readResponseBody(response));
-      const dataContainer = asRecord(data.data);
-      // Laravel format: { data: { access_token, refresh_token?, expires_in? } }
-      return {
-        accessToken:
-          (dataContainer.access_token as string) ||
-          (data.access_token as string),
-        refreshToken:
-          (dataContainer.refresh_token as string) ||
-          (data.refresh_token as string) ||
-          refreshToken,
-        expiresIn:
-          ((dataContainer.expires_in as number) ||
-            (data.expires_in as number) ||
-            TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE),
-      };
-    }
-
-    // For Symfony/Node, send refresh token in body
+    // Send refresh token in body
     const body = JSON.stringify({
       refresh_token: refreshToken,
       refreshToken: refreshToken, // Some backends expect camelCase
@@ -291,11 +248,19 @@ async function attemptTokenRefresh(
     }
 
     const data = asRecord(await readResponseBody(response));
+    const dataContainer = asRecord(data.data);
     return {
-      accessToken: (data.access_token as string) || (data.accessToken as string),
+      accessToken:
+        (dataContainer.access_token as string) ||
+        (data.access_token as string) ||
+        (data.accessToken as string),
       refreshToken:
-        (data.refresh_token as string) || (data.refreshToken as string) || refreshToken,
+        (dataContainer.refresh_token as string) ||
+        (data.refresh_token as string) ||
+        (data.refreshToken as string) ||
+        refreshToken,
       expiresIn:
+        (dataContainer.expires_in as number) ||
         (data.expires_in as number) ||
         (data.expiresIn as number) ||
         TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE,
@@ -396,15 +361,8 @@ async function proxyRequest(
       });
     }
 
-    // Extract body for signature (Laravel HMAC)
+    // Extract body
     const body = await extractBody(request);
-
-    // Get signature headers (HMAC for Laravel, empty for others)
-    const { headers: signatureHeaders, normalizedBody } = config.getSignatureHeaders(
-      method,
-      backendPath,
-      body
-    );
 
     // Get tokens from cookies
     const cookieNames = getCookieNamesForBackend(backend);
@@ -454,7 +412,6 @@ async function proxyRequest(
       'Content-Type': 'application/json',
       Accept: 'application/json',
       [REQUEST_ID_HEADER]: requestId,
-      ...signatureHeaders,
     };
 
     // Add auth token
@@ -468,13 +425,9 @@ async function proxyRequest(
       headers,
     };
 
-    // Use normalized body for Laravel (HMAC consistency), original for others
-    if (method !== 'GET' && method !== 'HEAD') {
-      if (normalizedBody !== undefined) {
-        options.body = normalizedBody;
-      } else if (body) {
-        options.body = JSON.stringify(body);
-      }
+    // Add body for mutating requests
+    if (method !== 'GET' && method !== 'HEAD' && body) {
+      options.body = JSON.stringify(body);
     }
 
     // Copy query params
@@ -624,15 +577,16 @@ async function buildResponse(
 
     // Extract token based on backend format
     if (backend === 'laravel') {
-      // Laravel: { data: { access_token, refresh_token?, expires_in? } }
+      // Laravel envelope: { success, data: { user, access_token, ... } } or old { data: { access_token } }
       accessToken = jsonData.data?.access_token;
       refreshTokenFromResponse = jsonData.data?.refresh_token;
       expiresIn = jsonData.data?.expires_in;
     } else {
-      // Symfony/Node: { access_token, accessToken, refresh_token, refreshToken, expires_in, expiresIn }
-      accessToken = jsonData.access_token || jsonData.accessToken;
-      refreshTokenFromResponse = jsonData.refresh_token || jsonData.refreshToken;
-      expiresIn = jsonData.expires_in || jsonData.expiresIn;
+      // Symfony/Node: check envelope format first, then fallback to root
+      const envelope = jsonData.data && typeof jsonData.data === 'object' ? jsonData.data : null;
+      accessToken = envelope?.access_token || envelope?.accessToken || jsonData.access_token || jsonData.accessToken;
+      refreshTokenFromResponse = envelope?.refresh_token || envelope?.refreshToken || jsonData.refresh_token || jsonData.refreshToken;
+      expiresIn = envelope?.expires_in || envelope?.expiresIn || jsonData.expires_in || jsonData.expiresIn;
     }
 
     // Store tokens if present
@@ -696,5 +650,5 @@ export async function DELETE(request: NextRequest, params: RouteParams) {
 /**
  * Configure route options
  */
-export const runtime = 'nodejs'; // Required for crypto (Laravel HMAC)
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic'; // Disable cache for sensitive routes

@@ -17,8 +17,6 @@ const config = defineConfig({
       LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8000',
       SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8002',
       NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:8003',
-      BFF_HMAC_SECRET: process.env.BFF_HMAC_SECRET || '',
-      BFF_ID: process.env.BFF_ID || 'tanstack-bff',
     },
   },
   plugins: [

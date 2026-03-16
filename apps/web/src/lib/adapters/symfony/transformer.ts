@@ -56,28 +56,49 @@ export function transformUser(symfonyUser: SymfonyUser): NormalizedUser {
 }
 
 /**
- * Transform Symfony auth response to normalized auth response
+ * Transform Symfony auth response to normalized auth response.
+ * Handles both native format and envelope { success, data: SymfonyAuthResponse }.
  */
-export function transformAuthResponse(response: SymfonyAuthResponse): AuthResponse {
+export function transformAuthResponse(
+  response: SymfonyAuthResponse | { success: boolean; data: SymfonyAuthResponse }
+): AuthResponse {
+  // Handle envelope format
+  const payload: SymfonyAuthResponse =
+    'success' in response &&
+    response.data &&
+    typeof response.data === 'object' &&
+    'access_token' in (response.data as object)
+      ? (response as { data: SymfonyAuthResponse }).data
+      : (response as SymfonyAuthResponse);
+
   const tokens: TokenStorage = {
-    access_token: response.access_token,
-    refresh_token: response.refresh_token,
-    token_type: response.token_type || 'Bearer',
-    expires_in: response.expires_in,
+    access_token: payload.access_token,
+    refresh_token: payload.refresh_token,
+    token_type: payload.token_type || 'Bearer',
+    expires_in: payload.expires_in,
   };
 
   return {
-    user: transformUser(response.user),
+    user: transformUser(payload.user),
     tokens,
   };
 }
 
 /**
- * Transform Symfony /me response to normalized user
+ * Transform Symfony /me response to normalized user.
+ * Handles both native format and envelope { success, data: SymfonyUser | { user: SymfonyUser } }.
  */
-export function transformMeResponse(response: SymfonyUser | { user: SymfonyUser }): NormalizedUser {
-  // Handle both { user: ... } and direct user object
-  const user = 'user' in response ? response.user : response;
+export function transformMeResponse(
+  response:
+    | SymfonyUser
+    | { user: SymfonyUser }
+    | { success: boolean; data: SymfonyUser | { user: SymfonyUser } }
+): NormalizedUser {
+  let inner: SymfonyUser | { user: SymfonyUser } = response as SymfonyUser | { user: SymfonyUser };
+  if ('success' in response && 'data' in response) {
+    inner = (response as { data: SymfonyUser | { user: SymfonyUser } }).data;
+  }
+  const user = 'user' in inner ? (inner as { user: SymfonyUser }).user : (inner as SymfonyUser);
   return transformUser(user);
 }
 

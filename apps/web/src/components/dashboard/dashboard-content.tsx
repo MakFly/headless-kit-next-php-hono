@@ -20,8 +20,8 @@ import {
   SettingsIcon,
   FileTextIcon,
 } from 'lucide-react';
-import { hasPermission, isAdmin } from '@rbac/types';
-import type { User } from '@rbac/types';
+import { hasPermission, isAdmin } from '@/types';
+import type { User } from '@/types';
 
 type DashboardContentProps = {
   user: User;

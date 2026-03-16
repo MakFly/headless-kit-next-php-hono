@@ -4,31 +4,19 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "public/build/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".output/**", "dist/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "api#dev": {
-      "cache": false,
-      "persistent": true,
-      "env": ["PORT=8000"]
-    },
     "lint": {
       "dependsOn": ["^build"]
     },
-    "test": {
-      "dependsOn": ["build"]
-    },
+    "test": {},
     "start": {
       "dependsOn": ["^build"],
       "persistent": true
-    },
-    "api#start": {
-      "cache": false,
-      "persistent": true,
-      "env": ["PORT=8000"]
     }
   }
 }

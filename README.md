@@ -219,7 +219,7 @@ Run both applications in development mode:
 
 ```bash
 # Terminal 1 - Next.js BFF
-bun run --filter @rbac/web dev
+bun run --filter @headless/web dev
 
 # Terminal 2 - Laravel API
 cd apps/api && php artisan serve
@@ -236,7 +236,7 @@ Access the application at:
 bun run build
 
 # Build specific app
-bun run --filter @rbac/web build
+bun run --filter @headless/web build
 ```
 
 ## API Endpoints

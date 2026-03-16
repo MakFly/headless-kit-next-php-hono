@@ -1,216 +1,152 @@
-# API Hono - Backend Node.js
+# API Hono — Backend Node.js
 
-## Vue d'ensemble
-
-Backend API REST construit avec **Hono** et **Bun**, conçu pour fonctionner avec le BFF Next.js via l'adapter `NodeAdapter`.
-
-## Stack technique
+## Stack
 
 - **Runtime**: Bun
-- **Framework**: Hono
-- **ORM**: Drizzle ORM
-- **Base de données**: SQLite (Bun native)
-- **Auth**: JWT avec jose
-- **Validation**: Zod
-- **Hashing**: Bun native bcrypt
+- **Framework**: Hono 4
+- **ORM**: Drizzle ORM (SQLite via `data.db`)
+- **Auth**: JWT HS256 via `jose`
+- **Validation**: Zod + `@hono/zod-validator`
+- **Port**: 8003
 
-## Architecture
+## Architecture — Vertical Slice
 
 ```
 src/
-├── index.ts              # Point d'entrée serveur
-├── types/                # Types TypeScript
-├── db/                   # Base de données
-│   ├── index.ts          # Connexion (bun:sqlite)
-│   ├── schema.ts         # Schéma Drizzle
-│   └── seed.ts           # Données initiales
-├── lib/                  # Utilitaires
-│   ├── hash.ts           # Hashing mots de passe
-│   └── jwt.ts            # Génération/vérification JWT
-├── repositories/         # Accès données (DAL)
-│   ├── user.repository.ts
-│   └── token.repository.ts
-├── services/             # Logique métier
-│   └── auth.service.ts
-├── middleware/           # Middlewares Hono
-│   └── auth.ts           # Auth JWT
-├── handlers/             # Handlers de requêtes
-│   ├── schemas.ts        # Schémas Zod
-│   └── auth.handler.ts
-└── routes/               # Définition des routes
-    └── auth.routes.ts
+├── index.ts                    # App bootstrap, global middleware, route mounts
+├── features/
+│   ├── auth/                   # JWT register/login/refresh/logout/me/oauth
+│   ├── shop/                   # products + categories (public)
+│   ├── cart/                   # cart management (auth)
+│   ├── orders/                 # order management (auth)
+│   ├── admin/                  # admin CRUD (auth+admin)
+│   ├── saas/                   # multi-tenant SaaS (auth+orgRbac)
+│   └── support/                # support chat (auth)
+├── shared/
+│   ├── db/
+│   │   ├── index.ts            # db + schema exports
+│   │   ├── schema.ts           # all Drizzle table definitions
+│   │   ├── seed.ts             # seed entrypoint
+│   │   └── seeders/            # per-feature seeders
+│   ├── middleware/
+│   │   ├── auth.ts             # authMiddleware, optionalAuthMiddleware, requireUser()
+│   │   ├── admin.ts            # adminMiddleware (requires admin role)
+│   │   ├── org-rbac.ts         # orgRbacMiddleware (requires org membership)
+│   │   ├── i18n.ts             # i18nMiddleware (Accept-Language → c.set('locale'))
+│   │   ├── security.ts         # security headers helpers
+│   │   └── index.ts            # requestContextMiddleware, i18nMiddleware re-exports
+│   ├── lib/
+│   │   ├── response.ts         # apiSuccess(), apiError()
+│   │   ├── errors.ts           # AppError class
+│   │   ├── jwt.ts              # signToken(), verifyToken()
+│   │   ├── hash.ts             # hashPassword(), verifyPassword()
+│   │   └── i18n/               # t() translation helper
+│   └── types/
+│       └── index.ts            # AppVariables, SafeUser, JwtPayload
+└── tests/
+    ├── setup.ts
+    ├── helpers/
+    │   └── test-app.ts         # createTestApp() factory
+    ├── integration/
+    │   ├── auth.test.ts
+    │   ├── health.test.ts
+    │   ├── shop/               # products.test.ts, cart.test.ts, orders.test.ts
+    │   ├── saas/               # saas.test.ts, admin.test.ts
+    │   └── support/            # support.test.ts
+    └── unit/
+        ├── hash.test.ts
+        ├── jwt.test.ts
+        └── schemas.test.ts
 ```
 
-## Commandes
+## Feature Convention
 
-```bash
-# Développement
-bun run dev               # Serveur avec hot-reload (port 8003)
-bun run start             # Démarrer sans hot-reload
+Each feature has exactly 5 files: `{name}.routes.ts`, `{name}.handlers.ts`, `{name}.service.ts`, `{name}.repository.ts`, `{name}.schemas.ts`.
 
-# Base de données
-bun run db:generate       # Générer migration
-bun run db:migrate        # Appliquer migrations
-bun run db:push           # Push direct (dev only)
-bun run db:seed           # Seed données initiales
-bun run db:studio         # Interface Drizzle Studio
+- **routes** — Hono route definitions, middleware chain, `zValidator` calls
+- **handlers** — Thin: parse request → call service → `apiSuccess` / `apiError`
+- **service** — Business logic; throws `AppError` on domain errors
+- **repository** — Drizzle ORM queries only
+- **schemas** — Zod schemas + inferred types
 
-# Tests
-bun test                  # Lancer tous les tests
-bun test --watch          # Mode watch
+## Global Middleware (src/index.ts)
 
-# Qualité
-bun run typecheck         # Vérification TypeScript
+Applied to all routes in order: `logger()`, `prettyJSON()`, `secureHeaders()`, `requestContextMiddleware`, `i18nMiddleware`, `cors()`.
+
+CORS allows: `FRONTEND_URL` + `http://localhost:3001`. Credentials enabled.
+
+## Response Envelope
+
+```typescript
+// Success — apiSuccess(c, data, meta?, status?)
+{ success: true, data: unknown, status: number, request_id: string, meta?: object }
+
+// Error — apiError(c, code, message, status, details?)
+{ success: false, error: { code: string, message: string, details?: unknown }, status: number, request_id: string }
 ```
 
-## Endpoints API
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/` | Non | Health check |
-| GET | `/health` | Non | Status |
-| POST | `/api/v1/auth/register` | Non | Inscription |
-| POST | `/api/v1/auth/login` | Non | Connexion |
-| GET | `/api/v1/auth/me` | Oui | User courant |
-| POST | `/api/v1/auth/refresh` | Non | Refresh token |
-| POST | `/api/v1/auth/logout` | Oui | Déconnexion |
-| GET | `/api/v1/auth/oauth/providers` | Non | SSO providers (Google, GitHub...) |
-
-## Format des réponses
-
-### Auth Response (login/register/refresh)
+Auth login/register response shape (inside `data`):
 
 ```json
-{
-  "user": {
-    "id": "abc123",
-    "email": "user@example.com",
-    "name": "John Doe",
-    "emailVerifiedAt": null,
-    "avatarUrl": null,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-01-01T00:00:00.000Z",
-    "roles": [{ "id": 1, "name": "User", "slug": "user" }]
-  },
-  "accessToken": "eyJ...",
-  "refreshToken": "eyJ...",
-  "expiresIn": 3600,
-  "tokenType": "Bearer"
-}
+{ "user": { "id": "...", "email": "...", "name": "..." }, "accessToken": "...", "refreshToken": "...", "expiresIn": 3600, "tokenType": "Bearer" }
 ```
 
-**Note**: Les champs sont disponibles en camelCase ET snake_case pour compatibilité avec différents clients.
+## Feature Routes
 
-### Error Response
+| Feature | Mount path | Middleware | Key endpoints |
+|---------|-----------|-----------|---------------|
+| auth | `/api/v1/auth` | public | `POST /register`, `POST /login`, `GET /me`, `POST /refresh`, `POST /logout`, `GET /oauth/providers` |
+| shop | `/api/v1` | public | `GET /products`, `GET /categories` |
+| cart | `/api/v1/cart` | `authMiddleware` | `GET /`, `POST /items`, `PATCH /items/:id`, `DELETE /items/:id` |
+| orders | `/api/v1/orders` | `authMiddleware` | `POST /`, `GET /`, `GET /:id` |
+| admin | `/api/v1/admin` | `authMiddleware` + `adminMiddleware` | products, orders, customers, reviews, segments, analytics |
+| saas | `/api/v1/saas` | `authMiddleware` + `orgRbacMiddleware` | plans, subscription, invoices, team, usage, settings, orgs |
+| support | `/api/v1/support` | `authMiddleware` | conversations, messages, canned responses |
 
-```json
-{
-  "error": "Message d'erreur",
-  "code": "ERROR_CODE",
-  "details": {}
-}
-```
-
-## Variables d'environnement
-
-| Variable | Description | Défaut |
-|----------|-------------|--------|
-| `PORT` | Port du serveur | `8003` |
-| `NODE_ENV` | Environnement | `development` |
-| `DATABASE_URL` | Chemin SQLite | `./data.db` |
-| `JWT_SECRET` | Secret JWT | (requis en prod) |
-| `JWT_ACCESS_EXPIRES_IN` | Expiration access token (sec) | `3600` |
-| `JWT_REFRESH_EXPIRES_IN` | Expiration refresh token (sec) | `604800` |
-| `FRONTEND_URL` | URL frontend (CORS) | `http://localhost:3000` |
-
-## Intégration avec Next.js BFF
-
-Ce backend est conçu pour fonctionner avec l'adapter `NodeAdapter` du BFF Next.js.
-
-### Configuration côté Next.js
-
-```env
-AUTH_BACKEND=node
-NODE_API_URL=http://localhost:8003
-NODE_AUTH_PREFIX=/api/v1/auth
-```
-
-### Mapping des endpoints
-
-| BFF Path | API Hono Path |
-|----------|---------------|
-| `/api/v1/auth/login` | `/api/v1/auth/login` |
-| `/api/v1/auth/register` | `/api/v1/auth/register` |
-| `/api/v1/me` | `/api/v1/auth/me` |
-| `/api/v1/auth/refresh` | `/api/v1/auth/refresh` |
-| `/api/v1/auth/logout` | `/api/v1/auth/logout` |
-
-## Tests
-
-Les tests utilisent le test runner natif de Bun.
+## Commands
 
 ```bash
-# Tous les tests
-bun test
-
-# Tests spécifiques
-bun test src/tests/unit/        # Tests unitaires
-bun test src/tests/integration/ # Tests d'intégration
-
-# Avec coverage
-bun test --coverage
+bun run dev                     # Dev server with --watch (port 8003)
+bun run start                   # Production server
+bun test                        # All tests
+bun test src/tests/unit/        # Unit tests only
+bun test src/tests/integration/ # Integration tests only
+bun test --grep "Auth"          # Filter by name
+bun run db:generate             # Generate Drizzle migration (drizzle-kit)
+bun run db:migrate              # Apply migrations
+bun run db:push                 # Push schema without migration (dev only)
+bun run db:seed                 # Seed data
+bun run db:studio               # Drizzle Studio UI
+bun run typecheck               # tsc --noEmit
+bun run build                   # Build to dist/
 ```
 
-## Migrations
+## Database
 
-**Important**: Toujours utiliser les migrations en production.
+- Drizzle ORM with SQLite (`data.db` at project root)
+- Schema: `src/shared/db/schema.ts` — all table definitions in one file
+- Config: `drizzle.config.ts` — dialect `sqlite`, output `./drizzle/`
+- ID convention: `text('id').primaryKey().$defaultFn(() => crypto.randomUUID())`
+- Timestamps: `text('created_at')` / `text('updated_at')` as ISO strings
 
-```bash
-# 1. Modifier src/db/schema.ts
-# 2. Générer la migration
-bun run db:generate
+## Environment
 
-# 3. Vérifier le SQL généré dans drizzle/
-# 4. Appliquer
-bun run db:migrate
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `8003` | Server port |
+| `API_VERSION` | `v1` | API version prefix |
+| `JWT_SECRET` | — | JWT signing secret (required in prod) |
+| `FRONTEND_URL` | `http://localhost:3000` | Primary CORS origin |
+| `DATABASE_URL` | `file:./data.db` | SQLite file path |
+| `NODE_ENV` | `development` | Controls error verbosity |
 
-## OAuth / SSO (Single Sign-On)
+## Skills
 
-L'endpoint `/api/v1/auth/oauth/providers` retourne la liste des providers SSO disponibles.
+Available in `.claude/skills/`:
 
-### Providers supportés (à implémenter)
-
-| Provider | Description |
-|----------|-------------|
-| `google` | Google OAuth 2.0 |
-| `github` | GitHub OAuth |
-| `apple` | Apple Sign In |
-| `microsoft` | Microsoft / Azure AD |
-| `facebook` | Facebook Login |
-
-### Flow OAuth
-
-1. `GET /api/v1/auth/oauth/providers` → Liste des providers disponibles
-2. `GET /api/v1/auth/oauth/{provider}` → Redirige vers le provider (à implémenter)
-3. `GET /api/v1/auth/oauth/{provider}/callback` → Callback après auth (à implémenter)
-
-### Configuration (exemple)
-
-```env
-# Google OAuth
-GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=xxx
-
-# GitHub OAuth
-GITHUB_CLIENT_ID=xxx
-GITHUB_CLIENT_SECRET=xxx
-```
-
-## Sécurité
-
-- Mots de passe hashés avec bcrypt (cost 12)
-- JWT signés avec HS256
-- Refresh tokens stockés en DB et révocables
-- CORS configuré pour le frontend uniquement
-- Secure headers via middleware Hono
+| Skill | Usage |
+|-------|-------|
+| `hono-feature` | Create a full feature slice (5 files + route mount) |
+| `hono-schema` | Add a Drizzle table + generate migration |
+| `hono-test` | Write integration or unit tests |
+| `hono-endpoint` | Add a single endpoint to an existing feature |

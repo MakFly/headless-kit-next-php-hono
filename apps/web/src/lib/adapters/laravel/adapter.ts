@@ -1,7 +1,5 @@
 /**
  * Laravel adapter for BFF authentication
- *
- * Uses HMAC signing for secure server-to-server communication
  */
 
 import type {
@@ -13,7 +11,6 @@ import type {
   NormalizedUser,
 } from "../types";
 import { BaseAdapter, AdapterError } from "../base-adapter";
-import { generateSignature, BFF_SECRET, BFF_ID } from "../../security/hmac";
 import { apiRequestJson } from "../../http/api-request";
 import {
   transformAuthResponse,
@@ -41,35 +38,20 @@ const ENDPOINTS = {
 };
 
 /**
- * Laravel adapter configuration
- */
-export type LaravelAdapterConfig = AdapterConfig & {
-  secret: string;
-  bffId: string;
-};
-
-/**
  * Laravel adapter class
- *
- * Implements HMAC-signed requests to Laravel backend
  */
 export class LaravelAdapter extends BaseAdapter {
-  protected override config: LaravelAdapterConfig;
-
-  constructor(config: Partial<LaravelAdapterConfig> = {}) {
-    const fullConfig: LaravelAdapterConfig = {
+  constructor(config: Partial<AdapterConfig> = {}) {
+    const fullConfig: AdapterConfig = {
       baseUrl: process.env.LARAVEL_API_URL || "http://localhost:8000",
       timeout: 30000,
-      secret: config.secret || BFF_SECRET,
-      bffId: config.bffId || BFF_ID,
       ...config,
     };
     super(fullConfig);
-    this.config = fullConfig;
   }
 
   /**
-   * Override makeRequest to add HMAC signing
+   * Override makeRequest for Laravel-specific behavior
    */
   protected override async makeRequest<T>(
     method: string,
@@ -82,18 +64,10 @@ export class LaravelAdapter extends BaseAdapter {
   ): Promise<T> {
     const { body, headers = {}, includeAuth = true } = options;
 
-    // Generate HMAC signature
-    const { normalizedBody, ...hmacHeaders } = generateSignature(
-      method,
-      path,
-      body,
-    );
-
     const url = `${this.config.baseUrl}${path}`;
     const requestHeaders: Record<string, string> = {
       "Content-Type": "application/json",
       Accept: "application/json",
-      ...hmacHeaders,
       ...headers,
     };
 
@@ -109,7 +83,7 @@ export class LaravelAdapter extends BaseAdapter {
       return await apiRequestJson<T>(url, {
         method,
         headers: requestHeaders,
-        body: normalizedBody,
+        body: body ? JSON.stringify(body) : undefined,
         timeoutMs: this.config.timeout,
       });
     } catch (error) {

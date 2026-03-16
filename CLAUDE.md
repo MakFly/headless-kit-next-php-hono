@@ -1,132 +1,155 @@
-# Laravel + Next.js + Symfony RBAC
+# CLAUDE.md
 
-## MCP - Codebase Search
-
-**TOUJOURS utiliser les outils MCP `mcp__codebase__*` pour rechercher dans la codebase** :
-
-- `codebase_search_code` - Rechercher du code (plus rapide que grep)
-- `codebase_file_info` - Infos fichier (symbols, imports)
-- `codebase_project_overview` - Vue d'ensemble du projet
-
-Ces outils sont plus performants que grep/glob sur les grands projets.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Architecture
 
-Ce projet utilise une architecture **BFF (Backend For Frontend)** :
+Monorepo **Headless Kit** — starter kit headless multi-backend avec BFF Next.js.
 
 ```
-Navigateur → Next.js (BFF) → Laravel API
-                          → Symfony API (BetterAuth)
+Navigateur → Next.js BFF (port 3001) ──→ Laravel API (port 8000)
+         → TanStack Start (port 3003) → Hono API (port 8003)
+                                       → Symfony API (port 8002)
 ```
 
-- **Frontend** : Next.js App Router (`apps/web/`)
-- **Backend Laravel** : Laravel avec Sanctum (`apps/api/`)
-- **Backend Symfony** : Symfony 8 avec BetterAuth (`apps/api-sf/`)
-- **Communication** : HMAC-signed requests entre BFF et backends
+Pattern BFF : le frontend ne contacte jamais les backends directement. Les requêtes passent par des Route Handlers (`/api/v1/*`) qui ajoutent HMAC signing et transmettent les cookies d'auth.
 
-## Structure du projet
+## Structure du monorepo
 
 ```
 apps/
-├── web/                    # Next.js App Router
-│   └── src/
-│       ├── app/api/v1/     # BFF Route Handlers (proxy vers backends)
-│       └── lib/api/        # Server Actions pour l'auth
-├── api/                    # Laravel API (port 8000)
-└── api-sf/                 # Symfony API avec BetterAuth (port 8002)
+├── web/              # Next.js 16 App Router (BFF) — port 3001
+├── web-tanstack/     # TanStack Start + Vite — port 3003
+├── api-laravel/      # Laravel 12 + BetterAuth + API Platform — port 8000
+├── api-sf/           # Symfony 8 + BetterAuth (Paseto V4) — port 8002
+└── api-hono/         # Hono + Drizzle + Bun — port 8003
+
+packages/
+├── config/           # Shared ESLint + TSConfig (@headless/config)
+└── types/            # Shared TypeScript types (@headless/types)
 ```
+
+Chaque app a son propre `CLAUDE.md` avec des instructions spécifiques.
 
 ## Commandes
 
 ```bash
-# Monorepo
-bun install                 # Installer les dépendances
-bun run build               # Build tous les packages
+# Monorepo (Turborepo + Bun workspaces)
+bun install                              # Installer les dépendances
+bun run dev                              # Dev tous les apps (turbo)
+bun run build                            # Build tous les packages
+bun run lint                             # Lint
 
-# Web (Next.js)
-bun run --filter @rbac/web dev      # Dev server (port 3000)
-bun run --filter @rbac/web build    # Production build
+# Next.js BFF (port 3001)
+bun run --filter @headless/web dev
+bun run --filter @headless/web build
 
-# API Laravel (port 8000)
-cd apps/api && php artisan serve
+# TanStack Start (port 3003)
+bun run --filter @headless/web-tanstack dev
 
-# API Symfony (port 8002)
+# Hono API (port 8003)
+bun run --filter @headless/api-hono dev
+bun run --filter @headless/api-hono db:migrate
+bun run --filter @headless/api-hono db:seed
+
+# Laravel API (port 8000)
+cd apps/api-laravel && php artisan serve --port=8000
+cd apps/api-laravel && php artisan test
+
+# Symfony API (port 8002)
 cd apps/api-sf && symfony server:start --port=8002 --no-tls
+cd apps/api-sf && php bin/phpunit
+cd apps/api-sf && php bin/phpunit tests/Functional/Auth/
 ```
 
 ## Authentification
 
-### Laravel (Sanctum)
+Trois backends implémentent l'auth avec des stratégies différentes :
 
-L'authentification utilise des **cookies HttpOnly** pour sécuriser les tokens.
+| Backend | Auth | Tokens | 2FA | Password Reset |
+|---------|------|--------|-----|----------------|
+| **Symfony** | BetterAuth bundle | Paseto V4 | Oui | Oui |
+| **Laravel** | BetterAuth + Passport | Bearer | Oui | En cours |
+| **Hono** | JWT (jose) | HS256 | Non | Non |
 
-### Symfony (BetterAuth)
+### Flow BFF (Next.js)
 
-Authentification stateless avec **tokens Paseto V4**.
-
-Endpoints disponibles :
-
-- `POST /auth/register` - Inscription
-- `POST /auth/login` - Connexion
-- `GET /auth/me` - Utilisateur courant
-- `POST /auth/refresh` - Rafraîchir le token
-- `POST /auth/logout` - Déconnexion
-- `GET /auth/2fa/status` - Statut 2FA
-- `POST /auth/2fa/setup` - Configuration 2FA
-- `GET /auth/oauth/providers` - Providers OAuth disponibles
-
-### Flow d'authentification (Laravel)
-
-1. Login via Server Action → BFF → Laravel
-2. Laravel retourne `access_token`
+1. Login via Server Action → BFF Route Handler → Backend
+2. Backend retourne `access_token` + `refresh_token`
 3. BFF stocke le token dans un cookie HttpOnly `auth_token`
-4. Les requêtes suivantes lisent le cookie et l'envoient à Laravel
+4. Les requêtes suivantes lisent le cookie et l'envoient au backend via header
 
-### Flow d'authentification (Symfony)
+### Flow TanStack Start
 
-1. Login via `POST /auth/login`
-2. Symfony retourne `access_token` et `refresh_token`
-3. Client stocke les tokens (localStorage ou cookie)
-4. Les requêtes suivantes envoient le token via `Authorization: Bearer <token>`
+- Utilise `Route.useRouteContext()` pour les données SSR (évite le flash UI)
+- Zustand pour les mutations client (login, logout)
+- Hydratation du store côté client via `useEffect`
 
-## Fichiers clés
+## Règles critiques
 
-- `apps/web/src/app/api/v1/[...path]/route.ts` - BFF Proxy
-- `apps/web/src/lib/api/auth.ts` - Server Actions auth
-- `apps/api-sf/config/packages/better_auth.yaml` - Config BetterAuth
+### Server Actions & Cookies (Next.js)
 
-## Règles importantes
+`credentials: 'include'` est **ignoré** côté serveur. Toujours passer le cookie manuellement :
 
-Voir `.claude/rules/` pour les règles détaillées :
+```typescript
+// Dans 'use server', TOUJOURS :
+const cookieStore = await cookies();
+const authToken = cookieStore.get('auth_token');
+headers['Cookie'] = `auth_token=${authToken.value}`;
+```
 
-- @.claude/rules/nextjs-server-actions-cookies.md
+Voir `.claude/rules/nextjs-server-actions-cookies.md` pour le détail.
+
+### BFF Client obligatoire (Next.js)
+
+Toutes les Server Actions vers le backend DOIVENT utiliser `bff-client.ts` (pas de `fetch()` direct).
+Voir `apps/web/.claude/rules/server-actions-bff-client.md`.
+
+### TypeScript
+
+Préférer `type` à `interface` partout. Voir `apps/web/.claude/rules/typescript-types-over-interfaces.md`.
+
+### Laravel — API Platform + BetterAuth
+
+BetterAuth reste en routes classiques (`/auth/*`). API Platform sert uniquement de source OpenAPI.
+Voir `apps/api-laravel/.claude/rules/api-platform-betterauth-docs.md`.
 
 ## Variables d'environnement
 
 ```env
-# Web (.env.local)
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Next.js (.env.local)
+NEXT_PUBLIC_APP_URL=http://localhost:3001
 LARAVEL_API_URL=http://localhost:8000
 SYMFONY_API_URL=http://localhost:8002
-BFF_SECRET=xxx              # Pour HMAC signing
+BFF_SECRET=xxx
 
-# API Laravel (.env)
+# Laravel (.env)
 APP_URL=http://localhost:8000
-SANCTUM_STATEFUL_DOMAINS=localhost:3000
+SANCTUM_STATEFUL_DOMAINS=localhost:3001
 
-# API Symfony (.env)
-APP_ENV=dev
+# Symfony (.env)
 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data_dev.db"
 BETTER_AUTH_SECRET=change_me_in_production
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3001
+
+# Hono (.env)
+PORT=8003
+JWT_SECRET=xxx
+FRONTEND_URL=http://localhost:3003
 ```
 
 ## Tests
 
 ```bash
-# Tests Symfony (api-sf)
+# Symfony — 52 tests fonctionnels auth
 cd apps/api-sf && php bin/phpunit
 
-# Tests spécifiques auth
-cd apps/api-sf && php bin/phpunit tests/Functional/Auth/
+# Laravel
+cd apps/api-laravel && php artisan test
+
+# Hono
+cd apps/api-hono && bun test
+
+# TanStack
+cd apps/web-tanstack && bun run test
 ```

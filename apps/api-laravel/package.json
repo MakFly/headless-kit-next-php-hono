@@ -1,5 +1,5 @@
 {
-    "name": "@rbac/api",
+    "name": "@headless/api",
     "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",

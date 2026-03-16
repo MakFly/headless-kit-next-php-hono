@@ -36,3 +36,7 @@ export type {
   BffRequestOptions,
   HttpMethod,
 } from './types';
+
+// Envelope helpers
+export { unwrapEnvelope, unwrapPaginated } from './envelope';
+export type { ApiEnvelope, ApiErrorEnvelope, PaginationMeta, UnwrappedPaginated } from './envelope';

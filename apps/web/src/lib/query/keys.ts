@@ -83,4 +83,20 @@ export const queryKeys = {
     photos: (albumId: number) =>
       [...queryKeys.albums.all, albumId, 'photos'] as const,
   },
+
+  // =========================================================================
+  // SaaS
+  // =========================================================================
+  saas: {
+    all: ['saas'] as const,
+    orgs: () => [...queryKeys.saas.all, 'orgs'] as const,
+    org: (orgId: string) => [...queryKeys.saas.all, 'org', orgId] as const,
+    subscription: (orgId: string) => [...queryKeys.saas.org(orgId), 'subscription'] as const,
+    invoices: (orgId: string) => [...queryKeys.saas.org(orgId), 'invoices'] as const,
+    plans: () => [...queryKeys.saas.all, 'plans'] as const,
+    team: (orgId: string) => [...queryKeys.saas.org(orgId), 'team'] as const,
+    usage: (orgId: string) => [...queryKeys.saas.org(orgId), 'usage'] as const,
+    settings: (orgId: string) => [...queryKeys.saas.org(orgId), 'settings'] as const,
+    dashboard: (orgId: string) => [...queryKeys.saas.org(orgId), 'dashboard'] as const,
+  },
 } as const;

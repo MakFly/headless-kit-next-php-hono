@@ -44,20 +44,36 @@ export function transformUser(symfonyUser: SymfonyUser): NormalizedUser {
   }
 }
 
-export function transformAuthResponse(response: SymfonyAuthResponse): AuthResponse {
+export function transformAuthResponse(
+  response: SymfonyAuthResponse | { success: boolean; data: SymfonyAuthResponse },
+): AuthResponse {
+  const payload: SymfonyAuthResponse =
+    'success' in response &&
+    response.data &&
+    typeof response.data === 'object' &&
+    'access_token' in (response.data as Record<string, unknown>)
+      ? (response as { data: SymfonyAuthResponse }).data
+      : (response as SymfonyAuthResponse)
+
   const tokens: TokenStorage = {
-    access_token: response.access_token,
-    refresh_token: response.refresh_token,
-    token_type: response.token_type || 'Bearer',
-    expires_in: response.expires_in,
+    access_token: payload.access_token,
+    refresh_token: payload.refresh_token,
+    token_type: payload.token_type || 'Bearer',
+    expires_in: payload.expires_in,
   }
-  return { user: transformUser(response.user), tokens }
+  return { user: transformUser(payload.user), tokens }
 }
 
 export type SymfonyMeResponse = SymfonyUser | { user: SymfonyUser; expiresAt?: string }
 
-export function transformMeResponse(response: SymfonyMeResponse): NormalizedUser {
-  const user = 'user' in response ? response.user : response
+export function transformMeResponse(
+  response: SymfonyMeResponse | { success: boolean; data: SymfonyMeResponse },
+): NormalizedUser {
+  let inner: SymfonyMeResponse = response as SymfonyMeResponse
+  if ('success' in response && 'data' in response) {
+    inner = (response as { data: SymfonyMeResponse }).data
+  }
+  const user = 'user' in inner ? (inner as { user: SymfonyUser }).user : (inner as SymfonyUser)
   return transformUser(user)
 }
 

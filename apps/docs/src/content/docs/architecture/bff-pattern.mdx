@@ -1,0 +1,125 @@
+---
+title: BFF Pattern
+description: How the Backend-for-Frontend proxy works in Headless Kit.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## What is a BFF?
+
+A Backend-for-Frontend (BFF) is a server that sits between your browser and your backend APIs. Instead of the browser calling `api.example.com` directly, it calls the BFF server, which proxies the request to the real backend.
+
+Headless Kit provides two frontend options, both implementing the same BFF proxy pattern:
+
+```
+Browser ──→ Next.js BFF (port 3001) ──→ Laravel / Symfony / Hono
+Browser ──→ TanStack Start BFF (port 3003) ──→ Laravel / Symfony / Hono
+            ├── adds HMAC signature
+            ├── reads/writes HttpOnly cookies
+            ├── validates CSRF
+            └── handles token refresh
+```
+
+<Aside type="tip">
+  **Next.js** is the recommended frontend with the most mature BFF proxy implementation. **TanStack Start** is a viable alternative for teams preferring Vite + TanStack Router. Both frontends work with all three backends.
+</Aside>
+
+## Why use a BFF?
+
+1. **Tokens never reach the browser.** Access and refresh tokens are stored in HttpOnly cookies managed by the BFF. Client-side JavaScript cannot access them, eliminating XSS token theft.
+
+2. **HMAC request signing.** The BFF signs every request to the backend with a shared secret. The backend verifies the signature, ensuring only the BFF (not arbitrary clients) can make API calls.
+
+3. **CSRF protection.** Mutating requests (POST, PUT, PATCH, DELETE) are validated against the `Origin` or `Referer` header. Requests from unknown origins are rejected with a 403.
+
+4. **Automatic token refresh.** The middleware checks token expiration on every request and triggers a proactive refresh when the token is within 5 minutes of expiring. If a 401 is received, the proxy retries with a refreshed token transparently.
+
+5. **Backend abstraction.** The frontend code is identical regardless of which backend is active. Switching from Laravel to Symfony requires changing one environment variable.
+
+## Request Flow
+
+### 1. Client makes an API call
+
+The browser calls a Next.js route handler, e.g., `GET /api/v1/auth/me`:
+
+```typescript
+// Client-side fetch
+const res = await fetch('/api/v1/auth/me');
+const user = await res.json();
+```
+
+### 2. Middleware intercepts
+
+The Next.js middleware (`createMiddleware`) runs first:
+
+- Reads the `auth_token_{backend}` cookie
+- Checks if the token is about to expire
+- Sets an `x-bff-refresh-needed` header if proactive refresh is needed
+- Redirects unauthenticated users away from protected routes
+- Redirects authenticated users away from login/register pages
+
+### 3. Proxy handler forwards the request
+
+The `createProxyHandler` at `/api/v1/[...path]/route.ts`:
+
+- Validates path segments (prevents traversal attacks)
+- Validates CSRF for mutating requests
+- Resolves the active backend from the `auth_backend` cookie
+- Transforms the path if needed (e.g., `/api/v1/me` becomes `/api/v1/auth/me` on Symfony)
+- Adds HMAC signature headers (for Laravel)
+- Attaches the Bearer token from the HttpOnly cookie
+- Forwards the request to the backend
+
+### 4. Response handling
+
+When the backend responds:
+
+- **200 with tokens**: The proxy extracts `access_token` and `refresh_token` from the response body and stores them in HttpOnly cookies
+- **401 Unauthorized**: The proxy attempts a token refresh. If successful, it retries the original request with the new token. If refresh fails, it clears all auth cookies and returns 401
+- **Other responses**: Passed through as-is with cache-control headers set to `no-store`
+
+## Security Layers
+
+| Layer | Protection | Implementation |
+| ----- | ---------- | -------------- |
+| HttpOnly Cookies | XSS token theft | Tokens stored server-side, never exposed to JS |
+| HMAC Signing | Unauthorized API access | `X-BFF-Signature` verified by Laravel |
+| CSRF Validation | Cross-site request forgery | Origin/Referer check on mutating requests |
+| Path Validation | Directory traversal | Regex check on every path segment |
+| Host Validation | SSRF | Final URL host must match configured backend |
+| Token Rotation | Session hijacking | Refresh tokens rotated on every refresh |
+
+## Configuration
+
+The proxy is configured via `BffNextjsConfig`:
+
+```typescript
+// apps/web/src/app/api/v1/[...path]/route.ts
+// The proxy handler exports all HTTP methods:
+
+export const { GET, POST, PUT, PATCH, DELETE } = createProxyHandler({
+  defaultBackend: 'laravel',
+  backends: {
+    laravel: {
+      baseUrl: process.env.LARAVEL_API_URL!,
+      hmac: {
+        secret: process.env.BFF_SECRET!,
+        bffId: process.env.BFF_ID || 'nextjs-bff',
+      },
+    },
+    symfony: {
+      baseUrl: process.env.SYMFONY_API_URL!,
+    },
+    node: {
+      baseUrl: process.env.HONO_API_URL!,
+    },
+  },
+  protectedRoutes: ['/dashboard'],
+  authRoutes: ['/auth/login', '/auth/register'],
+  timeout: 30000,
+});
+```
+
+<Aside>
+  The proxy handler exports all HTTP methods plus `runtime: 'nodejs'` and `dynamic: 'force-dynamic'` to ensure Next.js does not cache proxy responses.
+</Aside>

@@ -1,0 +1,51 @@
+better_auth:
+    # Mode API stateless pour BFF (tokens Paseto V4)
+    mode: api
+
+    # Secret key for token encryption - MUST be set via environment variable
+    secret: '%env(BETTER_AUTH_SECRET)%'
+
+    # Routing configuration
+    routing:
+        auto_configure: true
+
+    # Token configuration
+    token:
+        lifetime: 3600           # Access token: 1 hour
+        refresh_lifetime: 2592000 # Refresh token: 30 days
+
+    # Features
+    two_factor:
+        enabled: true
+        issuer: 'BFF API'
+
+    magic_link:
+        enabled: true
+        lifetime: 900           # 15 minutes
+
+    email_verification:
+        enabled: true
+        lifetime: 86400         # 24 hours
+
+    password_reset:
+        enabled: true
+        lifetime: 3600          # 1 hour
+
+    # Multi-tenant support
+    multi_tenant:
+        enabled: true
+        default_role: member
+
+    # Security
+    security:
+        auto_configure: false   # We configure security.yaml manually
+        firewall_pattern: '^/api'
+        public_routes_pattern: '^/api/v1/auth'
+
+    # Controllers
+    controllers:
+        enabled: true
+
+    # OpenAPI documentation
+    openapi:
+        enabled: true

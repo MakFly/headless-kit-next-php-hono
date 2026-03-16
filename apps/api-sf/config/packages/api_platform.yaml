@@ -1,7 +1,22 @@
 api_platform:
-    title: Hello API Platform
+    title: Headless Kit API
     version: 1.0.0
+    mapping:
+        paths:
+            - '%kernel.project_dir%/src/Shared/Entity'
     defaults:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+        pagination_items_per_page: 20
+        pagination_client_items_per_page: true
+    formats:
+        jsonld:
+            mime_types: ['application/ld+json']
+        json:
+            mime_types: ['application/json']
+    docs_formats:
+        jsonld:
+            mime_types: ['application/ld+json']
+        json:
+            mime_types: ['application/json']

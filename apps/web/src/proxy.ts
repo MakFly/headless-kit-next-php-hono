@@ -38,11 +38,31 @@ function getBackendFromPath(pathname: string): "laravel" | "symfony" | "node" | 
   return null;
 }
 
+function getLoginUrl(pathname: string): string {
+  if (pathname.startsWith("/saas")) return "/saas/auth/login";
+  if (pathname.startsWith("/support")) return "/support/auth/login";
+  if (pathname.startsWith("/shop")) return "/shop/auth/login";
+  return "/dashboard/auth/login";
+}
+
+function getGroupRoot(pathname: string): string {
+  if (pathname.startsWith("/shop/auth")) return "/shop";
+  if (pathname.startsWith("/saas/auth")) return "/saas";
+  if (pathname.startsWith("/support/auth")) return "/support";
+  if (pathname.startsWith("/dashboard/auth")) return "/dashboard";
+  return "/";
+}
+
 // Routes that require authentication
-const protectedRoutes = ["/dashboard"];
+const protectedRoutes = ["/dashboard", "/saas", "/support"];
 
 // Routes that should redirect to home if already authenticated
-const authRoutes = ["/auth/login", "/auth/register"];
+const authRoutes = [
+  "/shop/auth",
+  "/saas/auth",
+  "/support/auth",
+  "/dashboard/auth",
+];
 
 // API routes that should check for proactive refresh
 const apiRoutes = ["/api/v1/", "/api/auth/"];
@@ -150,11 +170,24 @@ export function proxy(request: NextRequest) {
     return attachBackendCookie(response);
   }
 
+  // Auth routes must be checked BEFORE protected routes
+  // (auth routes are nested under protected prefixes like /dashboard/auth/login)
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+
+  if (isAuthRoute) {
+    if (token && !isTokenExpired(token)) {
+      log.debug("Redirecting authenticated user from auth page", { pathname });
+      return attachBackendCookie(NextResponse.redirect(new URL(getGroupRoot(pathname), request.url)));
+    }
+    // Not authenticated → let them through to the auth page
+    return attachBackendCookie(NextResponse.next());
+  }
+
   // Check if trying to access protected route without token
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
     if (!token) {
       log.info("Redirecting unauthenticated user to login", { pathname });
-      const loginUrl = new URL("/auth/login", request.url);
+      const loginUrl = new URL(getLoginUrl(pathname), request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return attachBackendCookie(NextResponse.redirect(loginUrl));
     }
@@ -164,7 +197,7 @@ export function proxy(request: NextRequest) {
       log.info("Token expired without refresh token, redirecting to login", {
         pathname,
       });
-      const loginUrl = new URL("/auth/login", request.url);
+      const loginUrl = new URL(getLoginUrl(pathname), request.url);
       loginUrl.searchParams.set("redirect", pathname);
       const response = NextResponse.redirect(loginUrl);
       // Clear invalid token
@@ -174,21 +207,15 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // Check if trying to access auth routes while authenticated
-  if (authRoutes.some((route) => pathname.startsWith(route))) {
-    if (token && !isTokenExpired(token)) {
-      log.debug("Redirecting authenticated user from auth page", { pathname });
-      return attachBackendCookie(NextResponse.redirect(new URL("/", request.url)));
-    }
-  }
-
   return attachBackendCookie(NextResponse.next());
 }
 
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/auth/:path*",
+    "/saas/:path*",
+    "/support/:path*",
+    "/shop/auth/:path*",
     "/api/v1/:path*",
     "/laravel/:path*",
     "/symfony/:path*",

@@ -1,10 +1,10 @@
 import { create } from 'zustand'
-import type { User, PermissionAction, RoleSlug } from '@rbac/types'
+import type { User, PermissionAction, RoleSlug } from '@/types'
 import {
   hasPermission as checkHasPermission,
   hasRole as checkHasRole,
   isAdmin as checkIsAdmin,
-} from '@rbac/types'
+} from '@/types'
 import {
   loginFn,
   registerFn,
@@ -13,7 +13,7 @@ import {
   getOAuthUrlFn,
 } from '@/lib/server/auth'
 import { COOKIE_NAMES } from '@/lib/config/env'
-import type { LoginCredentials, RegisterData, OAuthProvider } from '@rbac/types'
+import type { LoginCredentials, RegisterData, OAuthProvider } from '@/types'
 
 const getStoredExpiresAt = (): number | null => {
   if (typeof document === 'undefined') return null

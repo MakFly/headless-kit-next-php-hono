@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Entity\RefreshToken;
-use App\Entity\Session;
-use App\Entity\User;
+use App\Shared\Entity\RefreshToken;
+use App\Shared\Entity\Session;
+use App\Shared\Entity\User;
 
 describe('entity identifier casting', function () {
     it('casts user id to string', function () {

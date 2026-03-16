@@ -9,18 +9,58 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SaasRouteImport } from './routes/saas'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SupportIndexRouteImport } from './routes/support/index'
+import { Route as ShopIndexRouteImport } from './routes/shop/index'
+import { Route as SaasIndexRouteImport } from './routes/saas/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as SupportAgentRouteImport } from './routes/support/agent'
+import { Route as SupportTicketIdRouteImport } from './routes/support/$ticketId'
+import { Route as ShopOrdersRouteImport } from './routes/shop/orders'
+import { Route as ShopCheckoutRouteImport } from './routes/shop/checkout'
+import { Route as ShopCartRouteImport } from './routes/shop/cart'
+import { Route as ShopAdminRouteImport } from './routes/shop/admin'
+import { Route as ShopSlugRouteImport } from './routes/shop/$slug'
+import { Route as SaasUsageRouteImport } from './routes/saas/usage'
+import { Route as SaasTeamRouteImport } from './routes/saas/team'
+import { Route as SaasSettingsRouteImport } from './routes/saas/settings'
+import { Route as SaasBillingRouteImport } from './routes/saas/billing'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardRolesRouteImport } from './routes/dashboard/roles'
 import { Route as DashboardHelpRouteImport } from './routes/dashboard/help'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as SupportAgentIndexRouteImport } from './routes/support/agent/index'
+import { Route as ShopAdminIndexRouteImport } from './routes/shop/admin/index'
+import { Route as SupportAgentRatingsRouteImport } from './routes/support/agent/ratings'
+import { Route as SupportAgentCannedRouteImport } from './routes/support/agent/canned'
+import { Route as ShopOrdersIdRouteImport } from './routes/shop/orders/$id'
+import { Route as ShopCategoriesCategoryRouteImport } from './routes/shop/categories/$category'
+import { Route as ShopAdminProductsRouteImport } from './routes/shop/admin/products'
+import { Route as ShopAdminOrdersRouteImport } from './routes/shop/admin/orders'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SaasRoute = SaasRouteImport.update({
+  id: '/saas',
+  path: '/saas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -35,10 +75,80 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SupportIndexRoute = SupportIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SupportRoute,
+} as any)
+const ShopIndexRoute = ShopIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopRoute,
+} as any)
+const SaasIndexRoute = SaasIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SaasRoute,
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const SupportAgentRoute = SupportAgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
+  getParentRoute: () => SupportRoute,
+} as any)
+const SupportTicketIdRoute = SupportTicketIdRouteImport.update({
+  id: '/$ticketId',
+  path: '/$ticketId',
+  getParentRoute: () => SupportRoute,
+} as any)
+const ShopOrdersRoute = ShopOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopCheckoutRoute = ShopCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopCartRoute = ShopCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopAdminRoute = ShopAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopSlugRoute = ShopSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ShopRoute,
+} as any)
+const SaasUsageRoute = SaasUsageRouteImport.update({
+  id: '/usage',
+  path: '/usage',
+  getParentRoute: () => SaasRoute,
+} as any)
+const SaasTeamRoute = SaasTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => SaasRoute,
+} as any)
+const SaasSettingsRoute = SaasSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => SaasRoute,
+} as any)
+const SaasBillingRoute = SaasBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => SaasRoute,
 } as any)
 const DashboardUsersRoute = DashboardUsersRouteImport.update({
   id: '/users',
@@ -70,6 +180,46 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const SupportAgentIndexRoute = SupportAgentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SupportAgentRoute,
+} as any)
+const ShopAdminIndexRoute = ShopAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopAdminRoute,
+} as any)
+const SupportAgentRatingsRoute = SupportAgentRatingsRouteImport.update({
+  id: '/ratings',
+  path: '/ratings',
+  getParentRoute: () => SupportAgentRoute,
+} as any)
+const SupportAgentCannedRoute = SupportAgentCannedRouteImport.update({
+  id: '/canned',
+  path: '/canned',
+  getParentRoute: () => SupportAgentRoute,
+} as any)
+const ShopOrdersIdRoute = ShopOrdersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ShopOrdersRoute,
+} as any)
+const ShopCategoriesCategoryRoute = ShopCategoriesCategoryRouteImport.update({
+  id: '/categories/$category',
+  path: '/categories/$category',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopAdminProductsRoute = ShopAdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => ShopAdminRoute,
+} as any)
+const ShopAdminOrdersRoute = ShopAdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => ShopAdminRoute,
+} as any)
 const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
   id: '/api/v1/$',
   path: '/api/v1/$',
@@ -79,14 +229,39 @@ const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/saas': typeof SaasRouteWithChildren
+  '/shop': typeof ShopRouteWithChildren
+  '/support': typeof SupportRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/dashboard/help': typeof DashboardHelpRoute
   '/dashboard/roles': typeof DashboardRolesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/saas/billing': typeof SaasBillingRoute
+  '/saas/settings': typeof SaasSettingsRoute
+  '/saas/team': typeof SaasTeamRoute
+  '/saas/usage': typeof SaasUsageRoute
+  '/shop/$slug': typeof ShopSlugRoute
+  '/shop/admin': typeof ShopAdminRouteWithChildren
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/orders': typeof ShopOrdersRouteWithChildren
+  '/support/$ticketId': typeof SupportTicketIdRoute
+  '/support/agent': typeof SupportAgentRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
+  '/saas/': typeof SaasIndexRoute
+  '/shop/': typeof ShopIndexRoute
+  '/support/': typeof SupportIndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/shop/admin/orders': typeof ShopAdminOrdersRoute
+  '/shop/admin/products': typeof ShopAdminProductsRoute
+  '/shop/categories/$category': typeof ShopCategoriesCategoryRoute
+  '/shop/orders/$id': typeof ShopOrdersIdRoute
+  '/support/agent/canned': typeof SupportAgentCannedRoute
+  '/support/agent/ratings': typeof SupportAgentRatingsRoute
+  '/shop/admin/': typeof ShopAdminIndexRoute
+  '/support/agent/': typeof SupportAgentIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -96,36 +271,106 @@ export interface FileRoutesByTo {
   '/dashboard/roles': typeof DashboardRolesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/saas/billing': typeof SaasBillingRoute
+  '/saas/settings': typeof SaasSettingsRoute
+  '/saas/team': typeof SaasTeamRoute
+  '/saas/usage': typeof SaasUsageRoute
+  '/shop/$slug': typeof ShopSlugRoute
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/orders': typeof ShopOrdersRouteWithChildren
+  '/support/$ticketId': typeof SupportTicketIdRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/saas': typeof SaasIndexRoute
+  '/shop': typeof ShopIndexRoute
+  '/support': typeof SupportIndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/shop/admin/orders': typeof ShopAdminOrdersRoute
+  '/shop/admin/products': typeof ShopAdminProductsRoute
+  '/shop/categories/$category': typeof ShopCategoriesCategoryRoute
+  '/shop/orders/$id': typeof ShopOrdersIdRoute
+  '/support/agent/canned': typeof SupportAgentCannedRoute
+  '/support/agent/ratings': typeof SupportAgentRatingsRoute
+  '/shop/admin': typeof ShopAdminIndexRoute
+  '/support/agent': typeof SupportAgentIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/saas': typeof SaasRouteWithChildren
+  '/shop': typeof ShopRouteWithChildren
+  '/support': typeof SupportRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/dashboard/help': typeof DashboardHelpRoute
   '/dashboard/roles': typeof DashboardRolesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/saas/billing': typeof SaasBillingRoute
+  '/saas/settings': typeof SaasSettingsRoute
+  '/saas/team': typeof SaasTeamRoute
+  '/saas/usage': typeof SaasUsageRoute
+  '/shop/$slug': typeof ShopSlugRoute
+  '/shop/admin': typeof ShopAdminRouteWithChildren
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/orders': typeof ShopOrdersRouteWithChildren
+  '/support/$ticketId': typeof SupportTicketIdRoute
+  '/support/agent': typeof SupportAgentRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
+  '/saas/': typeof SaasIndexRoute
+  '/shop/': typeof ShopIndexRoute
+  '/support/': typeof SupportIndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/shop/admin/orders': typeof ShopAdminOrdersRoute
+  '/shop/admin/products': typeof ShopAdminProductsRoute
+  '/shop/categories/$category': typeof ShopCategoriesCategoryRoute
+  '/shop/orders/$id': typeof ShopOrdersIdRoute
+  '/support/agent/canned': typeof SupportAgentCannedRoute
+  '/support/agent/ratings': typeof SupportAgentRatingsRoute
+  '/shop/admin/': typeof ShopAdminIndexRoute
+  '/support/agent/': typeof SupportAgentIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/saas'
+    | '/shop'
+    | '/support'
     | '/login'
     | '/register'
     | '/dashboard/help'
     | '/dashboard/roles'
     | '/dashboard/settings'
     | '/dashboard/users'
+    | '/saas/billing'
+    | '/saas/settings'
+    | '/saas/team'
+    | '/saas/usage'
+    | '/shop/$slug'
+    | '/shop/admin'
+    | '/shop/cart'
+    | '/shop/checkout'
+    | '/shop/orders'
+    | '/support/$ticketId'
+    | '/support/agent'
     | '/dashboard/'
+    | '/saas/'
+    | '/shop/'
+    | '/support/'
     | '/api/v1/$'
+    | '/shop/admin/orders'
+    | '/shop/admin/products'
+    | '/shop/categories/$category'
+    | '/shop/orders/$id'
+    | '/support/agent/canned'
+    | '/support/agent/ratings'
+    | '/shop/admin/'
+    | '/support/agent/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -135,32 +380,101 @@ export interface FileRouteTypes {
     | '/dashboard/roles'
     | '/dashboard/settings'
     | '/dashboard/users'
+    | '/saas/billing'
+    | '/saas/settings'
+    | '/saas/team'
+    | '/saas/usage'
+    | '/shop/$slug'
+    | '/shop/cart'
+    | '/shop/checkout'
+    | '/shop/orders'
+    | '/support/$ticketId'
     | '/dashboard'
+    | '/saas'
+    | '/shop'
+    | '/support'
     | '/api/v1/$'
+    | '/shop/admin/orders'
+    | '/shop/admin/products'
+    | '/shop/categories/$category'
+    | '/shop/orders/$id'
+    | '/support/agent/canned'
+    | '/support/agent/ratings'
+    | '/shop/admin'
+    | '/support/agent'
   id:
     | '__root__'
     | '/'
     | '/_auth'
     | '/dashboard'
+    | '/saas'
+    | '/shop'
+    | '/support'
     | '/_auth/login'
     | '/_auth/register'
     | '/dashboard/help'
     | '/dashboard/roles'
     | '/dashboard/settings'
     | '/dashboard/users'
+    | '/saas/billing'
+    | '/saas/settings'
+    | '/saas/team'
+    | '/saas/usage'
+    | '/shop/$slug'
+    | '/shop/admin'
+    | '/shop/cart'
+    | '/shop/checkout'
+    | '/shop/orders'
+    | '/support/$ticketId'
+    | '/support/agent'
     | '/dashboard/'
+    | '/saas/'
+    | '/shop/'
+    | '/support/'
     | '/api/v1/$'
+    | '/shop/admin/orders'
+    | '/shop/admin/products'
+    | '/shop/categories/$category'
+    | '/shop/orders/$id'
+    | '/support/agent/canned'
+    | '/support/agent/ratings'
+    | '/shop/admin/'
+    | '/support/agent/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
+  SaasRoute: typeof SaasRouteWithChildren
+  ShopRoute: typeof ShopRouteWithChildren
+  SupportRoute: typeof SupportRouteWithChildren
   ApiV1SplatRoute: typeof ApiV1SplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saas': {
+      id: '/saas'
+      path: '/saas'
+      fullPath: '/saas'
+      preLoaderRoute: typeof SaasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -182,12 +496,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/support/': {
+      id: '/support/'
+      path: '/'
+      fullPath: '/support/'
+      preLoaderRoute: typeof SupportIndexRouteImport
+      parentRoute: typeof SupportRoute
+    }
+    '/shop/': {
+      id: '/shop/'
+      path: '/'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof ShopIndexRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/saas/': {
+      id: '/saas/'
+      path: '/'
+      fullPath: '/saas/'
+      preLoaderRoute: typeof SaasIndexRouteImport
+      parentRoute: typeof SaasRoute
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/support/agent': {
+      id: '/support/agent'
+      path: '/agent'
+      fullPath: '/support/agent'
+      preLoaderRoute: typeof SupportAgentRouteImport
+      parentRoute: typeof SupportRoute
+    }
+    '/support/$ticketId': {
+      id: '/support/$ticketId'
+      path: '/$ticketId'
+      fullPath: '/support/$ticketId'
+      preLoaderRoute: typeof SupportTicketIdRouteImport
+      parentRoute: typeof SupportRoute
+    }
+    '/shop/orders': {
+      id: '/shop/orders'
+      path: '/orders'
+      fullPath: '/shop/orders'
+      preLoaderRoute: typeof ShopOrdersRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/checkout': {
+      id: '/shop/checkout'
+      path: '/checkout'
+      fullPath: '/shop/checkout'
+      preLoaderRoute: typeof ShopCheckoutRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/cart': {
+      id: '/shop/cart'
+      path: '/cart'
+      fullPath: '/shop/cart'
+      preLoaderRoute: typeof ShopCartRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/admin': {
+      id: '/shop/admin'
+      path: '/admin'
+      fullPath: '/shop/admin'
+      preLoaderRoute: typeof ShopAdminRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/$slug': {
+      id: '/shop/$slug'
+      path: '/$slug'
+      fullPath: '/shop/$slug'
+      preLoaderRoute: typeof ShopSlugRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/saas/usage': {
+      id: '/saas/usage'
+      path: '/usage'
+      fullPath: '/saas/usage'
+      preLoaderRoute: typeof SaasUsageRouteImport
+      parentRoute: typeof SaasRoute
+    }
+    '/saas/team': {
+      id: '/saas/team'
+      path: '/team'
+      fullPath: '/saas/team'
+      preLoaderRoute: typeof SaasTeamRouteImport
+      parentRoute: typeof SaasRoute
+    }
+    '/saas/settings': {
+      id: '/saas/settings'
+      path: '/settings'
+      fullPath: '/saas/settings'
+      preLoaderRoute: typeof SaasSettingsRouteImport
+      parentRoute: typeof SaasRoute
+    }
+    '/saas/billing': {
+      id: '/saas/billing'
+      path: '/billing'
+      fullPath: '/saas/billing'
+      preLoaderRoute: typeof SaasBillingRouteImport
+      parentRoute: typeof SaasRoute
     }
     '/dashboard/users': {
       id: '/dashboard/users'
@@ -231,6 +643,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/support/agent/': {
+      id: '/support/agent/'
+      path: '/'
+      fullPath: '/support/agent/'
+      preLoaderRoute: typeof SupportAgentIndexRouteImport
+      parentRoute: typeof SupportAgentRoute
+    }
+    '/shop/admin/': {
+      id: '/shop/admin/'
+      path: '/'
+      fullPath: '/shop/admin/'
+      preLoaderRoute: typeof ShopAdminIndexRouteImport
+      parentRoute: typeof ShopAdminRoute
+    }
+    '/support/agent/ratings': {
+      id: '/support/agent/ratings'
+      path: '/ratings'
+      fullPath: '/support/agent/ratings'
+      preLoaderRoute: typeof SupportAgentRatingsRouteImport
+      parentRoute: typeof SupportAgentRoute
+    }
+    '/support/agent/canned': {
+      id: '/support/agent/canned'
+      path: '/canned'
+      fullPath: '/support/agent/canned'
+      preLoaderRoute: typeof SupportAgentCannedRouteImport
+      parentRoute: typeof SupportAgentRoute
+    }
+    '/shop/orders/$id': {
+      id: '/shop/orders/$id'
+      path: '/$id'
+      fullPath: '/shop/orders/$id'
+      preLoaderRoute: typeof ShopOrdersIdRouteImport
+      parentRoute: typeof ShopOrdersRoute
+    }
+    '/shop/categories/$category': {
+      id: '/shop/categories/$category'
+      path: '/categories/$category'
+      fullPath: '/shop/categories/$category'
+      preLoaderRoute: typeof ShopCategoriesCategoryRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/admin/products': {
+      id: '/shop/admin/products'
+      path: '/products'
+      fullPath: '/shop/admin/products'
+      preLoaderRoute: typeof ShopAdminProductsRouteImport
+      parentRoute: typeof ShopAdminRoute
+    }
+    '/shop/admin/orders': {
+      id: '/shop/admin/orders'
+      path: '/orders'
+      fullPath: '/shop/admin/orders'
+      preLoaderRoute: typeof ShopAdminOrdersRouteImport
+      parentRoute: typeof ShopAdminRoute
+    }
     '/api/v1/$': {
       id: '/api/v1/$'
       path: '/api/v1/$'
@@ -273,10 +741,112 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface SaasRouteChildren {
+  SaasBillingRoute: typeof SaasBillingRoute
+  SaasSettingsRoute: typeof SaasSettingsRoute
+  SaasTeamRoute: typeof SaasTeamRoute
+  SaasUsageRoute: typeof SaasUsageRoute
+  SaasIndexRoute: typeof SaasIndexRoute
+}
+
+const SaasRouteChildren: SaasRouteChildren = {
+  SaasBillingRoute: SaasBillingRoute,
+  SaasSettingsRoute: SaasSettingsRoute,
+  SaasTeamRoute: SaasTeamRoute,
+  SaasUsageRoute: SaasUsageRoute,
+  SaasIndexRoute: SaasIndexRoute,
+}
+
+const SaasRouteWithChildren = SaasRoute._addFileChildren(SaasRouteChildren)
+
+interface ShopAdminRouteChildren {
+  ShopAdminOrdersRoute: typeof ShopAdminOrdersRoute
+  ShopAdminProductsRoute: typeof ShopAdminProductsRoute
+  ShopAdminIndexRoute: typeof ShopAdminIndexRoute
+}
+
+const ShopAdminRouteChildren: ShopAdminRouteChildren = {
+  ShopAdminOrdersRoute: ShopAdminOrdersRoute,
+  ShopAdminProductsRoute: ShopAdminProductsRoute,
+  ShopAdminIndexRoute: ShopAdminIndexRoute,
+}
+
+const ShopAdminRouteWithChildren = ShopAdminRoute._addFileChildren(
+  ShopAdminRouteChildren,
+)
+
+interface ShopOrdersRouteChildren {
+  ShopOrdersIdRoute: typeof ShopOrdersIdRoute
+}
+
+const ShopOrdersRouteChildren: ShopOrdersRouteChildren = {
+  ShopOrdersIdRoute: ShopOrdersIdRoute,
+}
+
+const ShopOrdersRouteWithChildren = ShopOrdersRoute._addFileChildren(
+  ShopOrdersRouteChildren,
+)
+
+interface ShopRouteChildren {
+  ShopSlugRoute: typeof ShopSlugRoute
+  ShopAdminRoute: typeof ShopAdminRouteWithChildren
+  ShopCartRoute: typeof ShopCartRoute
+  ShopCheckoutRoute: typeof ShopCheckoutRoute
+  ShopOrdersRoute: typeof ShopOrdersRouteWithChildren
+  ShopIndexRoute: typeof ShopIndexRoute
+  ShopCategoriesCategoryRoute: typeof ShopCategoriesCategoryRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopSlugRoute: ShopSlugRoute,
+  ShopAdminRoute: ShopAdminRouteWithChildren,
+  ShopCartRoute: ShopCartRoute,
+  ShopCheckoutRoute: ShopCheckoutRoute,
+  ShopOrdersRoute: ShopOrdersRouteWithChildren,
+  ShopIndexRoute: ShopIndexRoute,
+  ShopCategoriesCategoryRoute: ShopCategoriesCategoryRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
+
+interface SupportAgentRouteChildren {
+  SupportAgentCannedRoute: typeof SupportAgentCannedRoute
+  SupportAgentRatingsRoute: typeof SupportAgentRatingsRoute
+  SupportAgentIndexRoute: typeof SupportAgentIndexRoute
+}
+
+const SupportAgentRouteChildren: SupportAgentRouteChildren = {
+  SupportAgentCannedRoute: SupportAgentCannedRoute,
+  SupportAgentRatingsRoute: SupportAgentRatingsRoute,
+  SupportAgentIndexRoute: SupportAgentIndexRoute,
+}
+
+const SupportAgentRouteWithChildren = SupportAgentRoute._addFileChildren(
+  SupportAgentRouteChildren,
+)
+
+interface SupportRouteChildren {
+  SupportTicketIdRoute: typeof SupportTicketIdRoute
+  SupportAgentRoute: typeof SupportAgentRouteWithChildren
+  SupportIndexRoute: typeof SupportIndexRoute
+}
+
+const SupportRouteChildren: SupportRouteChildren = {
+  SupportTicketIdRoute: SupportTicketIdRoute,
+  SupportAgentRoute: SupportAgentRouteWithChildren,
+  SupportIndexRoute: SupportIndexRoute,
+}
+
+const SupportRouteWithChildren =
+  SupportRoute._addFileChildren(SupportRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
+  SaasRoute: SaasRouteWithChildren,
+  ShopRoute: ShopRouteWithChildren,
+  SupportRoute: SupportRouteWithChildren,
   ApiV1SplatRoute: ApiV1SplatRoute,
 }
 export const routeTree = rootRouteImport

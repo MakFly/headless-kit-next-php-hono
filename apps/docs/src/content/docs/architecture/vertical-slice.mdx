@@ -1,0 +1,189 @@
+---
+title: Vertical Slice Architecture
+description: How Headless Kit organizes code by feature instead of by layer.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## What is VSA?
+
+Headless Kit organizes backend code by **feature** (vertical slice) rather than by **layer** (controllers, services, repositories). Each feature is a self-contained directory with its own routes, handlers/controllers, services, and schemas/validation.
+
+```
+Features/
+├── Auth/         # Login, Register, 2FA, OAuth
+├── Shop/         # Products, Categories
+├── Cart/         # Cart CRUD
+├── Orders/       # Checkout, Order history
+├── Admin/        # RBAC, Dashboard, Product/Order management
+├── SaaS/         # Orgs, Plans, Subscriptions, Teams
+└── Support/      # Conversations, Messages, Canned Responses
+
+Shared/
+├── Models / Entities    # User, Role, Permission, Product...
+├── Middleware            # Auth guard, CORS, Security headers
+└── Services              # Mailer, Storage
+```
+
+<Aside type="tip">
+  The `Shared/` directory contains cross-cutting concerns used by multiple features. Feature-specific logic stays inside its feature directory.
+</Aside>
+
+## Convention per Backend
+
+<Tabs>
+  <TabItem label="Laravel">
+    Each feature has an `Actions/` directory with single-action invokable controllers and a `routes.php` file:
+
+    ```
+    app/Features/
+    ├── Shop/
+    │   ├── Actions/
+    │   │   ├── ListProducts.php      # Invokable controller
+    │   │   ├── ShowProduct.php
+    │   │   ├── ListCategories.php
+    │   │   └── ShowCategory.php
+    │   └── routes.php                # Feature routes
+    ├── Cart/
+    │   ├── Actions/
+    │   │   ├── ShowCart.php
+    │   │   ├── AddItem.php
+    │   │   ├── UpdateItem.php
+    │   │   └── RemoveItem.php
+    │   ├── Formatters/
+    │   │   └── CartFormatter.php     # Response formatting
+    │   └── routes.php
+    └── Admin/
+        ├── Actions/
+        │   ├── Dashboard.php
+        │   ├── ListUsers.php
+        │   ├── AdminListProducts.php
+        │   └── ... (~30 actions)
+        └── routes.php
+    ```
+
+    Shared models live in `app/Shared/Models/` (User, Role, Permission, Product, Category, Cart, Order, etc.).
+
+    Feature routes are auto-loaded in `routes/api.php`:
+
+    ```php
+    // routes/api.php
+    foreach (glob(app_path('Features/*/routes.php')) as $routes) {
+        require $routes;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Symfony">
+    Each feature uses **invokable controllers** (one action per class) and Doctrine repositories:
+
+    ```
+    src/Feature/
+    ├── Shop/
+    │   ├── Controller/
+    │   │   ├── ListProductsController.php
+    │   │   ├── ShowProductController.php
+    │   │   ├── ListCategoriesController.php
+    │   │   └── ShowCategoryController.php
+    │   └── Repository/
+    │       ├── ProductRepository.php
+    │       └── CategoryRepository.php
+    ├── Cart/
+    │   ├── Controller/
+    │   │   ├── ShowCartController.php
+    │   │   ├── AddItemController.php
+    │   │   ├── UpdateItemController.php
+    │   │   └── RemoveItemController.php
+    │   └── Repository/
+    │       └── CartRepository.php
+    └── Admin/
+        ├── Controller/
+        │   ├── Rbac/         # Role & permission management
+        │   └── Shop/         # Product, Order, Customer, Review admin
+        └── Service/
+            └── SegmentQueryService.php
+    ```
+
+    Shared entities live in `src/Shared/Entity/` and services in `src/Shared/Service/`.
+
+    Routes are defined via PHP attributes on each controller:
+
+    ```php
+    #[Route('/api/v1/shop/products', methods: ['GET'])]
+    class ListProductsController
+    {
+        public function __invoke(): JsonResponse { /* ... */ }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Hono">
+    Each feature follows a **5-file convention**:
+
+    ```
+    src/features/
+    ├── shop/
+    │   ├── shop.schemas.ts      # Zod validation schemas
+    │   ├── shop.repository.ts   # Database queries (Drizzle)
+    │   ├── shop.service.ts      # Business logic
+    │   ├── shop.handlers.ts     # Request handlers
+    │   └── shop.routes.ts       # Hono route definitions
+    ├── cart/
+    │   ├── cart.schemas.ts
+    │   ├── cart.repository.ts
+    │   ├── cart.service.ts
+    │   ├── cart.handlers.ts
+    │   └── cart.routes.ts
+    └── saas/
+        ├── saas.schemas.ts
+        ├── saas.repository.ts
+        ├── saas.service.ts
+        ├── saas.handlers.ts
+        └── saas.routes.ts
+    ```
+
+    Shared code lives in `src/shared/` (database schema, middleware, utilities).
+
+    Routes are composed in the main app file:
+
+    ```typescript
+    // src/index.ts
+    import { shopRoutes } from './features/shop/shop.routes';
+    import { cartRoutes } from './features/cart/cart.routes';
+
+    app.route('/api/v1', shopRoutes);
+    app.route('/api/v1', cartRoutes);
+    ```
+  </TabItem>
+</Tabs>
+
+## Adding a New Feature
+
+To add a new feature (e.g., "Blog"), create a new directory under the feature root:
+
+<Tabs>
+  <TabItem label="Laravel">
+    1. Create `app/Features/Blog/Actions/ListPosts.php` (invokable controller)
+    2. Create `app/Features/Blog/routes.php` with your route definitions
+    3. Add models to `app/Shared/Models/` if needed
+    4. Routes are auto-loaded — no registration needed
+  </TabItem>
+  <TabItem label="Symfony">
+    1. Create `src/Feature/Blog/Controller/ListPostsController.php` with `#[Route]` attributes
+    2. Create `src/Feature/Blog/Repository/PostRepository.php` if needed
+    3. Add entities to `src/Shared/Entity/`
+    4. Controllers are auto-discovered by Symfony — no registration needed
+  </TabItem>
+  <TabItem label="Hono">
+    1. Create the 5-file structure under `src/features/blog/`
+    2. Export routes from `blog.routes.ts`
+    3. Register in `src/index.ts`: `app.route('/api/v1', blogRoutes)`
+  </TabItem>
+</Tabs>
+
+## Why VSA?
+
+| Benefit | Description |
+| ------- | ----------- |
+| **Locality** | All code for a feature lives in one place — easy to understand and modify |
+| **Independence** | Features can be added or removed without affecting others |
+| **Preset-friendly** | The CLI can include/exclude entire feature directories based on the selected preset |
+| **Consistent** | The same pattern across all 3 backends makes switching stacks easy |

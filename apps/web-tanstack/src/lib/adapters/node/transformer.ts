@@ -53,18 +53,38 @@ export function transformUser(nodeUser: NodeUser): NormalizedUser {
   }
 }
 
-export function transformAuthResponse(response: NodeAuthResponse): AuthResponse {
+export function transformAuthResponse(
+  response: NodeAuthResponse | { success: boolean; data: NodeAuthResponse },
+): AuthResponse {
+  const payload: NodeAuthResponse =
+    'success' in response &&
+    response.data &&
+    typeof response.data === 'object' &&
+    ('accessToken' in (response.data as Record<string, unknown>) ||
+      'access_token' in (response.data as Record<string, unknown>))
+      ? (response as { data: NodeAuthResponse }).data
+      : (response as NodeAuthResponse)
+
   const tokens: TokenStorage = {
-    access_token: response.accessToken || response.access_token || '',
-    refresh_token: response.refreshToken || response.refresh_token,
-    token_type: response.tokenType || response.token_type || 'Bearer',
-    expires_in: response.expiresIn || response.expires_in,
+    access_token: payload.accessToken || payload.access_token || '',
+    refresh_token: payload.refreshToken || payload.refresh_token,
+    token_type: payload.tokenType || payload.token_type || 'Bearer',
+    expires_in: payload.expiresIn || payload.expires_in,
   }
-  return { user: transformUser(response.user), tokens }
+  return { user: transformUser(payload.user), tokens }
 }
 
-export function transformMeResponse(response: NodeUser | { user: NodeUser }): NormalizedUser {
-  const user = 'user' in response && response.user ? response.user : (response as NodeUser)
+export function transformMeResponse(
+  response: NodeUser | { user: NodeUser } | { success: boolean; data: NodeUser | { user: NodeUser } },
+): NormalizedUser {
+  let inner: NodeUser | { user: NodeUser } = response as NodeUser | { user: NodeUser }
+  if ('success' in response && 'data' in response) {
+    inner = (response as { data: NodeUser | { user: NodeUser } }).data
+  }
+  const user =
+    'user' in inner && (inner as { user: NodeUser }).user
+      ? (inner as { user: NodeUser }).user
+      : (inner as NodeUser)
   return transformUser(user)
 }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
-import type { User } from '@rbac/types';
+import type { User } from '@/types';
 
 type ZustandHydrationProps = {
   user: User | null;

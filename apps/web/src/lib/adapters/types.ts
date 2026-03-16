@@ -4,7 +4,7 @@
  * These types define the common interface for Laravel, Symfony, and Node.js backends
  */
 
-import type { User } from '@rbac/types';
+import type { User } from '@/types';
 
 /**
  * Supported backend types
@@ -85,8 +85,6 @@ export type AuthResponse = {
 export type AdapterConfig = {
   baseUrl: string;
   timeout?: number;
-  secret?: string;
-  bffId?: string;
   authPrefix?: string;
 };
 

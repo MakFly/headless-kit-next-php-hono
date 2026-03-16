@@ -1,0 +1,82 @@
+services:
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "{{FRONTEND_PORT}}:{{FRONTEND_PORT}}"
+    environment:
+      - NODE_ENV=production
+      - AUTH_BACKEND=laravel
+      - LARAVEL_API_URL=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - APP_KEY={{APP_KEY}}
+      - APP_URL=http://localhost:8000
+      - FRONTEND_URL=http://localhost:{{FRONTEND_PORT}}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE={{PROJECT_NAME}}
+      - DB_USERNAME=postgres
+      - DB_PASSWORD={{DB_PASSWORD}}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=mailpit
+      - MAIL_PORT=1025
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - api-storage:/var/www/html/storage
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: {{PROJECT_NAME}}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: {{DB_PASSWORD}}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  redis-data:
+  api-storage:

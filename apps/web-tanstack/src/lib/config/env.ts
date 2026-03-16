@@ -21,14 +21,16 @@ export const env = {
   AUTH_BACKEND: (process.env.AUTH_BACKEND || 'laravel') as AuthBackend,
 
   LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8000',
-  BFF_HMAC_SECRET: process.env.BFF_HMAC_SECRET || process.env.BFF_SECRET,
-  BFF_ID: process.env.BFF_ID || 'tanstack-bff',
 
   SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8002',
   SYMFONY_AUTH_PREFIX: process.env.SYMFONY_AUTH_PREFIX || '/api/v1/auth',
 
   NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:8003',
   NODE_AUTH_PREFIX: process.env.NODE_AUTH_PREFIX || '/api/v1/auth',
+
+  // AI
+  VITE_AI_PROVIDER: import.meta.env.VITE_AI_PROVIDER || 'anthropic',
+  VITE_AI_MODEL: import.meta.env.VITE_AI_MODEL || 'claude-sonnet-4-20250514',
 } as const
 
 export const COOKIE_NAMES = {

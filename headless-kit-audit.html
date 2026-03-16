@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Headless Kit — Audit de Marché & Architecture</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a2e;
+    --border: #2a2a3e;
+    --text: #e4e4ef;
+    --text-muted: #8888a0;
+    --accent: #6366f1;
+    --accent2: #8b5cf6;
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.1);
+    --yellow: #eab308;
+    --yellow-bg: rgba(234,179,8,0.1);
+    --red: #ef4444;
+    --red-bg: rgba(239,68,68,0.1);
+    --blue: #3b82f6;
+    --blue-bg: rgba(59,130,246,0.1);
+    --cyan: #06b6d4;
+    --pink: #ec4899;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border-radius: 1.5rem;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(139,92,246,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+
+  .header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    position: relative;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 3rem 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-title .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(99,102,241,0.1);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .tag-green { background: var(--green-bg); color: var(--green); }
+  .tag-yellow { background: var(--yellow-bg); color: var(--yellow); }
+  .tag-red { background: var(--red-bg); color: var(--red); }
+  .tag-blue { background: var(--blue-bg); color: var(--blue); }
+
+  /* Stat cards */
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .stat-card .value {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-card .label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+
+  .stat-card .delta {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  .delta-up { color: var(--green); }
+  .delta-down { color: var(--red); }
+
+  /* Architecture diagram */
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 2rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
+  }
+
+  .arch-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+
+  .arch-box {
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    border: 2px solid;
+    text-align: center;
+    min-width: 140px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+  }
+
+  .arch-box:hover { transform: scale(1.05); }
+
+  .arch-box.cli { border-color: var(--pink); background: rgba(236,72,153,0.1); color: var(--pink); }
+  .arch-box.frontend { border-color: var(--cyan); background: rgba(6,182,212,0.1); color: var(--cyan); }
+  .arch-box.core { border-color: var(--accent); background: rgba(99,102,241,0.1); color: var(--accent); }
+  .arch-box.symfony { border-color: #fff; background: rgba(255,255,255,0.05); color: #fff; }
+  .arch-box.laravel { border-color: var(--red); background: rgba(239,68,68,0.08); color: #ff6b6b; }
+  .arch-box.module { border-color: var(--yellow); background: rgba(234,179,8,0.08); color: var(--yellow); }
+  .arch-box.infra { border-color: var(--green); background: rgba(34,197,94,0.08); color: var(--green); }
+  .arch-box.free { border-color: var(--green); background: rgba(34,197,94,0.08); }
+  .arch-box.premium { border-color: var(--yellow); background: rgba(234,179,8,0.08); }
+
+  .arch-arrow {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    user-select: none;
+  }
+
+  .arch-label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-align: center;
+    margin: 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .arch-divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* Competitor table */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    background: var(--surface2);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  tr:hover td { background: rgba(99,102,241,0.03); }
+
+  /* SWOT */
+  .swot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .swot-card {
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+  }
+
+  .swot-card h4 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .swot-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .swot-card li {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding-left: 1.2rem;
+    position: relative;
+  }
+
+  .swot-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .swot-strengths li::before { background: var(--green); }
+  .swot-weaknesses li::before { background: var(--red); }
+  .swot-opportunities li::before { background: var(--blue); }
+  .swot-threats li::before { background: var(--yellow); }
+
+  /* Revenue scenarios */
+  .scenario {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  .scenario .scenario-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .scenario .revenue {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+
+  .scenario .detail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  /* RAF Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--pink), var(--green));
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.75rem;
+    top: 1.75rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    background: var(--bg);
+  }
+
+  .timeline-item .phase {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .timeline-item h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+  }
+
+  .timeline-task {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding: 0.4rem 0.75rem;
+    background: var(--surface2);
+    border-radius: 0.5rem;
+  }
+
+  .timeline-task .days {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  /* Recommendation banner */
+  .reco-banner {
+    background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(139,92,246,0.1) 50%, rgba(236,72,153,0.08) 100%);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    margin-top: 3rem;
+    text-align: center;
+  }
+
+  .reco-banner h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .reco-banner p {
+    color: var(--text-muted);
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 0.95rem;
+  }
+
+  .reco-steps {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .reco-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    width: 200px;
+    text-align: center;
+  }
+
+  .reco-step .number {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .reco-step .step-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .reco-step .step-detail {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Business model */
+  .biz-model {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .biz-column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+  }
+
+  .biz-column h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .biz-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .biz-item:last-child { border-bottom: none; }
+  .biz-item .price { font-weight: 700; }
+
+  @media (max-width: 768px) {
+    body { padding: 1rem; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .swot-grid { grid-template-columns: 1fr; }
+    .biz-model { grid-template-columns: 1fr; }
+    .header h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>Headless Kit</h1>
+  <p>Audit de marche France — Starter Kit Headless PHP (Symfony + Laravel)</p>
+</div>
+
+<!-- MARCHE ECOMMERCE -->
+<h2 class="section-title">
+  Marche E-commerce France
+  <span class="badge tag-green">Croissance</span>
+</h2>
+
+<div class="grid-4">
+  <div class="stat-card">
+    <div class="value">196 Mds</div>
+    <div class="label">CA e-commerce 2025</div>
+    <div class="delta delta-up">+7% vs 2024</div>
+  </div>
+  <div class="stat-card">
+    <div class="value">153K</div>
+    <div class="label">Sites marchands actifs</div>
+    <div class="delta delta-up">+9% en 2024</div>
+  </div>
+  <div class="stat-card">
+    <div class="value">212K</div>
+    <div class="label">Emplois e-commerce</div>
+    <div class="delta delta-up">+8% en 2024</div>
+  </div>
+  <div class="stat-card">
+    <div class="value">~30K</div>
+    <div class="label">Sites sur-mesure (cible)</div>
+    <div class="delta" style="color:var(--text-muted)">~20% des 153K</div>
+  </div>
+</div>
+
+<!-- ECOSYSTEME PHP FRANCE -->
+<h2 class="section-title">
+  Ecosysteme PHP France
+  <span class="badge tag-blue">Cible</span>
+</h2>
+
+<div class="grid-3">
+  <div class="stat-card">
+    <div class="value">64%</div>
+    <div class="label">Part Laravel chez les devs PHP</div>
+    <div class="delta" style="color:var(--text-muted)">JetBrains 2025</div>
+  </div>
+  <div class="stat-card">
+    <div class="value">21%</div>
+    <div class="label">Part Symfony chez les devs PHP</div>
+    <div class="delta" style="color:var(--text-muted)">Dominant en France</div>
+  </div>
+  <div class="stat-card">
+    <div class="value">542 EUR</div>
+    <div class="label">TJM moyen Symfony (Paris)</div>
+    <div class="delta" style="color:var(--text-muted)">450-470 EUR en province</div>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top:1rem">
+  <div class="card">
+    <h3>Pool de developpeurs cible</h3>
+    <p style="margin-top:0.75rem">
+      <strong style="color:var(--text)">~8 000</strong> freelances Symfony/Laravel actifs<br>
+      <strong style="color:var(--text)">~24 000</strong> devs en agences (x3)<br>
+      <strong style="color:var(--text)">~30 000+</strong> devs en entreprise<br>
+      <span style="border-top:1px solid var(--border);display:block;padding-top:0.5rem;margin-top:0.5rem">
+        <strong style="color:var(--accent);font-size:1.2rem">~60 000</strong> devs PHP en France<br>
+        <strong style="color:var(--cyan)">~18 000</strong> qui font du e-commerce (30%)
+      </span>
+    </p>
+  </div>
+  <div class="card">
+    <h3>Pourquoi la France ?</h3>
+    <p style="margin-top:0.75rem">
+      <strong style="color:var(--text)">Symfony est francais</strong> — cree par SensioLabs (2005)<br><br>
+      La France a la plus forte concentration de devs Symfony au monde. Les agences (Synolia, Diagram, The Tribe) sont des partenaires certifies Sylius.<br><br>
+      <span class="tag tag-green">Best market worldwide pour un produit Symfony</span>
+    </p>
+  </div>
+</div>
+
+<!-- CONCURRENTS -->
+<h2 class="section-title">
+  Paysage concurrentiel
+  <span class="badge tag-yellow">Sature mais...</span>
+</h2>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Produit</th>
+        <th>Stack</th>
+        <th>Prix</th>
+        <th>Stars</th>
+        <th>Position FR</th>
+        <th>Headless API-first</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>PrestaShop</strong></td>
+        <td>PHP custom</td>
+        <td>Gratuit + modules</td>
+        <td>-</td>
+        <td><span class="tag tag-green">Dominant</span></td>
+        <td><span class="tag tag-red">Non</span></td>
+      </tr>
+      <tr>
+        <td><strong>Sylius</strong></td>
+        <td>Symfony</td>
+        <td>Gratuit + Plus</td>
+        <td>~8K</td>
+        <td><span class="tag tag-green">Fort</span></td>
+        <td><span class="tag tag-green">Oui</span></td>
+      </tr>
+      <tr>
+        <td><strong>Bagisto</strong></td>
+        <td>Laravel</td>
+        <td>Gratuit</td>
+        <td>~16K</td>
+        <td><span class="tag tag-red">Faible</span></td>
+        <td><span class="tag tag-yellow">Partiel</span></td>
+      </tr>
+      <tr>
+        <td><strong>Aimeos</strong></td>
+        <td>PHP core + bridges</td>
+        <td>Gratuit</td>
+        <td>~9K</td>
+        <td><span class="tag tag-red">Faible</span></td>
+        <td><span class="tag tag-green">Oui</span></td>
+      </tr>
+      <tr>
+        <td><strong>Lunar</strong></td>
+        <td>Laravel</td>
+        <td>Gratuit</td>
+        <td>~3K</td>
+        <td><span class="tag tag-red">Absent</span></td>
+        <td><span class="tag tag-green">Oui</span></td>
+      </tr>
+      <tr style="background:rgba(99,102,241,0.05)">
+        <td><strong style="color:var(--accent)">Headless Kit (toi)</strong></td>
+        <td style="color:var(--accent)">Symfony + Laravel + Next.js BFF</td>
+        <td>99-249 EUR</td>
+        <td>0</td>
+        <td><span class="tag tag-blue">A lancer</span></td>
+        <td><span class="tag tag-green">Oui</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card" style="margin-top:1rem;border-color:var(--accent)">
+  <h3 style="color:var(--accent)">Le gap : personne ne propose...</h3>
+  <p style="margin-top:0.5rem;font-size:0.95rem;color:var(--text)">
+    Un <strong>starter kit headless</strong> avec BFF Next.js + choix Symfony OU Laravel + Auth production-grade (2FA, OAuth, RBAC) + HMAC signing + modules e-commerce optionnels.<br>
+    <span style="color:var(--text-muted)">Sylius = framework complet (pas un starter kit). Bagisto = Laravel only. Aimeos = DX complexe. ShipFast = JS only, pas e-commerce.</span>
+  </p>
+</div>
+
+<!-- BENCHMARK REVENUS -->
+<h2 class="section-title">
+  Benchmark revenus starter kits
+  <span class="badge tag-green">Prouve</span>
+</h2>
+
+<div class="grid-3">
+  <div class="card">
+    <div class="card-header">
+      <h3>ShipFast</h3>
+      <span class="tag tag-green">$1M+/an</span>
+    </div>
+    <p>Marc Lou — Next.js boilerplate a $199. <strong style="color:var(--green)">$1,032,000 en 2025</strong>, 92% de marge. 7 394 makers. Proof of concept du modele.</p>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3>SaaSykit</h3>
+      <span class="tag tag-blue">Laravel</span>
+    </div>
+    <p>Laravel SaaS starter kit. $199-$499 one-time. Revenue non public. Prouve que les devs Laravel paient pour des kits.</p>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3>Laravel Shopper</h3>
+      <span class="tag tag-yellow">Freemium</span>
+    </div>
+    <p>Core gratuit + starter kits a $99 (Blade, Livewire, Inertia). E-commerce headless TALL stack.</p>
+  </div>
+</div>
+
+<!-- SWOT -->
+<h2 class="section-title">Analyse SWOT</h2>
+
+<div class="swot-grid">
+  <div class="swot-card">
+    <h4><span style="color:var(--green)">&#9650;</span> Forces</h4>
+    <ul class="swot-strengths">
+      <li>70% du code deja ecrit (BFF, adapters, auth, HMAC)</li>
+      <li>Double framework Symfony + Laravel = unique</li>
+      <li>Architecture production-grade (Paseto V4, 2FA, RBAC)</li>
+      <li>France = meilleur marche Symfony au monde</li>
+    </ul>
+  </div>
+  <div class="swot-card">
+    <h4><span style="color:var(--red)">&#9660;</span> Faiblesses</h4>
+    <ul class="swot-weaknesses">
+      <li>Developeur solo = maintenance 2 bridges + frontend</li>
+      <li>Marche niche (PHP headless e-commerce)</li>
+      <li>Zero communaute / notoriete au demarrage</li>
+      <li>Le marketing fait 80% du succes (cf Marc Lou)</li>
+    </ul>
+  </div>
+  <div class="swot-card">
+    <h4><span style="color:var(--blue)">&#9654;</span> Opportunites</h4>
+    <ul class="swot-opportunities">
+      <li>Aucun "ShipFast du PHP e-commerce" n'existe</li>
+      <li>Agences FR cherchent des accelerateurs projet</li>
+      <li>Kit optimise IA (CLAUDE.md, rules) = angle unique</li>
+      <li>Headless en forte croissance (+7% e-commerce FR)</li>
+    </ul>
+  </div>
+  <div class="swot-card">
+    <h4><span style="color:var(--yellow)">&#9670;</span> Menaces</h4>
+    <ul class="swot-threats">
+      <li>Sylius peut sortir un starter kit officiel</li>
+      <li>Laravel 12 a ses propres starter kits</li>
+      <li>L'IA rend les boilerplates moins necessaires</li>
+      <li>Fatigue des starter kits (marche JS sature)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SCENARIOS REVENUS -->
+<h2 class="section-title">
+  Scenarios de revenus
+  <span class="badge tag-blue">Annuel</span>
+</h2>
+
+<div class="grid-3">
+  <div class="scenario">
+    <div class="scenario-label" style="color:var(--red)">Pessimiste</div>
+    <div class="revenue" style="color:var(--red)">~22K EUR</div>
+    <div class="detail">
+      150 ventes x 149 EUR<br>
+      France uniquement, peu de marketing<br>
+      <span style="color:var(--text-muted)">Side project rentable</span>
+    </div>
+  </div>
+  <div class="scenario" style="border-color:var(--accent)">
+    <div class="scenario-label" style="color:var(--accent)">Realiste</div>
+    <div class="revenue" style="color:var(--accent)">~119K EUR</div>
+    <div class="detail">
+      500 ventes x 199 EUR = 99.5K<br>
+      + 100 modules premium x 249 EUR = 24.9K<br>
+      <span style="color:var(--green)">Activite viable</span>
+    </div>
+  </div>
+  <div class="scenario">
+    <div class="scenario-label" style="color:var(--green)">Optimiste</div>
+    <div class="revenue" style="color:var(--green)">~383K EUR</div>
+    <div class="detail">
+      1 500 ventes x 199 EUR = 298.5K<br>
+      + 400 modules premium x 249 EUR = 99.6K<br>
+      <span style="color:var(--green)">Marketing fort + international</span>
+    </div>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<h2 class="section-title">
+  Architecture du produit
+  <span class="badge tag-blue">Cible</span>
+</h2>
+
+<div class="arch-diagram">
+  <div class="arch-label">Distribution</div>
+  <div class="arch-row">
+    <div class="arch-box cli">bunx create-headless-app</div>
+  </div>
+
+  <div class="arch-row">
+    <span class="arch-arrow">|</span>
+  </div>
+
+  <div class="arch-label">Frontend / BFF</div>
+  <div class="arch-row">
+    <div class="arch-box frontend">Next.js BFF<br><small>Proxy + HMAC + Auth</small></div>
+  </div>
+
+  <div class="arch-row">
+    <span class="arch-arrow">|</span>
+  </div>
+
+  <div class="arch-label">Core (npm package)</div>
+  <div class="arch-row">
+    <div class="arch-box core">@headless/core<br><small>Adapters + Security + Tokens</small></div>
+  </div>
+
+  <div class="arch-row">
+    <span class="arch-arrow" style="transform:rotate(45deg)">&#8601;</span>
+    <span style="width:4rem"></span>
+    <span class="arch-arrow" style="transform:rotate(-45deg)">&#8600;</span>
+  </div>
+
+  <div class="arch-label">Backend (au choix)</div>
+  <div class="arch-row">
+    <div class="arch-box symfony">Symfony 8<br><small>BetterAuth + Doctrine + API Platform</small></div>
+    <span style="color:var(--text-muted);font-weight:700">OU</span>
+    <div class="arch-box laravel">Laravel 12<br><small>BetterAuth + Eloquent + Sanctum</small></div>
+  </div>
+
+  <hr class="arch-divider">
+
+  <div class="arch-label">Modules optionnels (premium)</div>
+  <div class="arch-row">
+    <div class="arch-box module">Catalog<br><small>Produits JSONB</small></div>
+    <div class="arch-box module">Cart & Orders<br><small>State machine</small></div>
+    <div class="arch-box module">Stripe<br><small>Connect + Checkout</small></div>
+    <div class="arch-box module">S3 Storage<br><small>Media management</small></div>
+  </div>
+
+  <hr class="arch-divider">
+
+  <div class="arch-label">Infrastructure</div>
+  <div class="arch-row">
+    <div class="arch-box infra">PostgreSQL</div>
+    <div class="arch-box infra">Redis</div>
+    <div class="arch-box infra">Mailpit</div>
+    <div class="arch-box infra">Docker Compose</div>
+  </div>
+</div>
+
+<!-- BUSINESS MODEL -->
+<h2 class="section-title">
+  Business Model
+  <span class="badge tag-green">Freemium</span>
+</h2>
+
+<div class="biz-model">
+  <div class="biz-column" style="border-color:var(--green)">
+    <h4 style="color:var(--green)">&#9679; Gratuit (MIT)</h4>
+    <div class="biz-item"><span>create-headless-app CLI</span> <span class="price" style="color:var(--green)">Free</span></div>
+    <div class="biz-item"><span>@headless/core (adapters, HMAC)</span> <span class="price" style="color:var(--green)">Free</span></div>
+    <div class="biz-item"><span>@headless/bff-nextjs</span> <span class="price" style="color:var(--green)">Free</span></div>
+    <div class="biz-item"><span>Template Symfony (auth, RBAC)</span> <span class="price" style="color:var(--green)">Free</span></div>
+    <div class="biz-item"><span>Template Laravel (auth, RBAC)</span> <span class="price" style="color:var(--green)">Free</span></div>
+  </div>
+  <div class="biz-column" style="border-color:var(--yellow)">
+    <h4 style="color:var(--yellow)">&#9733; Premium</h4>
+    <div class="biz-item"><span>Module E-commerce (Catalog + Cart + Orders)</span> <span class="price" style="color:var(--yellow)">99 EUR</span></div>
+    <div class="biz-item"><span>Module Stripe Connect (Marketplace)</span> <span class="price" style="color:var(--yellow)">149 EUR</span></div>
+    <div class="biz-item"><span>Module Admin Dashboard</span> <span class="price" style="color:var(--yellow)">99 EUR</span></div>
+    <div class="biz-item"><span>Bundle complet (tout inclus)</span> <span class="price" style="color:var(--yellow)">249 EUR</span></div>
+    <div class="biz-item"><span>Support prioritaire (annuel)</span> <span class="price" style="color:var(--yellow)">499 EUR/an</span></div>
+  </div>
+</div>
+
+<!-- RAF TIMELINE -->
+<h2 class="section-title">
+  RAF — Reste A Faire
+  <span class="badge tag-blue">58 jours</span>
+</h2>
+
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="phase">Phase 1 — 16 jours</div>
+    <h4>Extraction & Core</h4>
+    <p>Extraire les briques reutilisables du monorepo existant en packages independants.</p>
+    <div class="timeline-tasks">
+      <div class="timeline-task"><span>Extraire @headless/core depuis apps/web/src/lib/</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Extraire @headless/bff-nextjs (proxy + middleware)</span> <span class="days">2j</span></div>
+      <div class="timeline-task"><span>Nettoyer template Symfony (BetterAuth + API Platform)</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Nettoyer template Laravel (BetterAuth + Sanctum)</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Tests unitaires du core extrait</span> <span class="days">2j</span></div>
+      <div class="timeline-task"><span>Tests d'integration BFF - chaque backend</span> <span class="days">3j</span></div>
+    </div>
+  </div>
+
+  <div class="timeline-item">
+    <div class="phase">Phase 2 — 9 jours</div>
+    <h4>CLI & Templates</h4>
+    <p>Creer le CLI interactif et le systeme de scaffolding.</p>
+    <div class="timeline-tasks">
+      <div class="timeline-task"><span>CLI create-headless-app avec Clack</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Systeme de templates (copie + remplacement)</span> <span class="days">2j</span></div>
+      <div class="timeline-task"><span>Docker Compose + Makefile par template</span> <span class="days">2j</span></div>
+      <div class="timeline-task"><span>Smoke tests CLI (cree projet - build - tests pass)</span> <span class="days">2j</span></div>
+    </div>
+  </div>
+
+  <div class="timeline-item">
+    <div class="phase">Phase 3 — 23 jours</div>
+    <h4>Module E-commerce</h4>
+    <p>Premier module premium : catalogue, panier, commandes, paiement.</p>
+    <div class="timeline-tasks">
+      <div class="timeline-task"><span>Domain core PHP pur (Product, Category, Cart, Order)</span> <span class="days">5j</span></div>
+      <div class="timeline-task"><span>Adapter Doctrine (Symfony) + migrations</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Adapter Eloquent (Laravel) + migrations</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>API REST : CRUD products, categories, cart</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Pricing pipeline (discounts, taxes)</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Stripe Checkout integration</span> <span class="days">2j</span></div>
+      <div class="timeline-task"><span>Stripe Connect (marketplace)</span> <span class="days">4j</span></div>
+    </div>
+  </div>
+
+  <div class="timeline-item">
+    <div class="phase">Phase 4 — 10 jours</div>
+    <h4>Distribution & Marketing</h4>
+    <p>Landing page, docs, publication, et lancement.</p>
+    <div class="timeline-tasks">
+      <div class="timeline-task"><span>Landing page (Astro ou Next.js)</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Documentation (Starlight / VitePress)</span> <span class="days">3j</span></div>
+      <div class="timeline-task"><span>Publication npm + Packagist</span> <span class="days">1j</span></div>
+      <div class="timeline-task"><span>Video demo "0 to deployed in 5 min"</span> <span class="days">1j</span></div>
+      <div class="timeline-task"><span>Lancement Product Hunt + Indie Hackers + Twitter</span> <span class="days">1j</span></div>
+      <div class="timeline-task"><span>Articles dev.to / blog</span> <span class="days">1j</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- RECOMMENDATION -->
+<div class="reco-banner">
+  <h3>Strategie recommandee</h3>
+  <p>
+    Lancer les Phases 1 + 2 + 4 d'abord (35 jours) : un starter kit Auth + RBAC + BFF a 99 EUR.<br>
+    Valider le marche, puis ajouter le module e-commerce comme premier upgrade premium.
+  </p>
+  <div class="reco-steps">
+    <div class="reco-step">
+      <div class="number">1</div>
+      <div class="step-label">MVP Auth Kit</div>
+      <div class="step-detail">35 jours<br>Gratuit + 99 EUR</div>
+    </div>
+    <div class="reco-step">
+      <div class="number">2</div>
+      <div class="step-label">Valider le marche</div>
+      <div class="step-detail">Feedback<br>Premieres ventes</div>
+    </div>
+    <div class="reco-step">
+      <div class="number">3</div>
+      <div class="step-label">Module E-com</div>
+      <div class="step-detail">23 jours<br>Premium 149-249 EUR</div>
+    </div>
+    <div class="reco-step">
+      <div class="number">4</div>
+      <div class="step-label">Scale</div>
+      <div class="step-detail">International<br>+ modules</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

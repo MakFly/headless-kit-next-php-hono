@@ -67,8 +67,6 @@ export function getAdapterConfig(backend: BackendType): Partial<AdapterConfig> {
     case 'laravel':
       return {
         baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8000',
-        secret: process.env.BFF_HMAC_SECRET || process.env.BFF_SECRET,
-        bffId: process.env.BFF_ID,
       };
 
     case 'symfony':

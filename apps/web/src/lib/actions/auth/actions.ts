@@ -4,7 +4,7 @@
 
 'use server';
 
-import type { User, LoginCredentials, RegisterData, AuthTokens, ApiResponse } from '@rbac/types';
+import type { User, LoginCredentials, RegisterData, AuthTokens, ApiResponse } from '@/types';
 import { cookies } from 'next/headers';
 import { getAuthAdapter, toUser, AdapterError } from '../../adapters';
 import { createLogger } from '@/lib/logger';

@@ -1,88 +1,293 @@
-.PHONY: help install install-web install-api install-api-sf install-api-hono api api-reset api-sf api-sf-reset api-sf-user api-hono api-hono-reset api-hono-user
+# ============================================================================
+# Headless Kit — Development Makefile
+# ============================================================================
+
+C_RESET   := \033[0m
+C_BOLD    := \033[1m
+C_DIM     := \033[2m
+C_GREEN   := \033[32m
+C_CYAN    := \033[36m
+C_YELLOW  := \033[33m
+C_RED     := \033[31m
+C_MAGENTA := \033[35m
+C_BLUE    := \033[34m
+
+CLI_DIR   := packages/create-headless-app
+TMP_DIR   := /tmp/headless-test
+
+.PHONY: help install build lint test clean \
+        dev-next-laravel dev-next-hono dev-next-sf \
+        dev-tanstack-laravel dev-tanstack-hono dev-tanstack-sf \
+        dev-all dev-landing dev-docs \
+        api-reset api-sf-reset api-hono-reset \
+        cli-build cli-test cli-try cli-try-all cli-clean \
+        cli-try-admin cli-try-landing cli-try-saas cli-try-ecommerce cli-try-none
+
+# ============================================================================
+# Help
+# ============================================================================
 
 help:
-	@echo "Available commands:"
-	@echo "  make install         - Install all dependencies (bun + composer)"
-	@echo "  make install-web    - Install web dependencies"
-	@echo "  make install-api    - Install Laravel API dependencies"
-	@echo "  make install-api-sf - Install Symfony API dependencies"
-	@echo "  make install-api-hono - Install Hono API dependencies"
 	@echo ""
-	@echo "  make api            - Start Laravel API server (port 8000)"
-	@echo "  make api-reset      - Reset Laravel API database + seed"
-	@echo "  make api-sf         - Start Symfony API server (port 8002)"
-	@echo "  make api-sf-reset   - Reset Symfony API database + create users"
-	@echo "  make api-sf-user    - Create test user in Symfony API"
-	@echo "  make api-hono       - Start Hono API server (port 8003)"
-	@echo "  make api-hono-reset - Reset Hono API database + seed"
-
-# Installation commands
-install: install-web install-api install-api-sf install-api-hono
+	@echo "  $(C_BOLD)$(C_CYAN)━━━ Headless Kit ━━━$(C_RESET)"
 	@echo ""
-	@echo "✓ All dependencies installed"
+	@echo "  $(C_BOLD)Dev Servers$(C_RESET)  $(C_DIM)frontend + backend en parallele$(C_RESET)"
+	@echo ""
+	@echo "  $(C_BOLD)  Next.js :3001$(C_RESET)"
+	@echo "  $(C_GREEN)dev-next-laravel$(C_RESET)     Next.js + Laravel $(C_DIM):8000$(C_RESET)  $(C_YELLOW)(defaut)$(C_RESET)"
+	@echo "  $(C_GREEN)dev-next-hono$(C_RESET)        Next.js + Hono    $(C_DIM):8003$(C_RESET)"
+	@echo "  $(C_GREEN)dev-next-sf$(C_RESET)          Next.js + Symfony $(C_DIM):8002$(C_RESET)"
+	@echo ""
+	@echo "  $(C_BOLD)  TanStack :3003$(C_RESET)"
+	@echo "  $(C_GREEN)dev-tanstack-laravel$(C_RESET)  TanStack + Laravel $(C_DIM):8000$(C_RESET)"
+	@echo "  $(C_GREEN)dev-tanstack-hono$(C_RESET)     TanStack + Hono    $(C_DIM):8003$(C_RESET)"
+	@echo "  $(C_GREEN)dev-tanstack-sf$(C_RESET)       TanStack + Symfony $(C_DIM):8002$(C_RESET)"
+	@echo ""
+	@echo "  $(C_GREEN)dev-all$(C_RESET)              Tout $(C_DIM)(6 apps)$(C_RESET)"
+	@echo ""
+	@echo "  $(C_BOLD)  Sites$(C_RESET)"
+	@echo "  $(C_GREEN)dev-landing$(C_RESET)          Landing page  $(C_DIM):4000$(C_RESET)"
+	@echo "  $(C_GREEN)dev-docs$(C_RESET)             Documentation $(C_DIM):4001$(C_RESET)"
+	@echo ""
+	@echo "  $(C_BOLD)Setup$(C_RESET)"
+	@echo "  $(C_GREEN)install$(C_RESET)              Install all deps $(C_DIM)(bun + composer)$(C_RESET)"
+	@echo "  $(C_GREEN)build$(C_RESET)                Build all packages"
+	@echo "  $(C_GREEN)lint$(C_RESET)                 Lint"
+	@echo "  $(C_GREEN)test$(C_RESET)                 Run all tests"
+	@echo "  $(C_GREEN)clean$(C_RESET)                Remove node_modules + dist"
+	@echo ""
+	@echo "  $(C_BOLD)DB Reset$(C_RESET)  $(C_DIM)fresh + seed$(C_RESET)"
+	@echo "  $(C_GREEN)api-reset$(C_RESET)            Laravel  $(C_DIM)(migrate:fresh --seed)$(C_RESET)"
+	@echo "  $(C_GREEN)api-sf-reset$(C_RESET)         Symfony  $(C_DIM)(schema:create + fixtures)$(C_RESET)"
+	@echo "  $(C_GREEN)api-hono-reset$(C_RESET)       Hono     $(C_DIM)(db:push + seed)$(C_RESET)"
+	@echo ""
+	@echo "  $(C_BOLD)CLI$(C_RESET)  $(C_DIM)(create-headless-app)$(C_RESET)"
+	@echo "  $(C_GREEN)cli-build$(C_RESET)            Build the CLI"
+	@echo "  $(C_GREEN)cli-test$(C_RESET)             Unit tests $(C_DIM)(228 tests)$(C_RESET)"
+	@echo "  $(C_GREEN)cli-try$(C_RESET)              Interactive $(C_DIM)(opens prompts)$(C_RESET)"
+	@echo "  $(C_GREEN)cli-try-saas$(C_RESET)         $(C_YELLOW)Recommended$(C_RESET) — SaaS + Next.js + Laravel"
+	@echo "  $(C_GREEN)cli-try-admin$(C_RESET)        Admin + Next.js + Laravel"
+	@echo "  $(C_GREEN)cli-try-landing$(C_RESET)      Landing + Next.js + Laravel"
+	@echo "  $(C_GREEN)cli-try-ecommerce$(C_RESET)    Ecommerce + TanStack + Hono"
+	@echo "  $(C_GREEN)cli-try-none$(C_RESET)         Minimal + Next.js + Hono"
+	@echo "  $(C_GREEN)cli-try-all$(C_RESET)          ALL 10 combos"
+	@echo "  $(C_GREEN)cli-clean$(C_RESET)            Remove $(C_DIM)$(TMP_DIR)$(C_RESET)"
+	@echo ""
+	@echo "  $(C_BOLD)$(C_YELLOW)Quick start:$(C_RESET)"
+	@echo "    make install            $(C_DIM)# une seule fois$(C_RESET)"
+	@echo "    make api-reset          $(C_DIM)# init la DB$(C_RESET)"
+	@echo "    make dev-next-laravel   $(C_DIM)# lance Next.js + Laravel$(C_RESET)"
+	@echo ""
 
-install-web:
-	@echo "Installing web dependencies..."
-	cd apps/web && bun install
-	cd apps/web-tanstack && bun install || true
+# ============================================================================
+# Dev Servers — frontend × backend
+# ============================================================================
 
-install-api:
-	@echo "Installing Laravel API dependencies..."
-	cd apps/api && composer install --no-interaction
+dev-next-laravel:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3001$(C_RESET)  +  $(C_BOLD)Laravel$(C_RESET) $(C_DIM):8000$(C_RESET)"
+	@bun run dev:next-laravel
 
-install-api-sf:
-	@echo "Installing Symfony API dependencies..."
-	cd apps/api-sf && cp -n .env.example .env || true
-	cd apps/api-sf && composer install --ignore-platform-req=ext-gmp --no-interaction
+dev-next-hono:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3001$(C_RESET)  +  $(C_BOLD)Hono$(C_RESET) $(C_DIM):8003$(C_RESET)"
+	@bun run dev:next-hono
 
-install-api-hono:
-	@echo "Installing Hono API dependencies..."
-	cd apps/api-hono && bun install
+dev-next-sf:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3001$(C_RESET)  +  $(C_BOLD)Symfony$(C_RESET) $(C_DIM):8002$(C_RESET)"
+	@bun run dev:next-sf
 
-# Laravel API (port 8000) - Test users: admin@example.com / Admin1234!
-api:
-	cd apps/api && php artisan serve --port=8000
+dev-tanstack-laravel:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3003$(C_RESET)  +  $(C_BOLD)Laravel$(C_RESET) $(C_DIM):8000$(C_RESET)"
+	@bun run dev:tanstack-laravel
+
+dev-tanstack-hono:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3003$(C_RESET)  +  $(C_BOLD)Hono$(C_RESET) $(C_DIM):8003$(C_RESET)"
+	@bun run dev:tanstack-hono
+
+dev-tanstack-sf:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3003$(C_RESET)  +  $(C_BOLD)Symfony$(C_RESET) $(C_DIM):8002$(C_RESET)"
+	@bun run dev:tanstack-sf
+
+dev-all:
+	@echo "  $(C_CYAN)►$(C_RESET) All apps"
+	@bun run dev:all
+
+dev-landing:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Landing$(C_RESET) $(C_DIM):4000$(C_RESET)"
+	@cd apps/landing && bun run dev
+
+dev-docs:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Docs$(C_RESET) $(C_DIM):4001$(C_RESET)"
+	@cd apps/docs && bun run dev
+
+# ============================================================================
+# Setup
+# ============================================================================
+
+install:
+	@echo "  $(C_CYAN)►$(C_RESET) Installing bun dependencies..."
+	@bun install
+	@echo "  $(C_CYAN)►$(C_RESET) Installing Laravel (composer)..."
+	@cd apps/api-laravel && composer install --no-interaction 2>/dev/null || echo "  $(C_YELLOW)⚠$(C_RESET) Laravel: composer install failed (php/composer needed)"
+	@echo "  $(C_CYAN)►$(C_RESET) Installing Symfony (composer)..."
+	@cd apps/api-sf && cp -n .env.example .env 2>/dev/null || true
+	@cd apps/api-sf && composer install --ignore-platform-req=ext-gmp --no-interaction 2>/dev/null || echo "  $(C_YELLOW)⚠$(C_RESET) Symfony: composer install failed (php/composer needed)"
+	@echo ""
+	@echo "  $(C_GREEN)✓$(C_RESET) Dependencies installed"
+
+build:
+	@echo "  $(C_CYAN)►$(C_RESET) Building..."
+	@bun run build
+	@echo "  $(C_GREEN)✓$(C_RESET) Build complete"
+
+lint:
+	@bun run lint
+
+test:
+	@echo "  $(C_CYAN)►$(C_RESET) Running tests..."
+	@bun run test
+	@echo "  $(C_GREEN)✓$(C_RESET) Tests passed"
+
+clean:
+	@echo "  $(C_YELLOW)►$(C_RESET) Cleaning..."
+	@rm -rf node_modules $(CLI_DIR)/dist
+	@echo "  $(C_GREEN)✓$(C_RESET) Clean"
+
+# ============================================================================
+# DB Reset
+# ============================================================================
 
 api-reset:
-	cd apps/api && php artisan migrate:fresh --seed --force
+	cd apps/api-laravel && php artisan migrate:fresh --seed --force
 	@echo ""
-	@echo "Test accounts (password: Admin1234!):"
-	@echo "  - admin@example.com (admin)"
-	@echo "  - test@test.com (user)"
-	@echo "  - refresh-test@example.com (user)"
-
-# Symfony API (port 8002) - Test users: admin@example.com / Admin1234!
-api-sf:
-	cd apps/api-sf && cp -n .env.example .env || true
-	cd apps/api-sf && composer install --ignore-platform-req=ext-gmp --no-interaction
-	cd apps/api-sf && symfony server:start --port=8002 --no-tls
+	@echo "  $(C_GREEN)✓$(C_RESET) Laravel DB reset"
+	@echo "  $(C_DIM)admin@example.com / Admin1234!$(C_RESET)"
+	@echo "  $(C_DIM)user@example.com / User1234!$(C_RESET)"
 
 api-sf-reset:
 	cd apps/api-sf && rm -f var/data_dev.db
-	cd apps/api-sf && php bin/console doctrine:schema:create
+	cd apps/api-sf && php bin/console doctrine:migrations:migrate --no-interaction
 	cd apps/api-sf && php bin/console doctrine:fixtures:load --no-interaction
 	@echo ""
-	@echo "Test accounts:"
-	@echo "  - admin@example.com / Admin1234! (ADMIN)"
-	@echo "  - test@test.com / Test1234! (USER)"
-	@echo "  - refresh-test@example.com / Refresh1234! (USER)"
-
-api-sf-user:
-	@echo "Use 'make api-sf-reset' to recreate the database with test users"
-	@echo "Test accounts:"
-	@echo "  - admin@example.com / Admin1234! (ADMIN)"
-	@echo "  - test@test.com / Test1234!"
-
-# Hono API (port 8003) - Test users: admin@example.com / Admin1234!
-api-hono:
-	cd apps/api-hono && bun run dev
+	@echo "  $(C_GREEN)✓$(C_RESET) Symfony DB reset"
+	@echo "  $(C_DIM)admin@example.com / Admin1234!$(C_RESET)"
+	@echo "  $(C_DIM)user@example.com / User1234!$(C_RESET)"
 
 api-hono-reset:
 	cd apps/api-hono && rm -f data.db
 	cd apps/api-hono && bun run db:push
 	cd apps/api-hono && bun run db:seed
 	@echo ""
-	@echo "Test accounts:"
-	@echo "  - admin@example.com / Admin1234! (admin)"
-	@echo "  - test@test.com / Test1234! (user)"
-	@echo "  - refresh-test@example.com / Refresh1234! (user)"
+	@echo "  $(C_GREEN)✓$(C_RESET) Hono DB reset"
+	@echo "  $(C_DIM)admin@example.com / Admin1234!$(C_RESET)"
+	@echo "  $(C_DIM)user@example.com / User1234!$(C_RESET)"
+
+# ============================================================================
+# CLI — create-headless-app
+# ============================================================================
+
+cli-build:
+	@echo "  $(C_CYAN)►$(C_RESET) Building CLI..."
+	@cd $(CLI_DIR) && bun run build
+	@echo "  $(C_GREEN)✓$(C_RESET) CLI built"
+
+cli-test:
+	@echo "  $(C_CYAN)►$(C_RESET) Running CLI tests..."
+	@cd $(CLI_DIR) && bun test
+	@echo "  $(C_GREEN)✓$(C_RESET) CLI tests passed"
+
+cli-try: cli-build
+	@echo ""
+	@echo "  $(C_BOLD)$(C_MAGENTA)Testing create-headless-app interactively$(C_RESET)"
+	@echo "  $(C_DIM)Output: $(TMP_DIR)/$(C_RESET)"
+	@echo ""
+	@mkdir -p $(TMP_DIR)
+	@cd $(TMP_DIR) && bun $(CURDIR)/$(CLI_DIR)/src/index.ts
+
+cli-try-admin: cli-build
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=admin FRONTEND=nextjs BACKEND=laravel NAME=my-admin
+
+cli-try-landing: cli-build
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=landing FRONTEND=nextjs BACKEND=laravel NAME=my-landing
+
+cli-try-saas: cli-build
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=saas FRONTEND=nextjs BACKEND=laravel NAME=my-saas
+
+cli-try-ecommerce: cli-build
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=ecommerce FRONTEND=tanstack BACKEND=hono NAME=my-shop
+
+cli-try-none: cli-build
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=none FRONTEND=nextjs BACKEND=hono NAME=my-bare
+
+cli-try-all: cli-build
+	@echo ""
+	@echo "  $(C_BOLD)$(C_MAGENTA)Running ALL preset tests$(C_RESET)"
+	@echo ""
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=admin      FRONTEND=nextjs   BACKEND=laravel NAME=test-admin-nj
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=admin      FRONTEND=tanstack BACKEND=laravel NAME=test-admin-ts
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=landing    FRONTEND=nextjs   BACKEND=laravel NAME=test-landing-nj
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=landing    FRONTEND=tanstack BACKEND=hono    NAME=test-landing-ts
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=saas       FRONTEND=nextjs   BACKEND=laravel NAME=test-saas-nj
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=saas       FRONTEND=tanstack BACKEND=symfony NAME=test-saas-ts
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=ecommerce  FRONTEND=nextjs   BACKEND=laravel NAME=test-ecom-nj
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=ecommerce  FRONTEND=tanstack BACKEND=hono    NAME=test-ecom-ts
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=none       FRONTEND=nextjs   BACKEND=hono    NAME=test-none-nj
+	@$(MAKE) --no-print-directory _cli-scaffold PRESET=none       FRONTEND=tanstack BACKEND=hono    NAME=test-none-ts
+	@echo "  $(C_GREEN)$(C_BOLD)✓ All 10 preset combinations passed$(C_RESET)"
+	@echo ""
+
+cli-clean:
+	@echo "  $(C_YELLOW)►$(C_RESET) Cleaning $(TMP_DIR)..."
+	@rm -rf $(TMP_DIR)
+	@echo "  $(C_GREEN)✓$(C_RESET) Test output cleaned"
+
+# ============================================================================
+# Internal
+# ============================================================================
+
+_cli-scaffold:
+	@echo "  $(C_BLUE)┌$(C_RESET) $(C_BOLD)$(PRESET)$(C_RESET) + $(FRONTEND) + $(BACKEND) $(C_DIM)→ $(NAME)$(C_RESET)"
+	@rm -rf $(TMP_DIR)/$(NAME)
+	@mkdir -p $(TMP_DIR)
+	@cd $(TMP_DIR) && node -e " \
+		const { scaffold } = await import('$(CURDIR)/$(CLI_DIR)/dist/scaffold.js'); \
+		await scaffold({ \
+			projectName: '$(NAME)', \
+			backend: '$(BACKEND)', \
+			frontend: '$(FRONTEND)', \
+			features: ['rbac'], \
+			database: 'sqlite', \
+			preset: '$(PRESET)', \
+		}); \
+	"
+	@$(MAKE) --no-print-directory _cli-verify DIR=$(TMP_DIR)/$(NAME) PRESET=$(PRESET)
+
+_cli-verify:
+	@_ok=true; \
+	if [ ! -f $(DIR)/apps/web/package.json ]; then \
+		echo "  $(C_RED)│$(C_RESET)  $(C_RED)✗$(C_RESET) apps/web/package.json missing"; _ok=false; \
+	fi; \
+	if [ ! -d $(DIR)/apps/api ]; then \
+		echo "  $(C_RED)│$(C_RESET)  $(C_RED)✗$(C_RESET) apps/api missing"; _ok=false; \
+	fi; \
+	if grep -rq 'workspace:' $(DIR)/apps/web/package.json 2>/dev/null; then \
+		echo "  $(C_RED)│$(C_RESET)  $(C_RED)✗$(C_RESET) Found workspace:* refs"; _ok=false; \
+	fi; \
+	if grep -rq '@headless/' $(DIR)/apps/web/src/ 2>/dev/null; then \
+		echo "  $(C_RED)│$(C_RESET)  $(C_RED)✗$(C_RESET) Found @headless/* imports"; _ok=false; \
+	fi; \
+	if grep -rqE '\{\{[A-Z_]+\}\}' $(DIR)/apps/web/src/ 2>/dev/null; then \
+		echo "  $(C_RED)│$(C_RESET)  $(C_RED)✗$(C_RESET) Found unreplaced {{VARS}}"; _ok=false; \
+	fi; \
+	if [ "$(PRESET)" != "none" ]; then \
+		if [ ! -f $(DIR)/apps/web/src/components/ui/button.tsx ]; then \
+			echo "  $(C_RED)│$(C_RESET)  $(C_RED)✗$(C_RESET) button.tsx missing"; _ok=false; \
+		fi; \
+		if [ ! -f $(DIR)/apps/web/components.json ]; then \
+			echo "  $(C_RED)│$(C_RESET)  $(C_RED)✗$(C_RESET) components.json missing"; _ok=false; \
+		fi; \
+	fi; \
+	if $$_ok; then \
+		echo "  $(C_GREEN)└$(C_RESET)  $(C_GREEN)✓ passed$(C_RESET)"; \
+	else \
+		echo "  $(C_RED)└$(C_RESET)  $(C_RED)✗ FAILED$(C_RESET)"; exit 1; \
+	fi

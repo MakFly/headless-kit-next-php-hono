@@ -83,3 +83,30 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Auth split-screen branding panel */
+.auth-panel-bg {
+  background-color: oklch(0.1 0 0);
+  background-image: radial-gradient(circle, oklch(1 0 0 / 4%) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.dark .auth-panel-bg {
+  background-color: oklch(0.08 0 0);
+  background-image: radial-gradient(circle, oklch(1 0 0 / 6%) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.auth-glow {
+  background: radial-gradient(ellipse at 80% 80%, oklch(0.55 0.2 285 / 12%), transparent 60%);
+}
+.dark .auth-glow {
+  background: radial-gradient(ellipse at 80% 80%, oklch(0.55 0.2 285 / 8%), transparent 60%);
+}

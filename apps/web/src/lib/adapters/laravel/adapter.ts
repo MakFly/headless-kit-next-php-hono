@@ -43,7 +43,7 @@ const ENDPOINTS = {
 export class LaravelAdapter extends BaseAdapter {
   constructor(config: Partial<AdapterConfig> = {}) {
     const fullConfig: AdapterConfig = {
-      baseUrl: process.env.LARAVEL_API_URL || "http://localhost:8000",
+      baseUrl: process.env.LARAVEL_API_URL || "http://localhost:8002",
       timeout: 30000,
       ...config,
     };

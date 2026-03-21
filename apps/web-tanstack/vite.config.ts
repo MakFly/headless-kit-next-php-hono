@@ -14,9 +14,9 @@ const config = defineConfig({
   nitro: {
     runtimeConfig: {
       AUTH_BACKEND: process.env.AUTH_BACKEND || 'laravel',
-      LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8000',
-      SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8002',
-      NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:8003',
+      LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8002',
+      SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8001',
+      NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:3333',
     },
   },
   plugins: [
@@ -38,7 +38,7 @@ const config = defineConfig({
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.mdx', '.mjs'],
   },
   server: {
-    port: 54321,
+    port: 3301,
     strictPort: false,
     // proxy: {
     //   '/api': {

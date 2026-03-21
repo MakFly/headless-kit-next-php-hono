@@ -1,7 +1,7 @@
 export type AuthBackend = 'laravel' | 'symfony' | 'node'
 
 export const env = {
-  VITE_APP_URL: import.meta.env.VITE_APP_URL || 'http://localhost:3003',
+  VITE_APP_URL: import.meta.env.VITE_APP_URL || 'http://localhost:3301',
 
   NODE_ENV: process.env.NODE_ENV || 'development',
 
@@ -20,12 +20,12 @@ export const env = {
 
   AUTH_BACKEND: (process.env.AUTH_BACKEND || 'laravel') as AuthBackend,
 
-  LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8000',
+  LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8002',
 
-  SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8002',
+  SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8001',
   SYMFONY_AUTH_PREFIX: process.env.SYMFONY_AUTH_PREFIX || '/api/v1/auth',
 
-  NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:8003',
+  NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:3333',
   NODE_AUTH_PREFIX: process.env.NODE_AUTH_PREFIX || '/api/v1/auth',
 
   // AI

@@ -22,5 +22,10 @@ export {
   getOAuthProvidersAction,
   getOAuthUrlAction,
   sendMagicLinkAction,
+  forgotPasswordAction,
+  verifyResetTokenAction,
+  resetPasswordAction,
+  updateProfileAction,
+  deleteAccountAction,
   AuthActionError,
 } from './actions';

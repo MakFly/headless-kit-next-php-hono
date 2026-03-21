@@ -156,7 +156,7 @@ All API exceptions (`api/*`) are caught and returned via `ApiResponse::error()`:
 ## Commands
 
 ```bash
-php artisan serve --port=8000         # Dev server
+php artisan serve --port=8002         # Dev server
 php artisan test                      # Run all tests
 php artisan test tests/Feature/ShopTest.php  # Specific test file
 php artisan test --filter=test_name   # Single test

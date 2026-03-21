@@ -69,6 +69,8 @@ export type AuthAdapter = {
   storeTokens: (tokens: TokenStorage) => Promise<void>
   clearTokens: () => Promise<void>
   getAccessToken: () => Promise<string | null>
+  updateProfile: (data: { name?: string; email?: string }) => Promise<NormalizedUser>
+  deleteAccount: () => Promise<void>
 }
 
 export function toUser(normalized: NormalizedUser): User {

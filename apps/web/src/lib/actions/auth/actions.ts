@@ -9,6 +9,7 @@ import { cookies } from 'next/headers';
 import { getAuthAdapter, toUser, AdapterError } from '../../adapters';
 import { createLogger } from '@/lib/logger';
 import { AuthActionError, throwAuthError } from '../_shared/errors';
+import { bffPost, bffPatch, bffDelete } from '../_shared/bff-client';
 import { AUTH_BACKEND_COOKIE, resolveBackend } from '@/lib/auth/backend-context';
 
 const log = createLogger('auth');
@@ -172,6 +173,80 @@ export async function sendMagicLinkAction(email: string): Promise<ApiResponse<{ 
         message: 'Magic link sent successfully',
       },
     };
+  } catch (error) {
+    throwAuthError(error);
+  }
+}
+
+export async function forgotPasswordAction(
+  email: string
+): Promise<ApiResponse<{ message: string }>> {
+  try {
+    const response = await bffPost<{ message: string }>(
+      '/api/v1/auth/password/forgot',
+      { email },
+      { skipAuth: true }
+    );
+    return {
+      data: response || { message: 'If an account exists with that email, you will receive a reset link.' },
+    };
+  } catch (error) {
+    throwAuthError(error);
+  }
+}
+
+export async function verifyResetTokenAction(
+  token: string
+): Promise<ApiResponse<{ valid: boolean; email?: string }>> {
+  try {
+    const response = await bffPost<{ valid: boolean; email?: string }>(
+      '/api/v1/auth/password/verify-token',
+      { token },
+      { skipAuth: true }
+    );
+    return { data: response };
+  } catch (error) {
+    if (error instanceof AuthActionError && (error.statusCode === 400 || error.statusCode === 422)) {
+      return { data: { valid: false } };
+    }
+    throwAuthError(error);
+  }
+}
+
+export async function resetPasswordAction(
+  token: string,
+  newPassword: string
+): Promise<ApiResponse<{ message: string }>> {
+  try {
+    const response = await bffPost<{ message: string }>(
+      '/api/v1/auth/password/reset',
+      { token, newPassword },
+      { skipAuth: true }
+    );
+    return { data: response || { message: 'Password reset successfully' } };
+  } catch (error) {
+    throwAuthError(error);
+  }
+}
+
+export async function updateProfileAction(
+  data: { name?: string; email?: string }
+): Promise<ApiResponse<{ user: User }>> {
+  try {
+    const response = await bffPatch<{ data?: unknown } & Record<string, unknown>>(
+      '/api/v1/auth/me',
+      data
+    );
+    const userData = (response as { data?: unknown }).data || response;
+    return { data: { user: userData as User } };
+  } catch (error) {
+    throwAuthError(error);
+  }
+}
+
+export async function deleteAccountAction(): Promise<void> {
+  try {
+    await bffDelete('/api/v1/auth/me');
   } catch (error) {
     throwAuthError(error);
   }

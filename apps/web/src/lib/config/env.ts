@@ -27,7 +27,7 @@ export const env = {
   // =========================================================================
 
   /** Public app URL (used for BFF requests) */
-  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3300',
 
   /** Node environment */
   NODE_ENV: process.env.NODE_ENV || 'development',
@@ -67,14 +67,14 @@ export const env = {
   // =========================================================================
 
   /** Laravel API base URL */
-  LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8000',
+  LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8002',
 
   // =========================================================================
   // Symfony API Configuration
   // =========================================================================
 
   /** Symfony API base URL */
-  SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8002',
+  SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8001',
 
   /** Symfony auth endpoint prefix */
   SYMFONY_AUTH_PREFIX: process.env.SYMFONY_AUTH_PREFIX || '/api/v1/auth',
@@ -84,7 +84,7 @@ export const env = {
   // =========================================================================
 
   /** Node.js API base URL */
-  NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:8003',
+  NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:3333',
 
   /** Node.js auth endpoint prefix */
   NODE_AUTH_PREFIX: process.env.NODE_AUTH_PREFIX || '/api/v1/auth',

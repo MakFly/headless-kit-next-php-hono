@@ -34,15 +34,6 @@ export default async function UsersPage() {
     error = e instanceof Error ? e.message : 'Failed to load data';
   }
 
-  // DEBUG
-  console.log('[USERS PAGE]', {
-    userRoles: user.roles,
-    isAdmin: isAdmin(user),
-    usersCount: users?.length || 0,
-    rolesCount: roles?.length || 0,
-    error,
-  });
-
   return (
     <>
       <SiteHeaderServer

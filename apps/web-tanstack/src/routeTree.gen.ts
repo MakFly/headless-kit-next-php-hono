@@ -19,6 +19,7 @@ import { Route as SupportIndexRouteImport } from './routes/support/index'
 import { Route as ShopIndexRouteImport } from './routes/shop/index'
 import { Route as SaasIndexRouteImport } from './routes/saas/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as SupportCRouteImport } from './routes/support/c'
 import { Route as SupportAgentRouteImport } from './routes/support/agent'
 import { Route as SupportTicketIdRouteImport } from './routes/support/$ticketId'
 import { Route as ShopOrdersRouteImport } from './routes/shop/orders'
@@ -29,22 +30,43 @@ import { Route as ShopSlugRouteImport } from './routes/shop/$slug'
 import { Route as SaasUsageRouteImport } from './routes/saas/usage'
 import { Route as SaasTeamRouteImport } from './routes/saas/team'
 import { Route as SaasSettingsRouteImport } from './routes/saas/settings'
+import { Route as SaasOnboardingRouteImport } from './routes/saas/onboarding'
 import { Route as SaasBillingRouteImport } from './routes/saas/billing'
+import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
+import { Route as DashboardTodosRouteImport } from './routes/dashboard/todos'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardRolesRouteImport } from './routes/dashboard/roles'
+import { Route as DashboardPostsRouteImport } from './routes/dashboard/posts'
+import { Route as DashboardPermissionsRouteImport } from './routes/dashboard/permissions'
 import { Route as DashboardHelpRouteImport } from './routes/dashboard/help'
+import { Route as DashboardApiKeysRouteImport } from './routes/dashboard/api-keys'
+import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as SupportAgentIndexRouteImport } from './routes/support/agent/index'
 import { Route as ShopAdminIndexRouteImport } from './routes/shop/admin/index'
+import { Route as SupportCIdRouteImport } from './routes/support/c/$id'
+import { Route as SupportAuthResetPasswordRouteImport } from './routes/support/auth/reset-password'
+import { Route as SupportAuthForgotPasswordRouteImport } from './routes/support/auth/forgot-password'
 import { Route as SupportAgentRatingsRouteImport } from './routes/support/agent/ratings'
 import { Route as SupportAgentCannedRouteImport } from './routes/support/agent/canned'
 import { Route as ShopOrdersIdRouteImport } from './routes/shop/orders/$id'
 import { Route as ShopCategoriesCategoryRouteImport } from './routes/shop/categories/$category'
+import { Route as ShopAuthResetPasswordRouteImport } from './routes/shop/auth/reset-password'
+import { Route as ShopAuthForgotPasswordRouteImport } from './routes/shop/auth/forgot-password'
+import { Route as ShopAdminReviewsRouteImport } from './routes/shop/admin/reviews'
 import { Route as ShopAdminProductsRouteImport } from './routes/shop/admin/products'
 import { Route as ShopAdminOrdersRouteImport } from './routes/shop/admin/orders'
+import { Route as ShopAdminInventoryRouteImport } from './routes/shop/admin/inventory'
+import { Route as ShopAdminCustomersRouteImport } from './routes/shop/admin/customers'
+import { Route as ShopAdminCategoriesRouteImport } from './routes/shop/admin/categories'
+import { Route as ShopAdminAnalyticsRouteImport } from './routes/shop/admin/analytics'
+import { Route as SaasAuthResetPasswordRouteImport } from './routes/saas/auth/reset-password'
+import { Route as SaasAuthForgotPasswordRouteImport } from './routes/saas/auth/forgot-password'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
+import { Route as ApiAiChatRouteImport } from './routes/api/ai/chat'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -94,6 +116,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const SupportCRoute = SupportCRouteImport.update({
+  id: '/c',
+  path: '/c',
+  getParentRoute: () => SupportRoute,
 } as any)
 const SupportAgentRoute = SupportAgentRouteImport.update({
   id: '/agent',
@@ -145,14 +172,29 @@ const SaasSettingsRoute = SaasSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => SaasRoute,
 } as any)
+const SaasOnboardingRoute = SaasOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => SaasRoute,
+} as any)
 const SaasBillingRoute = SaasBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
   getParentRoute: () => SaasRoute,
 } as any)
+const OauthCallbackRoute = OauthCallbackRouteImport.update({
+  id: '/oauth/callback',
+  path: '/oauth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardUsersRoute = DashboardUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTodosRoute = DashboardTodosRouteImport.update({
+  id: '/todos',
+  path: '/todos',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
@@ -165,10 +207,30 @@ const DashboardRolesRoute = DashboardRolesRouteImport.update({
   path: '/roles',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPostsRoute = DashboardPostsRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPermissionsRoute = DashboardPermissionsRouteImport.update({
+  id: '/permissions',
+  path: '/permissions',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardHelpRoute = DashboardHelpRouteImport.update({
   id: '/help',
   path: '/help',
   getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardApiKeysRoute = DashboardApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
   id: '/register',
@@ -178,6 +240,11 @@ const AuthRegisterRoute = AuthRegisterRouteImport.update({
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
 const SupportAgentIndexRoute = SupportAgentIndexRouteImport.update({
@@ -190,6 +257,23 @@ const ShopAdminIndexRoute = ShopAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ShopAdminRoute,
 } as any)
+const SupportCIdRoute = SupportCIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => SupportCRoute,
+} as any)
+const SupportAuthResetPasswordRoute =
+  SupportAuthResetPasswordRouteImport.update({
+    id: '/auth/reset-password',
+    path: '/auth/reset-password',
+    getParentRoute: () => SupportRoute,
+  } as any)
+const SupportAuthForgotPasswordRoute =
+  SupportAuthForgotPasswordRouteImport.update({
+    id: '/auth/forgot-password',
+    path: '/auth/forgot-password',
+    getParentRoute: () => SupportRoute,
+  } as any)
 const SupportAgentRatingsRoute = SupportAgentRatingsRouteImport.update({
   id: '/ratings',
   path: '/ratings',
@@ -210,6 +294,21 @@ const ShopCategoriesCategoryRoute = ShopCategoriesCategoryRouteImport.update({
   path: '/categories/$category',
   getParentRoute: () => ShopRoute,
 } as any)
+const ShopAuthResetPasswordRoute = ShopAuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopAuthForgotPasswordRoute = ShopAuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopAdminReviewsRoute = ShopAdminReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => ShopAdminRoute,
+} as any)
 const ShopAdminProductsRoute = ShopAdminProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -220,9 +319,44 @@ const ShopAdminOrdersRoute = ShopAdminOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => ShopAdminRoute,
 } as any)
+const ShopAdminInventoryRoute = ShopAdminInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => ShopAdminRoute,
+} as any)
+const ShopAdminCustomersRoute = ShopAdminCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => ShopAdminRoute,
+} as any)
+const ShopAdminCategoriesRoute = ShopAdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => ShopAdminRoute,
+} as any)
+const ShopAdminAnalyticsRoute = ShopAdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => ShopAdminRoute,
+} as any)
+const SaasAuthResetPasswordRoute = SaasAuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => SaasRoute,
+} as any)
+const SaasAuthForgotPasswordRoute = SaasAuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => SaasRoute,
+} as any)
 const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
   id: '/api/v1/$',
   path: '/api/v1/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiChatRoute = ApiAiChatRouteImport.update({
+  id: '/api/ai/chat',
+  path: '/api/ai/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -232,13 +366,21 @@ export interface FileRoutesByFullPath {
   '/saas': typeof SaasRouteWithChildren
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRouteWithChildren
+  '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
+  '/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/api-keys': typeof DashboardApiKeysRoute
   '/dashboard/help': typeof DashboardHelpRoute
+  '/dashboard/permissions': typeof DashboardPermissionsRoute
+  '/dashboard/posts': typeof DashboardPostsRoute
   '/dashboard/roles': typeof DashboardRolesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/todos': typeof DashboardTodosRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/saas/billing': typeof SaasBillingRoute
+  '/saas/onboarding': typeof SaasOnboardingRoute
   '/saas/settings': typeof SaasSettingsRoute
   '/saas/team': typeof SaasTeamRoute
   '/saas/usage': typeof SaasUsageRoute
@@ -249,29 +391,51 @@ export interface FileRoutesByFullPath {
   '/shop/orders': typeof ShopOrdersRouteWithChildren
   '/support/$ticketId': typeof SupportTicketIdRoute
   '/support/agent': typeof SupportAgentRouteWithChildren
+  '/support/c': typeof SupportCRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/saas/': typeof SaasIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/support/': typeof SupportIndexRoute
+  '/api/ai/chat': typeof ApiAiChatRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/saas/auth/forgot-password': typeof SaasAuthForgotPasswordRoute
+  '/saas/auth/reset-password': typeof SaasAuthResetPasswordRoute
+  '/shop/admin/analytics': typeof ShopAdminAnalyticsRoute
+  '/shop/admin/categories': typeof ShopAdminCategoriesRoute
+  '/shop/admin/customers': typeof ShopAdminCustomersRoute
+  '/shop/admin/inventory': typeof ShopAdminInventoryRoute
   '/shop/admin/orders': typeof ShopAdminOrdersRoute
   '/shop/admin/products': typeof ShopAdminProductsRoute
+  '/shop/admin/reviews': typeof ShopAdminReviewsRoute
+  '/shop/auth/forgot-password': typeof ShopAuthForgotPasswordRoute
+  '/shop/auth/reset-password': typeof ShopAuthResetPasswordRoute
   '/shop/categories/$category': typeof ShopCategoriesCategoryRoute
   '/shop/orders/$id': typeof ShopOrdersIdRoute
   '/support/agent/canned': typeof SupportAgentCannedRoute
   '/support/agent/ratings': typeof SupportAgentRatingsRoute
+  '/support/auth/forgot-password': typeof SupportAuthForgotPasswordRoute
+  '/support/auth/reset-password': typeof SupportAuthResetPasswordRoute
+  '/support/c/$id': typeof SupportCIdRoute
   '/shop/admin/': typeof ShopAdminIndexRoute
   '/support/agent/': typeof SupportAgentIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
+  '/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/api-keys': typeof DashboardApiKeysRoute
   '/dashboard/help': typeof DashboardHelpRoute
+  '/dashboard/permissions': typeof DashboardPermissionsRoute
+  '/dashboard/posts': typeof DashboardPostsRoute
   '/dashboard/roles': typeof DashboardRolesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/todos': typeof DashboardTodosRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/saas/billing': typeof SaasBillingRoute
+  '/saas/onboarding': typeof SaasOnboardingRoute
   '/saas/settings': typeof SaasSettingsRoute
   '/saas/team': typeof SaasTeamRoute
   '/saas/usage': typeof SaasUsageRoute
@@ -280,17 +444,31 @@ export interface FileRoutesByTo {
   '/shop/checkout': typeof ShopCheckoutRoute
   '/shop/orders': typeof ShopOrdersRouteWithChildren
   '/support/$ticketId': typeof SupportTicketIdRoute
+  '/support/c': typeof SupportCRouteWithChildren
   '/dashboard': typeof DashboardIndexRoute
   '/saas': typeof SaasIndexRoute
   '/shop': typeof ShopIndexRoute
   '/support': typeof SupportIndexRoute
+  '/api/ai/chat': typeof ApiAiChatRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/saas/auth/forgot-password': typeof SaasAuthForgotPasswordRoute
+  '/saas/auth/reset-password': typeof SaasAuthResetPasswordRoute
+  '/shop/admin/analytics': typeof ShopAdminAnalyticsRoute
+  '/shop/admin/categories': typeof ShopAdminCategoriesRoute
+  '/shop/admin/customers': typeof ShopAdminCustomersRoute
+  '/shop/admin/inventory': typeof ShopAdminInventoryRoute
   '/shop/admin/orders': typeof ShopAdminOrdersRoute
   '/shop/admin/products': typeof ShopAdminProductsRoute
+  '/shop/admin/reviews': typeof ShopAdminReviewsRoute
+  '/shop/auth/forgot-password': typeof ShopAuthForgotPasswordRoute
+  '/shop/auth/reset-password': typeof ShopAuthResetPasswordRoute
   '/shop/categories/$category': typeof ShopCategoriesCategoryRoute
   '/shop/orders/$id': typeof ShopOrdersIdRoute
   '/support/agent/canned': typeof SupportAgentCannedRoute
   '/support/agent/ratings': typeof SupportAgentRatingsRoute
+  '/support/auth/forgot-password': typeof SupportAuthForgotPasswordRoute
+  '/support/auth/reset-password': typeof SupportAuthResetPasswordRoute
+  '/support/c/$id': typeof SupportCIdRoute
   '/shop/admin': typeof ShopAdminIndexRoute
   '/support/agent': typeof SupportAgentIndexRoute
 }
@@ -302,13 +480,21 @@ export interface FileRoutesById {
   '/saas': typeof SaasRouteWithChildren
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRouteWithChildren
+  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
+  '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/api-keys': typeof DashboardApiKeysRoute
   '/dashboard/help': typeof DashboardHelpRoute
+  '/dashboard/permissions': typeof DashboardPermissionsRoute
+  '/dashboard/posts': typeof DashboardPostsRoute
   '/dashboard/roles': typeof DashboardRolesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/todos': typeof DashboardTodosRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/saas/billing': typeof SaasBillingRoute
+  '/saas/onboarding': typeof SaasOnboardingRoute
   '/saas/settings': typeof SaasSettingsRoute
   '/saas/team': typeof SaasTeamRoute
   '/saas/usage': typeof SaasUsageRoute
@@ -319,17 +505,31 @@ export interface FileRoutesById {
   '/shop/orders': typeof ShopOrdersRouteWithChildren
   '/support/$ticketId': typeof SupportTicketIdRoute
   '/support/agent': typeof SupportAgentRouteWithChildren
+  '/support/c': typeof SupportCRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/saas/': typeof SaasIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/support/': typeof SupportIndexRoute
+  '/api/ai/chat': typeof ApiAiChatRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/saas/auth/forgot-password': typeof SaasAuthForgotPasswordRoute
+  '/saas/auth/reset-password': typeof SaasAuthResetPasswordRoute
+  '/shop/admin/analytics': typeof ShopAdminAnalyticsRoute
+  '/shop/admin/categories': typeof ShopAdminCategoriesRoute
+  '/shop/admin/customers': typeof ShopAdminCustomersRoute
+  '/shop/admin/inventory': typeof ShopAdminInventoryRoute
   '/shop/admin/orders': typeof ShopAdminOrdersRoute
   '/shop/admin/products': typeof ShopAdminProductsRoute
+  '/shop/admin/reviews': typeof ShopAdminReviewsRoute
+  '/shop/auth/forgot-password': typeof ShopAuthForgotPasswordRoute
+  '/shop/auth/reset-password': typeof ShopAuthResetPasswordRoute
   '/shop/categories/$category': typeof ShopCategoriesCategoryRoute
   '/shop/orders/$id': typeof ShopOrdersIdRoute
   '/support/agent/canned': typeof SupportAgentCannedRoute
   '/support/agent/ratings': typeof SupportAgentRatingsRoute
+  '/support/auth/forgot-password': typeof SupportAuthForgotPasswordRoute
+  '/support/auth/reset-password': typeof SupportAuthResetPasswordRoute
+  '/support/c/$id': typeof SupportCIdRoute
   '/shop/admin/': typeof ShopAdminIndexRoute
   '/support/agent/': typeof SupportAgentIndexRoute
 }
@@ -341,13 +541,21 @@ export interface FileRouteTypes {
     | '/saas'
     | '/shop'
     | '/support'
+    | '/forgot-password'
     | '/login'
     | '/register'
+    | '/reset-password'
+    | '/dashboard/api-keys'
     | '/dashboard/help'
+    | '/dashboard/permissions'
+    | '/dashboard/posts'
     | '/dashboard/roles'
     | '/dashboard/settings'
+    | '/dashboard/todos'
     | '/dashboard/users'
+    | '/oauth/callback'
     | '/saas/billing'
+    | '/saas/onboarding'
     | '/saas/settings'
     | '/saas/team'
     | '/saas/usage'
@@ -358,29 +566,51 @@ export interface FileRouteTypes {
     | '/shop/orders'
     | '/support/$ticketId'
     | '/support/agent'
+    | '/support/c'
     | '/dashboard/'
     | '/saas/'
     | '/shop/'
     | '/support/'
+    | '/api/ai/chat'
     | '/api/v1/$'
+    | '/saas/auth/forgot-password'
+    | '/saas/auth/reset-password'
+    | '/shop/admin/analytics'
+    | '/shop/admin/categories'
+    | '/shop/admin/customers'
+    | '/shop/admin/inventory'
     | '/shop/admin/orders'
     | '/shop/admin/products'
+    | '/shop/admin/reviews'
+    | '/shop/auth/forgot-password'
+    | '/shop/auth/reset-password'
     | '/shop/categories/$category'
     | '/shop/orders/$id'
     | '/support/agent/canned'
     | '/support/agent/ratings'
+    | '/support/auth/forgot-password'
+    | '/support/auth/reset-password'
+    | '/support/c/$id'
     | '/shop/admin/'
     | '/support/agent/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
     | '/login'
     | '/register'
+    | '/reset-password'
+    | '/dashboard/api-keys'
     | '/dashboard/help'
+    | '/dashboard/permissions'
+    | '/dashboard/posts'
     | '/dashboard/roles'
     | '/dashboard/settings'
+    | '/dashboard/todos'
     | '/dashboard/users'
+    | '/oauth/callback'
     | '/saas/billing'
+    | '/saas/onboarding'
     | '/saas/settings'
     | '/saas/team'
     | '/saas/usage'
@@ -389,17 +619,31 @@ export interface FileRouteTypes {
     | '/shop/checkout'
     | '/shop/orders'
     | '/support/$ticketId'
+    | '/support/c'
     | '/dashboard'
     | '/saas'
     | '/shop'
     | '/support'
+    | '/api/ai/chat'
     | '/api/v1/$'
+    | '/saas/auth/forgot-password'
+    | '/saas/auth/reset-password'
+    | '/shop/admin/analytics'
+    | '/shop/admin/categories'
+    | '/shop/admin/customers'
+    | '/shop/admin/inventory'
     | '/shop/admin/orders'
     | '/shop/admin/products'
+    | '/shop/admin/reviews'
+    | '/shop/auth/forgot-password'
+    | '/shop/auth/reset-password'
     | '/shop/categories/$category'
     | '/shop/orders/$id'
     | '/support/agent/canned'
     | '/support/agent/ratings'
+    | '/support/auth/forgot-password'
+    | '/support/auth/reset-password'
+    | '/support/c/$id'
     | '/shop/admin'
     | '/support/agent'
   id:
@@ -410,13 +654,21 @@ export interface FileRouteTypes {
     | '/saas'
     | '/shop'
     | '/support'
+    | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/register'
+    | '/_auth/reset-password'
+    | '/dashboard/api-keys'
     | '/dashboard/help'
+    | '/dashboard/permissions'
+    | '/dashboard/posts'
     | '/dashboard/roles'
     | '/dashboard/settings'
+    | '/dashboard/todos'
     | '/dashboard/users'
+    | '/oauth/callback'
     | '/saas/billing'
+    | '/saas/onboarding'
     | '/saas/settings'
     | '/saas/team'
     | '/saas/usage'
@@ -427,17 +679,31 @@ export interface FileRouteTypes {
     | '/shop/orders'
     | '/support/$ticketId'
     | '/support/agent'
+    | '/support/c'
     | '/dashboard/'
     | '/saas/'
     | '/shop/'
     | '/support/'
+    | '/api/ai/chat'
     | '/api/v1/$'
+    | '/saas/auth/forgot-password'
+    | '/saas/auth/reset-password'
+    | '/shop/admin/analytics'
+    | '/shop/admin/categories'
+    | '/shop/admin/customers'
+    | '/shop/admin/inventory'
     | '/shop/admin/orders'
     | '/shop/admin/products'
+    | '/shop/admin/reviews'
+    | '/shop/auth/forgot-password'
+    | '/shop/auth/reset-password'
     | '/shop/categories/$category'
     | '/shop/orders/$id'
     | '/support/agent/canned'
     | '/support/agent/ratings'
+    | '/support/auth/forgot-password'
+    | '/support/auth/reset-password'
+    | '/support/c/$id'
     | '/shop/admin/'
     | '/support/agent/'
   fileRoutesById: FileRoutesById
@@ -449,6 +715,8 @@ export interface RootRouteChildren {
   SaasRoute: typeof SaasRouteWithChildren
   ShopRoute: typeof ShopRouteWithChildren
   SupportRoute: typeof SupportRouteWithChildren
+  OauthCallbackRoute: typeof OauthCallbackRoute
+  ApiAiChatRoute: typeof ApiAiChatRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
 }
 
@@ -524,6 +792,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/support/c': {
+      id: '/support/c'
+      path: '/c'
+      fullPath: '/support/c'
+      preLoaderRoute: typeof SupportCRouteImport
+      parentRoute: typeof SupportRoute
+    }
     '/support/agent': {
       id: '/support/agent'
       path: '/agent'
@@ -594,6 +869,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SaasSettingsRouteImport
       parentRoute: typeof SaasRoute
     }
+    '/saas/onboarding': {
+      id: '/saas/onboarding'
+      path: '/onboarding'
+      fullPath: '/saas/onboarding'
+      preLoaderRoute: typeof SaasOnboardingRouteImport
+      parentRoute: typeof SaasRoute
+    }
     '/saas/billing': {
       id: '/saas/billing'
       path: '/billing'
@@ -601,11 +883,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SaasBillingRouteImport
       parentRoute: typeof SaasRoute
     }
+    '/oauth/callback': {
+      id: '/oauth/callback'
+      path: '/oauth/callback'
+      fullPath: '/oauth/callback'
+      preLoaderRoute: typeof OauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/users': {
       id: '/dashboard/users'
       path: '/users'
       fullPath: '/dashboard/users'
       preLoaderRoute: typeof DashboardUsersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/todos': {
+      id: '/dashboard/todos'
+      path: '/todos'
+      fullPath: '/dashboard/todos'
+      preLoaderRoute: typeof DashboardTodosRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/settings': {
@@ -622,12 +918,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRolesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/posts': {
+      id: '/dashboard/posts'
+      path: '/posts'
+      fullPath: '/dashboard/posts'
+      preLoaderRoute: typeof DashboardPostsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/permissions': {
+      id: '/dashboard/permissions'
+      path: '/permissions'
+      fullPath: '/dashboard/permissions'
+      preLoaderRoute: typeof DashboardPermissionsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/help': {
       id: '/dashboard/help'
       path: '/help'
       fullPath: '/dashboard/help'
       preLoaderRoute: typeof DashboardHelpRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/api-keys': {
+      id: '/dashboard/api-keys'
+      path: '/api-keys'
+      fullPath: '/dashboard/api-keys'
+      preLoaderRoute: typeof DashboardApiKeysRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_auth/reset-password': {
+      id: '/_auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_auth/register': {
       id: '/_auth/register'
@@ -643,6 +967,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/forgot-password': {
+      id: '/_auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/support/agent/': {
       id: '/support/agent/'
       path: '/'
@@ -656,6 +987,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/shop/admin/'
       preLoaderRoute: typeof ShopAdminIndexRouteImport
       parentRoute: typeof ShopAdminRoute
+    }
+    '/support/c/$id': {
+      id: '/support/c/$id'
+      path: '/$id'
+      fullPath: '/support/c/$id'
+      preLoaderRoute: typeof SupportCIdRouteImport
+      parentRoute: typeof SupportCRoute
+    }
+    '/support/auth/reset-password': {
+      id: '/support/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/support/auth/reset-password'
+      preLoaderRoute: typeof SupportAuthResetPasswordRouteImport
+      parentRoute: typeof SupportRoute
+    }
+    '/support/auth/forgot-password': {
+      id: '/support/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/support/auth/forgot-password'
+      preLoaderRoute: typeof SupportAuthForgotPasswordRouteImport
+      parentRoute: typeof SupportRoute
     }
     '/support/agent/ratings': {
       id: '/support/agent/ratings'
@@ -685,6 +1037,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopCategoriesCategoryRouteImport
       parentRoute: typeof ShopRoute
     }
+    '/shop/auth/reset-password': {
+      id: '/shop/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/shop/auth/reset-password'
+      preLoaderRoute: typeof ShopAuthResetPasswordRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/auth/forgot-password': {
+      id: '/shop/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/shop/auth/forgot-password'
+      preLoaderRoute: typeof ShopAuthForgotPasswordRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/admin/reviews': {
+      id: '/shop/admin/reviews'
+      path: '/reviews'
+      fullPath: '/shop/admin/reviews'
+      preLoaderRoute: typeof ShopAdminReviewsRouteImport
+      parentRoute: typeof ShopAdminRoute
+    }
     '/shop/admin/products': {
       id: '/shop/admin/products'
       path: '/products'
@@ -699,6 +1072,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopAdminOrdersRouteImport
       parentRoute: typeof ShopAdminRoute
     }
+    '/shop/admin/inventory': {
+      id: '/shop/admin/inventory'
+      path: '/inventory'
+      fullPath: '/shop/admin/inventory'
+      preLoaderRoute: typeof ShopAdminInventoryRouteImport
+      parentRoute: typeof ShopAdminRoute
+    }
+    '/shop/admin/customers': {
+      id: '/shop/admin/customers'
+      path: '/customers'
+      fullPath: '/shop/admin/customers'
+      preLoaderRoute: typeof ShopAdminCustomersRouteImport
+      parentRoute: typeof ShopAdminRoute
+    }
+    '/shop/admin/categories': {
+      id: '/shop/admin/categories'
+      path: '/categories'
+      fullPath: '/shop/admin/categories'
+      preLoaderRoute: typeof ShopAdminCategoriesRouteImport
+      parentRoute: typeof ShopAdminRoute
+    }
+    '/shop/admin/analytics': {
+      id: '/shop/admin/analytics'
+      path: '/analytics'
+      fullPath: '/shop/admin/analytics'
+      preLoaderRoute: typeof ShopAdminAnalyticsRouteImport
+      parentRoute: typeof ShopAdminRoute
+    }
+    '/saas/auth/reset-password': {
+      id: '/saas/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/saas/auth/reset-password'
+      preLoaderRoute: typeof SaasAuthResetPasswordRouteImport
+      parentRoute: typeof SaasRoute
+    }
+    '/saas/auth/forgot-password': {
+      id: '/saas/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/saas/auth/forgot-password'
+      preLoaderRoute: typeof SaasAuthForgotPasswordRouteImport
+      parentRoute: typeof SaasRoute
+    }
     '/api/v1/$': {
       id: '/api/v1/$'
       path: '/api/v1/$'
@@ -706,33 +1121,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai/chat': {
+      id: '/api/ai/chat'
+      path: '/api/ai/chat'
+      fullPath: '/api/ai/chat'
+      preLoaderRoute: typeof ApiAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardApiKeysRoute: typeof DashboardApiKeysRoute
   DashboardHelpRoute: typeof DashboardHelpRoute
+  DashboardPermissionsRoute: typeof DashboardPermissionsRoute
+  DashboardPostsRoute: typeof DashboardPostsRoute
   DashboardRolesRoute: typeof DashboardRolesRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardTodosRoute: typeof DashboardTodosRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardApiKeysRoute: DashboardApiKeysRoute,
   DashboardHelpRoute: DashboardHelpRoute,
+  DashboardPermissionsRoute: DashboardPermissionsRoute,
+  DashboardPostsRoute: DashboardPostsRoute,
   DashboardRolesRoute: DashboardRolesRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardTodosRoute: DashboardTodosRoute,
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
@@ -743,31 +1177,47 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 interface SaasRouteChildren {
   SaasBillingRoute: typeof SaasBillingRoute
+  SaasOnboardingRoute: typeof SaasOnboardingRoute
   SaasSettingsRoute: typeof SaasSettingsRoute
   SaasTeamRoute: typeof SaasTeamRoute
   SaasUsageRoute: typeof SaasUsageRoute
   SaasIndexRoute: typeof SaasIndexRoute
+  SaasAuthForgotPasswordRoute: typeof SaasAuthForgotPasswordRoute
+  SaasAuthResetPasswordRoute: typeof SaasAuthResetPasswordRoute
 }
 
 const SaasRouteChildren: SaasRouteChildren = {
   SaasBillingRoute: SaasBillingRoute,
+  SaasOnboardingRoute: SaasOnboardingRoute,
   SaasSettingsRoute: SaasSettingsRoute,
   SaasTeamRoute: SaasTeamRoute,
   SaasUsageRoute: SaasUsageRoute,
   SaasIndexRoute: SaasIndexRoute,
+  SaasAuthForgotPasswordRoute: SaasAuthForgotPasswordRoute,
+  SaasAuthResetPasswordRoute: SaasAuthResetPasswordRoute,
 }
 
 const SaasRouteWithChildren = SaasRoute._addFileChildren(SaasRouteChildren)
 
 interface ShopAdminRouteChildren {
+  ShopAdminAnalyticsRoute: typeof ShopAdminAnalyticsRoute
+  ShopAdminCategoriesRoute: typeof ShopAdminCategoriesRoute
+  ShopAdminCustomersRoute: typeof ShopAdminCustomersRoute
+  ShopAdminInventoryRoute: typeof ShopAdminInventoryRoute
   ShopAdminOrdersRoute: typeof ShopAdminOrdersRoute
   ShopAdminProductsRoute: typeof ShopAdminProductsRoute
+  ShopAdminReviewsRoute: typeof ShopAdminReviewsRoute
   ShopAdminIndexRoute: typeof ShopAdminIndexRoute
 }
 
 const ShopAdminRouteChildren: ShopAdminRouteChildren = {
+  ShopAdminAnalyticsRoute: ShopAdminAnalyticsRoute,
+  ShopAdminCategoriesRoute: ShopAdminCategoriesRoute,
+  ShopAdminCustomersRoute: ShopAdminCustomersRoute,
+  ShopAdminInventoryRoute: ShopAdminInventoryRoute,
   ShopAdminOrdersRoute: ShopAdminOrdersRoute,
   ShopAdminProductsRoute: ShopAdminProductsRoute,
+  ShopAdminReviewsRoute: ShopAdminReviewsRoute,
   ShopAdminIndexRoute: ShopAdminIndexRoute,
 }
 
@@ -794,6 +1244,8 @@ interface ShopRouteChildren {
   ShopCheckoutRoute: typeof ShopCheckoutRoute
   ShopOrdersRoute: typeof ShopOrdersRouteWithChildren
   ShopIndexRoute: typeof ShopIndexRoute
+  ShopAuthForgotPasswordRoute: typeof ShopAuthForgotPasswordRoute
+  ShopAuthResetPasswordRoute: typeof ShopAuthResetPasswordRoute
   ShopCategoriesCategoryRoute: typeof ShopCategoriesCategoryRoute
 }
 
@@ -804,6 +1256,8 @@ const ShopRouteChildren: ShopRouteChildren = {
   ShopCheckoutRoute: ShopCheckoutRoute,
   ShopOrdersRoute: ShopOrdersRouteWithChildren,
   ShopIndexRoute: ShopIndexRoute,
+  ShopAuthForgotPasswordRoute: ShopAuthForgotPasswordRoute,
+  ShopAuthResetPasswordRoute: ShopAuthResetPasswordRoute,
   ShopCategoriesCategoryRoute: ShopCategoriesCategoryRoute,
 }
 
@@ -825,16 +1279,34 @@ const SupportAgentRouteWithChildren = SupportAgentRoute._addFileChildren(
   SupportAgentRouteChildren,
 )
 
+interface SupportCRouteChildren {
+  SupportCIdRoute: typeof SupportCIdRoute
+}
+
+const SupportCRouteChildren: SupportCRouteChildren = {
+  SupportCIdRoute: SupportCIdRoute,
+}
+
+const SupportCRouteWithChildren = SupportCRoute._addFileChildren(
+  SupportCRouteChildren,
+)
+
 interface SupportRouteChildren {
   SupportTicketIdRoute: typeof SupportTicketIdRoute
   SupportAgentRoute: typeof SupportAgentRouteWithChildren
+  SupportCRoute: typeof SupportCRouteWithChildren
   SupportIndexRoute: typeof SupportIndexRoute
+  SupportAuthForgotPasswordRoute: typeof SupportAuthForgotPasswordRoute
+  SupportAuthResetPasswordRoute: typeof SupportAuthResetPasswordRoute
 }
 
 const SupportRouteChildren: SupportRouteChildren = {
   SupportTicketIdRoute: SupportTicketIdRoute,
   SupportAgentRoute: SupportAgentRouteWithChildren,
+  SupportCRoute: SupportCRouteWithChildren,
   SupportIndexRoute: SupportIndexRoute,
+  SupportAuthForgotPasswordRoute: SupportAuthForgotPasswordRoute,
+  SupportAuthResetPasswordRoute: SupportAuthResetPasswordRoute,
 }
 
 const SupportRouteWithChildren =
@@ -847,6 +1319,8 @@ const rootRouteChildren: RootRouteChildren = {
   SaasRoute: SaasRouteWithChildren,
   ShopRoute: ShopRouteWithChildren,
   SupportRoute: SupportRouteWithChildren,
+  OauthCallbackRoute: OauthCallbackRoute,
+  ApiAiChatRoute: ApiAiChatRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
 }
 export const routeTree = rootRouteImport

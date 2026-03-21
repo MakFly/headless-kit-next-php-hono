@@ -36,7 +36,7 @@ function getLaravelConfig(): ProxyConfig {
   const authPrefix = process.env.LARAVEL_AUTH_PREFIX || '/api/auth';
 
   return {
-    baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8000',
+    baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8002',
     timeout: 30000,
     transformPath: (bffPath: string) => {
       // /api/v1/auth/* in BFF maps to /api/auth/* in Laravel (no v1 prefix for auth)
@@ -75,7 +75,7 @@ function getSymfonyConfig(): ProxyConfig {
   const authPrefix = process.env.SYMFONY_AUTH_PREFIX || '/api/v1/auth';
 
   return {
-    baseUrl: process.env.SYMFONY_API_URL || 'http://localhost:8002',
+    baseUrl: process.env.SYMFONY_API_URL || 'http://localhost:8001',
     timeout: 30000,
     transformPath: (bffPath: string) => {
       // /api/v1/auth/* in BFF maps to /api/v1/auth/* in Symfony (1:1 mapping)
@@ -114,7 +114,7 @@ function getNodeConfig(): ProxyConfig {
   const authPrefix = process.env.NODE_AUTH_PREFIX || '/api/v1/auth';
 
   return {
-    baseUrl: process.env.NODE_API_URL || 'http://localhost:8003',
+    baseUrl: process.env.NODE_API_URL || 'http://localhost:3333',
     timeout: 30000,
     transformPath: (bffPath: string) => {
       // /api/v1/auth/* in BFF maps to NODE_AUTH_PREFIX/* in Node.js

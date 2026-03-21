@@ -7,7 +7,7 @@
 - **ORM**: Drizzle ORM (SQLite via `data.db`)
 - **Auth**: JWT HS256 via `jose`
 - **Validation**: Zod + `@hono/zod-validator`
-- **Port**: 8003
+- **Port**: 3333
 
 ## Architecture — Vertical Slice
 
@@ -73,7 +73,7 @@ Each feature has exactly 5 files: `{name}.routes.ts`, `{name}.handlers.ts`, `{na
 
 Applied to all routes in order: `logger()`, `prettyJSON()`, `secureHeaders()`, `requestContextMiddleware`, `i18nMiddleware`, `cors()`.
 
-CORS allows: `FRONTEND_URL` + `http://localhost:3001`. Credentials enabled.
+CORS allows: `FRONTEND_URL` + `http://localhost:3300`. Credentials enabled.
 
 ## Response Envelope
 
@@ -106,7 +106,7 @@ Auth login/register response shape (inside `data`):
 ## Commands
 
 ```bash
-bun run dev                     # Dev server with --watch (port 8003)
+bun run dev                     # Dev server with --watch (port 3333)
 bun run start                   # Production server
 bun test                        # All tests
 bun test src/tests/unit/        # Unit tests only
@@ -133,7 +133,7 @@ bun run build                   # Build to dist/
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PORT` | `8003` | Server port |
+| `PORT` | `3333` | Server port |
 | `API_VERSION` | `v1` | API version prefix |
 | `JWT_SECRET` | — | JWT signing secret (required in prod) |
 | `FRONTEND_URL` | `http://localhost:3000` | Primary CORS origin |

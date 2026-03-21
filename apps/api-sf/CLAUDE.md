@@ -184,7 +184,7 @@ BetterAuth\Symfony\Service\UserIdConverter:
 ## Commands
 
 ```bash
-symfony server:start --port=8002 --no-tls  # Dev server
+symfony server:start --port=8001 --no-tls  # Dev server
 php bin/phpunit                             # Run all tests (129)
 php bin/phpunit tests/Functional/Auth/      # Auth tests only
 php bin/phpunit --filter=testListProducts   # Specific test

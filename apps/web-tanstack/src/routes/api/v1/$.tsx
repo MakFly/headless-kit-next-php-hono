@@ -147,7 +147,7 @@ function getProxyConfig() {
 }
 
 function buildBackendUrl(config: Partial<AdapterConfig>, path: string): URL {
-  const baseUrl = config.baseUrl?.replace(/\/$/, '') || 'http://localhost:8000'
+  const baseUrl = config.baseUrl?.replace(/\/$/, '') || 'http://localhost:8002'
   return new URL(path, baseUrl)
 }
 

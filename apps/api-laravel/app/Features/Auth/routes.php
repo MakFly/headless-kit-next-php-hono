@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Features\Auth\Actions\DeleteAccountAction;
+use App\Features\Auth\Actions\ForgotPasswordAction;
 use App\Features\Auth\Actions\OAuthProviders;
+use App\Features\Auth\Actions\ResetPasswordAction;
 use App\Features\Auth\Actions\TestAccounts;
+use App\Features\Auth\Actions\UpdateProfileAction;
+use App\Features\Auth\Actions\VerifyResetTokenAction;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function (): void {
@@ -13,9 +18,16 @@ Route::prefix('auth')->group(function (): void {
     Route::post('/refresh', [\BetterAuth\Laravel\Http\Controllers\AuthController::class, 'refresh']);
     Route::get('/test-accounts', TestAccounts::class);
 
+    // Password reset routes (public, forgot is rate-limited)
+    Route::post('/password/forgot', ForgotPasswordAction::class)->middleware('throttle:5,1');
+    Route::post('/password/reset', ResetPasswordAction::class);
+    Route::post('/password/verify-token', VerifyResetTokenAction::class);
+
     // Protected routes
     Route::middleware('auth:betterauth')->group(function (): void {
         Route::get('/me', [\BetterAuth\Laravel\Http\Controllers\AuthController::class, 'me']);
+        Route::patch('/me', UpdateProfileAction::class);
+        Route::delete('/me', DeleteAccountAction::class);
         Route::post('/logout', [\BetterAuth\Laravel\Http\Controllers\AuthController::class, 'logout']);
         Route::post('/revoke-all', [\BetterAuth\Laravel\Http\Controllers\AuthController::class, 'revokeAll']);
         Route::put('/password', [\BetterAuth\Laravel\Http\Controllers\AuthController::class, 'updatePassword']);

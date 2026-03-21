@@ -30,9 +30,9 @@ Browser
   │
   └─ Client fetch → /api/v1/* (catch-all route handler)
                          │
-                         ├─ Laravel  (port 8000)
-                         ├─ Symfony  (port 8002)
-                         └─ Hono     (port 8003)
+                         ├─ Laravel  (port 8002)
+                         ├─ Symfony  (port 8001)
+                         └─ Hono     (port 3333)
 ```
 
 **The frontend never contacts backends directly.** All traffic goes through the BFF proxy at `/api/v1/*`.
@@ -159,7 +159,7 @@ src/
 2. Client calls useAuthStore.login() (Zustand)
 3. Zustand calls loginAction() (Server Action)
 4. Server Action calls bffPost('/api/v1/auth/login', credentials, { skipAuth: true })
-5. bff-client POSTs to http://localhost:3001/api/v1/auth/login
+5. bff-client POSTs to http://localhost:3300/api/v1/auth/login
 6. Route handler transforms path → backend /api/auth/login (Laravel) or /api/v1/auth/login (Symfony)
 7. Backend returns { data: { user, access_token, refresh_token, expires_in } }
 8. Route handler stores tokens in HttpOnly cookies:
@@ -223,12 +223,12 @@ See `.claude/rules/data-fetching-strategy.md` for the full decision matrix.
 
 ```env
 # Required
-NEXT_PUBLIC_APP_URL=http://localhost:3001
+NEXT_PUBLIC_APP_URL=http://localhost:3300
 
 # Backend URLs
-LARAVEL_API_URL=http://localhost:8000
-SYMFONY_API_URL=http://localhost:8002
-NODE_API_URL=http://localhost:8003
+LARAVEL_API_URL=http://localhost:8002
+SYMFONY_API_URL=http://localhost:8001
+NODE_API_URL=http://localhost:3333
 
 # Backend selection (laravel | symfony | node)
 AUTH_BACKEND=laravel
@@ -260,7 +260,7 @@ All env vars should be accessed via `src/lib/config/env.ts`, never `process.env`
 ## Commands
 
 ```bash
-bun run dev         # Dev server on port 3001
+bun run dev         # Dev server on port 3300
 bun run build       # Production build (only when explicitly asked)
 bun run lint        # ESLint
 ```

@@ -7,9 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Monorepo **Headless Kit** — starter kit headless multi-backend avec BFF Next.js.
 
 ```
-Navigateur → Next.js BFF (port 3001) ──→ Laravel API (port 8000)
-         → TanStack Start (port 3003) → Hono API (port 8003)
-                                       → Symfony API (port 8002)
+Navigateur → Next.js BFF (port 3300) ──→ Laravel API (port 8002)
+         → TanStack Start (port 3301) → Hono API (port 3333)
+                                       → Symfony API (port 8001)
 ```
 
 Pattern BFF : le frontend ne contacte jamais les backends directement. Les requêtes passent par des Route Handlers (`/api/v1/*`) qui ajoutent HMAC signing et transmettent les cookies d'auth.
@@ -18,11 +18,11 @@ Pattern BFF : le frontend ne contacte jamais les backends directement. Les requ�
 
 ```
 apps/
-├── web/              # Next.js 16 App Router (BFF) — port 3001
-├── web-tanstack/     # TanStack Start + Vite — port 3003
-├── api-laravel/      # Laravel 12 + BetterAuth + API Platform — port 8000
-├── api-sf/           # Symfony 8 + BetterAuth (Paseto V4) — port 8002
-└── api-hono/         # Hono + Drizzle + Bun — port 8003
+├── web/              # Next.js 16 App Router (BFF) — port 3300
+├── web-tanstack/     # TanStack Start + Vite — port 3301
+├── api-laravel/      # Laravel 12 + BetterAuth + API Platform — port 8002
+├── api-sf/           # Symfony 8 + BetterAuth (Paseto V4) — port 8001
+└── api-hono/         # Hono + Drizzle + Bun — port 3333
 
 packages/
 ├── config/           # Shared ESLint + TSConfig (@headless/config)
@@ -40,24 +40,24 @@ bun run dev                              # Dev tous les apps (turbo)
 bun run build                            # Build tous les packages
 bun run lint                             # Lint
 
-# Next.js BFF (port 3001)
+# Next.js BFF (port 3300)
 bun run --filter @headless/web dev
 bun run --filter @headless/web build
 
-# TanStack Start (port 3003)
+# TanStack Start (port 3301)
 bun run --filter @headless/web-tanstack dev
 
-# Hono API (port 8003)
+# Hono API (port 3333)
 bun run --filter @headless/api-hono dev
 bun run --filter @headless/api-hono db:migrate
 bun run --filter @headless/api-hono db:seed
 
-# Laravel API (port 8000)
-cd apps/api-laravel && php artisan serve --port=8000
+# Laravel API (port 8002)
+cd apps/api-laravel && php artisan serve --port=8002
 cd apps/api-laravel && php artisan test
 
-# Symfony API (port 8002)
-cd apps/api-sf && symfony server:start --port=8002 --no-tls
+# Symfony API (port 8001)
+cd apps/api-sf && symfony server:start --port=8001 --no-tls
 cd apps/api-sf && php bin/phpunit
 cd apps/api-sf && php bin/phpunit tests/Functional/Auth/
 ```
@@ -69,8 +69,8 @@ Trois backends implémentent l'auth avec des stratégies différentes :
 | Backend | Auth | Tokens | 2FA | Password Reset |
 |---------|------|--------|-----|----------------|
 | **Symfony** | BetterAuth bundle | Paseto V4 | Oui | Oui |
-| **Laravel** | BetterAuth + Passport | Bearer | Oui | En cours |
-| **Hono** | JWT (jose) | HS256 | Non | Non |
+| **Laravel** | BetterAuth + Passport | Bearer | Oui | Oui |
+| **Hono** | JWT (jose) | HS256 | Oui | Oui |
 
 ### Flow BFF (Next.js)
 
@@ -118,24 +118,25 @@ Voir `apps/api-laravel/.claude/rules/api-platform-betterauth-docs.md`.
 
 ```env
 # Next.js (.env.local)
-NEXT_PUBLIC_APP_URL=http://localhost:3001
-LARAVEL_API_URL=http://localhost:8000
-SYMFONY_API_URL=http://localhost:8002
+NEXT_PUBLIC_APP_URL=http://localhost:3300
+LARAVEL_API_URL=http://localhost:8002
+SYMFONY_API_URL=http://localhost:8001
+NODE_API_URL=http://localhost:3333
 BFF_SECRET=xxx
 
 # Laravel (.env)
-APP_URL=http://localhost:8000
-SANCTUM_STATEFUL_DOMAINS=localhost:3001
+APP_URL=http://localhost:8002
+FRONTEND_URL=http://localhost:3300
 
 # Symfony (.env)
 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data_dev.db"
 BETTER_AUTH_SECRET=change_me_in_production
-FRONTEND_URL=http://localhost:3001
+FRONTEND_URL=http://localhost:3300
 
 # Hono (.env)
-PORT=8003
+PORT=3333
 JWT_SECRET=xxx
-FRONTEND_URL=http://localhost:3003
+FRONTEND_URL=http://localhost:3301
 ```
 
 ## Tests

@@ -12,6 +12,10 @@ import {
   logoutFn,
   registerFn,
 } from '@/lib/server/auth'
+import {
+  verify2faFn,
+  verify2faRecoveryFn,
+} from '@/lib/server/two-factor'
 import { COOKIE_NAMES } from '@/lib/config/env'
 
 const getStoredExpiresAt = (): number | null => {
@@ -35,6 +39,7 @@ type AuthState = {
   isHydrated: boolean
   isLoading: boolean
   error: string | null
+  requires2fa: boolean
 
   setUser: (user: User | null, expiresIn?: number | null) => void
   hydrate: (user: User | null, expiresIn?: number | null) => void
@@ -43,6 +48,8 @@ type AuthState = {
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
   loginWithOAuth: (provider: OAuthProvider) => Promise<void>
+  verify2fa: (code: string) => Promise<void>
+  verify2faRecovery: (code: string) => Promise<void>
   clearError: () => void
 
   isAuthenticated: () => boolean
@@ -58,6 +65,7 @@ export const useAuthStore = create<AuthState>()(
       isHydrated: false,
       isLoading: false,
       error: null,
+      requires2fa: false,
 
       setUser: (user, expiresIn) =>
         set((state) => ({
@@ -75,13 +83,18 @@ export const useAuthStore = create<AuthState>()(
         })),
 
       login: async (credentials) => {
-        set({ error: null, isLoading: true })
+        set({ error: null, isLoading: true, requires2fa: false })
         try {
           const response = await loginFn({ data: credentials })
+          if ('requires2fa' in response && response.requires2fa) {
+            set({ requires2fa: true, isLoading: false })
+            return
+          }
           set({
             user: response.user,
             expiresIn: response.expiresIn,
             isLoading: false,
+            requires2fa: false,
           })
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Login failed'
@@ -111,7 +124,7 @@ export const useAuthStore = create<AuthState>()(
         set({ error: null, isLoading: true })
         try {
           await logoutFn()
-          set({ user: null, expiresIn: null, isLoading: false })
+          set({ user: null, expiresIn: null, isLoading: false, requires2fa: false })
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Logout failed'
           set({ error: message, user: null, expiresIn: null, isLoading: false })
@@ -144,6 +157,40 @@ export const useAuthStore = create<AuthState>()(
           const message =
             err instanceof Error ? err.message : 'OAuth redirect failed'
           set({ error: message })
+          throw err
+        }
+      },
+
+      verify2fa: async (code) => {
+        set({ error: null, isLoading: true })
+        try {
+          const response = await verify2faFn({ data: { code } })
+          set({
+            user: response.user,
+            expiresIn: response.expiresIn,
+            isLoading: false,
+            requires2fa: false,
+          })
+        } catch (err) {
+          const message = err instanceof Error ? err.message : '2FA verification failed'
+          set({ error: message, isLoading: false })
+          throw err
+        }
+      },
+
+      verify2faRecovery: async (code) => {
+        set({ error: null, isLoading: true })
+        try {
+          const response = await verify2faRecoveryFn({ data: { code } })
+          set({
+            user: response.user,
+            expiresIn: response.expiresIn,
+            isLoading: false,
+            requires2fa: false,
+          })
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Recovery verification failed'
+          set({ error: message, isLoading: false })
           throw err
         }
       },

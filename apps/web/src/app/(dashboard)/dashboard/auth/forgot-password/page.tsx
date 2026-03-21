@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import { forgotPasswordAction } from "@/lib/actions/auth/actions"
 
 export default function DashboardForgotPasswordPage() {
   const [email, setEmail] = useState("")
@@ -18,17 +19,7 @@ export default function DashboardForgotPasswordPage() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch("/api/v1/auth/password/forgot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => null)
-        throw new Error(data?.message || "Something went wrong. Please try again.")
-      }
-
+      await forgotPasswordAction(email)
       setIsSuccess(true)
       toast.success("Email sent", {
         description: "If an account exists with that email, you will receive a reset link.",

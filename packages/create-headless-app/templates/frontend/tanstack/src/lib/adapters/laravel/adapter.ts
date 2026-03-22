@@ -1,12 +1,4 @@
-import type {
-  AdapterConfig,
-  LoginRequest,
-  RegisterRequest,
-  RefreshTokenRequest,
-  AuthResponse,
-  NormalizedUser,
-} from '../types'
-import { BaseAdapter, AdapterError } from '../base-adapter'
+import { AdapterError, BaseAdapter } from '../base-adapter'
 import { apiRequestJson } from '../../http/api-request'
 import {
   transformAuthResponse,
@@ -14,6 +6,19 @@ import {
   transformOAuthProviders,
   transformOAuthRedirect,
 } from './transformer'
+import type {
+  AdapterConfig,
+  AuthResponse,
+  LoginRequest,
+  NormalizedUser,
+  RecoveryCodesResponse,
+  RefreshTokenRequest,
+  RegisterRequest,
+  TwoFaDisableResponse,
+  TwoFaEnableResponse,
+  TwoFaSetupResponse,
+  TwoFaStatus,
+} from '../types'
 
 const ENDPOINTS = {
   LOGIN: '/api/v1/auth/login',
@@ -23,12 +28,19 @@ const ENDPOINTS = {
   ME: '/api/v1/me',
   OAUTH_PROVIDERS: '/api/v1/auth/providers',
   OAUTH_REDIRECT: (provider: string) => `/api/v1/auth/${provider}/redirect`,
+  TWO_FA_STATUS: '/api/auth/2fa/status',
+  TWO_FA_SETUP: '/api/auth/2fa/setup',
+  TWO_FA_ENABLE: '/api/auth/2fa/enable',
+  TWO_FA_VERIFY: '/api/auth/2fa/verify',
+  TWO_FA_DISABLE: '/api/auth/2fa/disable',
+  TWO_FA_RECOVERY: '/api/auth/2fa/recovery',
+  TWO_FA_RECOVERY_CODES: '/api/auth/2fa/recovery-codes',
 }
 
 export class LaravelAdapter extends BaseAdapter {
   constructor(config: Partial<AdapterConfig> = {}) {
     const fullConfig: AdapterConfig = {
-      baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8000',
+      baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8002',
       timeout: 30000,
       ...config,
     }
@@ -42,7 +54,7 @@ export class LaravelAdapter extends BaseAdapter {
       body?: unknown
       headers?: Record<string, string>
       includeAuth?: boolean
-    } = {},
+    } = {}
   ): Promise<T> {
     const { body, headers = {}, includeAuth = true } = options
 
@@ -121,17 +133,108 @@ export class LaravelAdapter extends BaseAdapter {
     }
   }
 
-  async getOAuthProviders(): Promise<string[]> {
-    const response = await this.makeRequest<{ data: string[] }>(
-      'GET', ENDPOINTS.OAUTH_PROVIDERS, { includeAuth: false },
+  async getOAuthProviders(): Promise<Array<string>> {
+    const response = await this.makeRequest<{ data: Array<string> }>(
+      'GET', ENDPOINTS.OAUTH_PROVIDERS, { includeAuth: false }
     )
     return transformOAuthProviders(response)
   }
 
   async getOAuthUrl(provider: string): Promise<string> {
     const response = await this.makeRequest<{ data: { redirect_url: string } }>(
-      'GET', ENDPOINTS.OAUTH_REDIRECT(provider), { includeAuth: false },
+      'GET', ENDPOINTS.OAUTH_REDIRECT(provider), { includeAuth: false }
     )
     return transformOAuthRedirect(response)
+  }
+
+  async get2faStatus(): Promise<TwoFaStatus> {
+    const response = await this.makeRequest<{ enabled: boolean } | { data: { enabled: boolean } }>(
+      'GET', ENDPOINTS.TWO_FA_STATUS
+    )
+    const data = 'data' in response ? response.data : response
+    return { enabled: data.enabled ?? false }
+  }
+
+  async setup2fa(): Promise<TwoFaSetupResponse> {
+    const response = await this.makeRequest<{
+      secret?: string
+      qrCode?: string
+      qr_code?: string
+      backupCodes?: string[]
+      backup_codes?: string[]
+      data?: { secret: string; qrCode?: string; qr_code?: string; backupCodes?: string[]; backup_codes?: string[] }
+    }>('POST', ENDPOINTS.TWO_FA_SETUP)
+    const d = response.data ?? response
+    return {
+      secret: d.secret ?? '',
+      qrCode: d.qrCode ?? d.qr_code ?? '',
+      backupCodes: d.backupCodes ?? d.backup_codes ?? [],
+    }
+  }
+
+  async enable2fa(code: string): Promise<TwoFaEnableResponse> {
+    const response = await this.makeRequest<{
+      enabled?: boolean
+      backupCodes?: string[]
+      backup_codes?: string[]
+      data?: { enabled: boolean; backupCodes?: string[]; backup_codes?: string[] }
+    }>('POST', ENDPOINTS.TWO_FA_ENABLE, { body: { code } })
+    const d = response.data ?? response
+    return {
+      enabled: d.enabled ?? true,
+      backupCodes: d.backupCodes ?? d.backup_codes ?? [],
+    }
+  }
+
+  async verify2fa(code: string): Promise<AuthResponse> {
+    const response = await this.makeRequest<{
+      data: { user: unknown; access_token: string; token_type?: string; expires_in?: number }
+    }>('POST', ENDPOINTS.TWO_FA_VERIFY, { body: { code }, includeAuth: false })
+    const authResponse = transformAuthResponse(response as never)
+    await this.storeTokens(authResponse.tokens)
+    return authResponse
+  }
+
+  async disable2fa(code: string): Promise<TwoFaDisableResponse> {
+    const response = await this.makeRequest<{ enabled?: boolean; data?: { enabled: boolean } }>(
+      'POST', ENDPOINTS.TWO_FA_DISABLE, { body: { code } }
+    )
+    const d = response.data ?? response
+    return { enabled: d.enabled ?? false }
+  }
+
+  async verify2faRecovery(code: string): Promise<AuthResponse> {
+    const response = await this.makeRequest<{
+      data: { user: unknown; access_token: string; token_type?: string; expires_in?: number }
+    }>('POST', ENDPOINTS.TWO_FA_RECOVERY, { body: { code }, includeAuth: false })
+    const authResponse = transformAuthResponse(response as never)
+    await this.storeTokens(authResponse.tokens)
+    return authResponse
+  }
+
+  async getRecoveryCodes(): Promise<RecoveryCodesResponse> {
+    const response = await this.makeRequest<{
+      codes?: string[]
+      backupCodes?: string[]
+      backup_codes?: string[]
+      data?: { codes?: string[]; backupCodes?: string[]; backup_codes?: string[] }
+    }>('GET', ENDPOINTS.TWO_FA_RECOVERY_CODES)
+    const d = response.data ?? response
+    return { codes: d.codes ?? d.backupCodes ?? d.backup_codes ?? [] }
+  }
+
+  async updateProfile(data: { name?: string; email?: string }): Promise<NormalizedUser> {
+    const response = await this.makeRequest<{ data: NormalizedUser } | NormalizedUser>(
+      'PATCH', '/api/v1/auth/me', { body: data }
+    )
+    if (response && typeof response === 'object' && 'data' in response) {
+      return (response as { data: NormalizedUser }).data
+    }
+    return response as NormalizedUser
+  }
+
+  async deleteAccount(): Promise<void> {
+    await this.makeRequest('DELETE', '/api/v1/auth/me')
+    await this.clearTokens()
   }
 }

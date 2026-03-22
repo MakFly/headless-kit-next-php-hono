@@ -24,9 +24,9 @@ import { t } from './shared/lib/i18n/index.ts';
 import type { AppVariables } from './shared/types/index.ts';
 
 // Configuration
-const port = parseInt(process.env.PORT || '8003', 10);
+const port = parseInt(process.env.PORT || '{{API_PORT}}', 10);
 const apiVersion = process.env.API_VERSION || 'v1';
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:{{FRONTEND_PORT}}';
 
 // Create app
 const app = new Hono<{ Variables: AppVariables }>();
@@ -42,7 +42,7 @@ app.use('*', i18nMiddleware);
 app.use(
   '*',
   cors({
-    origin: [frontendUrl, 'http://localhost:3001'],
+    origin: [frontendUrl],
     credentials: true,
     allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Request-Id', 'Accept-Language'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

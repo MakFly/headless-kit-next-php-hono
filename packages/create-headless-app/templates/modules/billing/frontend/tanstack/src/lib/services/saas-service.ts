@@ -16,7 +16,7 @@ import type {
 function getApiBaseUrl(): string {
   const backend = getBackendType()
   const config = getAdapterConfig(backend)
-  const fallback = process.env.LARAVEL_API_URL || 'http://localhost:8000'
+  const fallback = process.env.LARAVEL_API_URL || 'http://localhost:8002'
   return (config.baseUrl || fallback).replace(/\/$/, '')
 }
 

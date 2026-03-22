@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie } from '@tanstack/react-start/server'
-import { getAuthAdapter, toUser, COOKIE_NAMES } from '../adapters'
+import { COOKIE_NAMES, getAuthAdapter, toUser } from '../adapters'
 import { ApiException } from '../http'
 
 function getExpiresInFromCookie(): number | null {
@@ -102,4 +102,51 @@ export const getOAuthUrlFn = createServerFn({ method: 'POST' })
     const adapter = getAuthAdapter()
     const url = await adapter.getOAuthUrl(data.provider)
     return { url }
+  })
+
+// =========================================================================
+// Profile
+// =========================================================================
+
+export const updateProfileFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { name?: string; email?: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    const normalized = await adapter.updateProfile(data)
+    return { user: toUser(normalized) }
+  })
+
+export const deleteAccountFn = createServerFn({ method: 'POST' }).handler(async () => {
+  const adapter = getAuthAdapter()
+  await adapter.deleteAccount()
+  return { success: true }
+})
+
+// =========================================================================
+// Password Reset
+// =========================================================================
+
+export const forgotPasswordFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { email: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    return adapter.forgotPassword(data.email)
+  })
+
+export const verifyResetTokenFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { token: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    try {
+      return await adapter.verifyResetToken(data.token)
+    } catch {
+      return { valid: false as const }
+    }
+  })
+
+export const resetPasswordFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { token: string; newPassword: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    return adapter.resetPassword(data.token, data.newPassword)
   })

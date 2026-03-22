@@ -72,11 +72,11 @@ function getBackendType(): BackendType {
 function getBackendBaseUrl(backend: BackendType): string {
   switch (backend) {
     case 'laravel':
-      return process.env.LARAVEL_API_URL || 'http://localhost:8000';
+      return process.env.LARAVEL_API_URL || 'http://localhost:8002';
     case 'symfony':
-      return process.env.SYMFONY_API_URL || 'http://localhost:8002';
+      return process.env.SYMFONY_API_URL || 'http://localhost:8001';
     case 'node':
-      return process.env.NODE_API_URL || 'http://localhost:8003';
+      return process.env.NODE_API_URL || 'http://localhost:3333';
   }
 }
 

@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php bin/phpunit *)",
+      "Bash(php bin/phpunit)",
+      "Bash(php bin/console *)",
+      "Bash(symfony server:*)",
+      "Bash(bunx next build *)",
+      "Bash(bunx next build)",
+      "Bash(bun run build *)",
+      "Bash(bun run build)",
+      "Bash(bun run dev *)",
+      "Bash(bun run typecheck *)",
+      "Bash(bun run typecheck)",
+      "Bash(bun test *)",
+      "Bash(bun test)",
+      "Bash(bun run db:*)",
+      "Bash(bun run lint *)",
+      "Bash(bun run lint)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(find *)",
+      "Bash(echo *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "WebFetch"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)"
+    ]
+  }
+}

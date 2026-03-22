@@ -1,26 +1,31 @@
 import {
+  deleteCookie,
   getCookie,
   setCookie,
-  deleteCookie,
 } from '@tanstack/react-start/server'
-import type {
-  AuthAdapter,
-  AdapterConfig,
-  LoginRequest,
-  RegisterRequest,
-  RefreshTokenRequest,
-  AuthResponse,
-  NormalizedUser,
-  TokenStorage,
-} from './types'
 import {
   TOKEN_CONFIG,
   COOKIE_NAMES as TOKEN_COOKIE_NAMES,
   calculateExpirationTimestamp,
   formatExpirationForCookie,
 } from '../services/token-service'
-import { AdapterError } from './errors'
 import { apiRequestJson } from '../http/api-request'
+import { AdapterError } from './errors'
+import type {
+  AdapterConfig,
+  AuthAdapter,
+  AuthResponse,
+  LoginRequest,
+  NormalizedUser,
+  RecoveryCodesResponse,
+  RefreshTokenRequest,
+  RegisterRequest,
+  TokenStorage,
+  TwoFaDisableResponse,
+  TwoFaEnableResponse,
+  TwoFaSetupResponse,
+  TwoFaStatus,
+} from './types'
 
 export { AdapterError } from './errors'
 
@@ -148,6 +153,15 @@ export abstract class BaseAdapter implements AuthAdapter {
   abstract logout(): Promise<void>
   abstract refresh(request?: RefreshTokenRequest): Promise<AuthResponse>
   abstract getUser(): Promise<NormalizedUser | null>
-  abstract getOAuthProviders(): Promise<string[]>
+  abstract getOAuthProviders(): Promise<Array<string>>
   abstract getOAuthUrl(provider: string): Promise<string>
+  abstract get2faStatus(): Promise<TwoFaStatus>
+  abstract setup2fa(): Promise<TwoFaSetupResponse>
+  abstract enable2fa(code: string): Promise<TwoFaEnableResponse>
+  abstract verify2fa(code: string): Promise<AuthResponse>
+  abstract disable2fa(code: string): Promise<TwoFaDisableResponse>
+  abstract verify2faRecovery(code: string): Promise<AuthResponse>
+  abstract getRecoveryCodes(): Promise<RecoveryCodesResponse>
+  abstract updateProfile(data: { name?: string; email?: string }): Promise<NormalizedUser>
+  abstract deleteAccount(): Promise<void>
 }

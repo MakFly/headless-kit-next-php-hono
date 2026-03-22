@@ -35,14 +35,14 @@ export const env = {
   AUTH_BACKEND: (process.env.AUTH_BACKEND || '{{BACKEND}}') as AuthBackend,
 
   // Laravel API Configuration
-  LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8000',
+  LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8002',
 
   // Symfony API Configuration
-  SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8002',
+  SYMFONY_API_URL: process.env.SYMFONY_API_URL || 'http://localhost:8001',
   SYMFONY_AUTH_PREFIX: process.env.SYMFONY_AUTH_PREFIX || '/api/v1/auth',
 
   // Node.js API Configuration
-  NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:8003',
+  NODE_API_URL: process.env.NODE_API_URL || 'http://localhost:3333',
   NODE_AUTH_PREFIX: process.env.NODE_AUTH_PREFIX || '/api/v1/auth',
 } as const;
 

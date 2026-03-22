@@ -11,7 +11,7 @@ import { cookies } from 'next/headers';
 import { BffActionError } from './errors';
 import type { BffRequestOptions } from './types';
 
-const BFF_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+const BFF_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3300';
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME || 'auth_token';
 const REFRESH_COOKIE_NAME = process.env.REFRESH_COOKIE_NAME || 'refresh_token';
 

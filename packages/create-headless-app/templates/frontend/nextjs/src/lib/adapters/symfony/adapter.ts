@@ -35,7 +35,7 @@ export type SymfonyAdapterConfig = AdapterConfig;
 export class SymfonyAdapter extends BaseAdapter {
   constructor(config: Partial<SymfonyAdapterConfig> = {}) {
     const fullConfig: SymfonyAdapterConfig = {
-      baseUrl: process.env.SYMFONY_API_URL || 'http://localhost:8002',
+      baseUrl: process.env.SYMFONY_API_URL || 'http://localhost:8001',
       timeout: 30000,
       ...config,
     };

@@ -58,17 +58,17 @@ export function getAdapterConfig(backend: BackendType): Partial<AdapterConfig> {
   switch (backend) {
     case 'laravel':
       return {
-        baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8000',
+        baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8002',
       };
 
     case 'symfony':
       return {
-        baseUrl: process.env.SYMFONY_API_URL || 'http://localhost:8002',
+        baseUrl: process.env.SYMFONY_API_URL || 'http://localhost:8001',
       };
 
     case 'node':
       return {
-        baseUrl: process.env.NODE_API_URL || 'http://localhost:8003',
+        baseUrl: process.env.NODE_API_URL || 'http://localhost:3333',
         authPrefix: process.env.NODE_AUTH_PREFIX || '/api/auth',
       };
   }

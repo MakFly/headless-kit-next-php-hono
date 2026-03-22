@@ -43,7 +43,7 @@ export class NodeAdapter extends BaseAdapter {
 
   constructor(config: Partial<NodeAdapterConfig> = {}) {
     const fullConfig: NodeAdapterConfig = {
-      baseUrl: process.env.NODE_API_URL || 'http://localhost:8003',
+      baseUrl: process.env.NODE_API_URL || 'http://localhost:3333',
       timeout: 30000,
       authPrefix: config.authPrefix || process.env.NODE_AUTH_PREFIX || '/api/auth',
       ...config,

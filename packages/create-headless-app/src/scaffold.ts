@@ -20,6 +20,7 @@ export type TemplateVars = {
   DB_PASSWORD: string;
   JWT_SECRET: string;
   BETTER_AUTH_SECRET: string;
+  BFF_SECRET: string;
 };
 
 export async function scaffold(options: ProjectOptions): Promise<void> {
@@ -135,17 +136,18 @@ export async function scaffold(options: ProjectOptions): Promise<void> {
     BACKEND: options.backend,
     API_PORT:
       options.backend === 'laravel'
-        ? '8000'
+        ? '8002'
         : options.backend === 'symfony'
-          ? '8002'
-          : '8003',
-    FRONTEND_PORT: options.frontend === 'nextjs' ? '3001' : '3003',
+          ? '8001'
+          : '3333',
+    FRONTEND_PORT: options.frontend === 'nextjs' ? '3300' : '3301',
     // Docker-specific secrets
     APP_KEY: `base64:${Buffer.from(generateSecret(32), 'hex').toString('base64')}`,
     APP_SECRET: generateSecret(32),
     DB_PASSWORD: generateSecret(16),
     JWT_SECRET: generateSecret(32),
     BETTER_AUTH_SECRET: generateSecret(32),
+    BFF_SECRET: generateSecret(32),
   };
 
   // Generate files first (before variable replacement so they are also processed)

@@ -149,6 +149,11 @@ export async function scaffold(options: ProjectOptions): Promise<void> {
     spinner.stop(`${options.modules.length} module(s) applied`);
   }
 
+  // Clean up unused backend adapters from frontend
+  spinner.start('Cleaning up unused backends...');
+  await cleanupUnusedBackends(path.join(projectDir, 'apps/web'), options.backend);
+  spinner.stop('Unused backends removed');
+
   // Generate config files
   spinner.start('Generating configuration...');
 
@@ -275,5 +280,165 @@ async function mergeModuleDeps(pkgPath: string, modules: ModuleId[]): Promise<vo
     await fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf-8');
   } catch {
     // package.json not yet present — will be created by preset overlay
+  }
+}
+
+/**
+ * Backend adapter directory names mapping
+ */
+const BACKEND_ADAPTER_DIRS: Record<string, string> = {
+  laravel: 'laravel',
+  symfony: 'symfony',
+  hono: 'node',
+};
+
+/**
+ * Remove unused backend adapters, simplify proxy-config and env.ts
+ * to only reference the selected backend.
+ */
+async function cleanupUnusedBackends(webDir: string, selectedBackend: string): Promise<void> {
+  const adaptersDir = path.join(webDir, 'src/lib/adapters');
+  const selectedDir = BACKEND_ADAPTER_DIRS[selectedBackend];
+
+  // 1. Delete unused adapter directories
+  for (const [backend, dirName] of Object.entries(BACKEND_ADAPTER_DIRS)) {
+    if (backend !== selectedBackend) {
+      await fs.rm(path.join(adaptersDir, dirName), { recursive: true, force: true });
+    }
+  }
+
+  // 2. Rewrite adapters/index.ts to only import the selected backend
+  const indexPath = path.join(adaptersDir, 'index.ts');
+  try {
+    const adapterClass = selectedBackend === 'laravel' ? 'LaravelAdapter'
+      : selectedBackend === 'symfony' ? 'SymfonyAdapter'
+      : 'NodeAdapter';
+    const envVar = selectedBackend === 'laravel' ? 'LARAVEL_API_URL'
+      : selectedBackend === 'symfony' ? 'SYMFONY_API_URL'
+      : 'NODE_API_URL';
+    const defaultUrl = selectedBackend === 'laravel' ? 'http://localhost:8002'
+      : selectedBackend === 'symfony' ? 'http://localhost:8001'
+      : 'http://localhost:3333';
+
+    const newIndex = `/**
+ * Auth adapter factory — configured for ${selectedBackend} backend
+ */
+
+import type { AuthAdapter, BackendType, AdapterConfig } from './types';
+import { ${adapterClass} } from './${selectedDir}';
+
+export type { AuthAdapter, BackendType, AdapterConfig } from './types';
+export type {
+  LoginRequest,
+  RegisterRequest,
+  RefreshTokenRequest,
+  AuthResponse,
+  NormalizedUser,
+  TokenStorage,
+} from './types';
+export { toUser } from './types';
+export { ${adapterClass} } from './${selectedDir}';
+export { AdapterError } from './errors';
+export { COOKIE_NAMES } from './base-adapter';
+export {
+  getProxyConfig,
+  isPublicRoute,
+  buildBackendUrl,
+  type ProxyConfig,
+} from './proxy-config';
+
+export function getBackendType(): BackendType {
+  return '${selectedBackend === 'hono' ? 'node' : selectedBackend}';
+}
+
+export function getAdapterConfig(): Partial<AdapterConfig> {
+  return {
+    baseUrl: process.env.${envVar} || '${defaultUrl}',
+  };
+}
+
+const cachedAdapter: { instance?: AuthAdapter } = {};
+
+export function getAuthAdapter(): AuthAdapter {
+  if (cachedAdapter.instance) return cachedAdapter.instance;
+  cachedAdapter.instance = new ${adapterClass}(getAdapterConfig());
+  return cachedAdapter.instance;
+}
+
+export function createAdapter(
+  _backend?: BackendType,
+  config?: Partial<AdapterConfig>,
+): AuthAdapter {
+  return new ${adapterClass}({ ...getAdapterConfig(), ...config });
+}
+
+export function resetAdapter(): void {
+  delete cachedAdapter.instance;
+}
+`;
+    await fs.writeFile(indexPath, newIndex, 'utf-8');
+  } catch {
+    // index.ts not present
+  }
+
+  // 3. Rewrite proxy-config.ts to only have the selected backend
+  const proxyPath = path.join(adaptersDir, 'proxy-config.ts');
+  try {
+    await fs.access(proxyPath);
+    let content = await fs.readFile(proxyPath, 'utf-8');
+
+    // Replace getProxyConfig switch with direct return
+    const configFn = selectedBackend === 'laravel' ? 'getLaravelConfig'
+      : selectedBackend === 'symfony' ? 'getSymfonyConfig'
+      : 'getNodeConfig';
+
+    // Remove the other two config functions and simplify getProxyConfig
+    const otherBackends = ['laravel', 'symfony', 'hono'].filter(b => b !== selectedBackend);
+    const otherFns = otherBackends.map(b =>
+      b === 'laravel' ? 'getLaravelConfig' : b === 'symfony' ? 'getSymfonyConfig' : 'getNodeConfig'
+    );
+
+    // Simple approach: replace the switch body
+    content = content.replace(
+      /export function getProxyConfig\([^)]*\): ProxyConfig \{[\s\S]*?\n\}/,
+      `export function getProxyConfig(): ProxyConfig {\n  return ${configFn}();\n}`,
+    );
+
+    // Remove imports of getBackendType if present
+    content = content.replace(/import \{ getBackendType \} from '\.\/index';\n?/, '');
+    content = content.replace(/import type \{ BackendType \} from '\.\/types';\n?/, '');
+
+    await fs.writeFile(proxyPath, content, 'utf-8');
+  } catch {
+    // proxy-config.ts not present (TanStack doesn't have it)
+  }
+
+  // 4. Simplify env.ts to only reference the selected backend URL
+  const envTsPath = path.join(webDir, 'src/lib/config/env.ts');
+  try {
+    let envContent = await fs.readFile(envTsPath, 'utf-8');
+
+    // Replace AuthBackend type with single value
+    envContent = envContent.replace(
+      /export type AuthBackend = .*?;/,
+      `export type AuthBackend = '${selectedBackend === 'hono' ? 'node' : selectedBackend}';`,
+    );
+
+    // Remove unused backend URL entries
+    const urlEntries: Record<string, RegExp> = {
+      laravel: /\s*\/\/ Laravel API Configuration\n\s*LARAVEL_API_URL:.*\n/,
+      symfony: /\s*\/\/ Symfony API Configuration\n\s*SYMFONY_API_URL:.*\n\s*SYMFONY_AUTH_PREFIX:.*\n/,
+      hono: /\s*\/\/ Node\.js API Configuration\n\s*NODE_API_URL:.*\n\s*NODE_AUTH_PREFIX:.*\n/,
+    };
+
+    for (const [backend, regex] of Object.entries(urlEntries)) {
+      if (backend !== selectedBackend) {
+        envContent = envContent.replace(regex, '\n');
+      }
+    }
+
+    await fs.writeFile(envTsPath, envContent, 'utf-8');
+  } catch {
+    // env.ts not present
   }
 }

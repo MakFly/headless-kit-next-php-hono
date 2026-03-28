@@ -14,7 +14,7 @@ You are a senior Laravel reviewer. You audit code for:
 
 1. **VSA compliance**: Are Actions invokable? Are models in `App\Shared\Models\`?
 2. **Response format**: Is `ApiResponse` used everywhere? No raw `response()->json()`?
-3. **Route registration**: Are routes included in `routes/api.php`? Auth routes without v1 prefix?
+3. **Route registration**: Are routes included in `routes/api.php` inside the `v1` prefix group? Auth routes at `/api/v1/auth/*`?
 4. **Middleware**: Is `auth:betterauth` used (not `auth`)? Correct middleware chain?
 5. **BetterAuth**: Are native routes not being recreated?
 6. **Type safety**: `declare(strict_types=1)`, typed parameters, return types?

@@ -88,13 +88,12 @@ class ListProducts
 
 ### Convention — Feature route files
 
-Auth routes are included without prefix. All other feature routes are included inside a `Route::prefix('v1')` group in `routes/api.php`:
+All feature routes (including auth) are included inside the `Route::prefix('v1')` group in `routes/api.php`:
 
 ```php
 // routes/api.php
-require app_path('Features/Auth/routes.php');          // /auth/* directly
-
 Route::prefix('v1')->group(function () {
+    require app_path('Features/Auth/routes.php');       // /api/v1/auth/*
     require app_path('Features/Shop/routes.php');       // /api/v1/...
     require app_path('Features/Cart/routes.php');
     // ...
@@ -171,7 +170,7 @@ composer dump-autoload                # Regenerate autoloader
 
 | Feature | Prefix | Middleware | Key Actions |
 |---------|--------|-----------|-------------|
-| Auth | `/auth` | rate-limit | OAuthProviders, TestAccounts (+ BetterAuth handles register/login/me/refresh/logout) |
+| Auth | `/api/v1/auth` | rate-limit | OAuthProviders, TestAccounts (+ BetterAuth handles register/login/me/refresh/logout) |
 | Shop | `/api/v1` | public | ListProducts, ShowProduct, ListCategories, ShowCategory |
 | Cart | `/api/v1/cart` | `auth:betterauth` | ShowCart, AddItem, UpdateItem, RemoveItem |
 | Orders | `/api/v1/orders` | `auth:betterauth` | CreateOrder, ListOrders, ShowOrder |

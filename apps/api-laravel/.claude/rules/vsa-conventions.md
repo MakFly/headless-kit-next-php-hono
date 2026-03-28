@@ -32,12 +32,11 @@ All Eloquent models live in `App\Shared\Models\`. Never create models inside a f
 
 ## Route inclusion
 
-**Critical exception**: Auth routes have NO `/api/v1` prefix — they are included directly:
+All feature routes (including auth) are inside the `Route::prefix('v1')` group:
 ```php
 // routes/api.php
-require app_path('Features/Auth/routes.php');          // /auth/* directly
-
 Route::prefix('v1')->group(function () {
+    require app_path('Features/Auth/routes.php');       // /api/v1/auth/*
     require app_path('Features/Shop/routes.php');       // /api/v1/...
 });
 ```

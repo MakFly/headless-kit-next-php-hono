@@ -18,8 +18,8 @@ You are a Laravel 12 backend specialist for the Headless Kit API.
 
 ## Key conventions
 
-- Auth routes: no v1 prefix (direct `/auth/*`)
-- All other features: inside `Route::prefix('v1')` group in `routes/api.php`
+- All features (including auth): inside `Route::prefix('v1')` group in `routes/api.php`
+- Auth routes resolve to `/api/v1/auth/*` (consistent with Symfony and Hono)
 - `declare(strict_types=1)` in every file
 - PHPUnit 11 for tests (no Pest)
 

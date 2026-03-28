@@ -8,7 +8,7 @@ Applied to ALL routes in this order:
 3. `secureHeaders()` — security headers
 4. `requestContextMiddleware` — sets `requestId` in context
 5. `i18nMiddleware` — sets `locale` from Accept-Language
-6. `cors()` — CORS with `FRONTEND_URL` + `http://localhost:3300`
+6. `cors()` — CORS with `FRONTEND_URL` + optional `BFF_ORIGIN` env var
 
 ## Available route middleware
 

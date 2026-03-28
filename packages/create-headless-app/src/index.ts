@@ -55,10 +55,10 @@ async function main() {
     );
   }
   console.log(
-    pc.dim(`  Frontend: http://localhost:${options.frontend === 'nextjs' ? '3001' : '3003'}`),
+    pc.dim(`  Frontend: http://localhost:${options.frontend === 'nextjs' ? '3300' : '3301'}`),
   );
   console.log(
-    pc.dim(`  Backend:  http://localhost:${options.backend === 'laravel' ? '8000' : options.backend === 'symfony' ? '8002' : '8003'}`),
+    pc.dim(`  Backend:  http://localhost:${options.backend === 'laravel' ? '8002' : options.backend === 'symfony' ? '8001' : '3333'}`),
   );
   console.log('');
 }

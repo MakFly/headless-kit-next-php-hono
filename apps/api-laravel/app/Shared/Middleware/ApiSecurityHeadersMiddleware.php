@@ -20,6 +20,11 @@ class ApiSecurityHeadersMiddleware
         $response->headers->set('X-Request-Id', $requestId);
         $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
         $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        $response->headers->set('X-XSS-Protection', '0');
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
         return $response;
     }

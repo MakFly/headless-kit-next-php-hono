@@ -39,6 +39,10 @@ class RegisterController extends AbstractController
                 return $this->api->error('VALIDATION_ERROR', 'auth.invalid_email_format', 422);
             }
 
+            if (strlen($password) < 8) {
+                return $this->api->error('VALIDATION_ERROR', 'auth.password_too_short', 400);
+            }
+
             $additionalData = $name !== null ? ['name' => $name] : [];
 
             $this->authManager->signUp($email, $password, $additionalData);

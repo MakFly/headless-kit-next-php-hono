@@ -18,6 +18,11 @@ type RateLimitEntry = {
   resetAt: number;
 };
 
+/**
+ * In-memory rate limit store.
+ * WARNING: Resets on process restart. Not suitable for horizontal scaling.
+ * For multi-instance production deployments, replace with a Redis-backed store.
+ */
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
 function setNoStoreHeaders(headers: Headers): void {

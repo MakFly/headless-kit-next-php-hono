@@ -30,31 +30,26 @@ export type ProxyConfig = {
 
 /**
  * Laravel proxy configuration
- * Routes: /api/v1/auth/* (configurable via LARAVEL_AUTH_PREFIX)
+ * Routes: /api/v1/auth/* (1:1 mapping, same as Symfony)
  */
 function getLaravelConfig(): ProxyConfig {
-  const authPrefix = process.env.LARAVEL_AUTH_PREFIX || '/api/auth';
+  const authPrefix = process.env.LARAVEL_AUTH_PREFIX || '/api/v1/auth';
 
   return {
     baseUrl: process.env.LARAVEL_API_URL || 'http://localhost:8002',
     timeout: 30000,
     transformPath: (bffPath: string) => {
-      // /api/v1/auth/* in BFF maps to /api/auth/* in Laravel (no v1 prefix for auth)
-      if (bffPath.startsWith('/api/v1/auth/')) {
-        return bffPath.replace('/api/v1/auth/', `${authPrefix}/`);
-      }
-      // /api/v1/me → /api/auth/me
+      // /api/v1/me → /api/v1/auth/me
       if (bffPath === '/api/v1/me') {
         return `${authPrefix}/me`;
       }
-      // Other /api/v1/* routes pass through (RBAC, admin, etc.)
+      // All routes pass through (1:1 mapping)
       return bffPath;
     },
     publicRoutes: [
       `${authPrefix}/login`,
       `${authPrefix}/register`,
       `${authPrefix}/refresh`,
-      `${authPrefix}/providers`,
       `${authPrefix}/oauth/providers`,
       `${authPrefix}/test-accounts`,
       // Shop public routes

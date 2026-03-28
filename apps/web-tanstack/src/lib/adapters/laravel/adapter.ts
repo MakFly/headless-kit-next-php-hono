@@ -28,13 +28,13 @@ const ENDPOINTS = {
   ME: '/api/v1/me',
   OAUTH_PROVIDERS: '/api/v1/auth/providers',
   OAUTH_REDIRECT: (provider: string) => `/api/v1/auth/${provider}/redirect`,
-  TWO_FA_STATUS: '/api/auth/2fa/status',
-  TWO_FA_SETUP: '/api/auth/2fa/setup',
-  TWO_FA_ENABLE: '/api/auth/2fa/enable',
-  TWO_FA_VERIFY: '/api/auth/2fa/verify',
-  TWO_FA_DISABLE: '/api/auth/2fa/disable',
-  TWO_FA_RECOVERY: '/api/auth/2fa/recovery',
-  TWO_FA_RECOVERY_CODES: '/api/auth/2fa/recovery-codes',
+  TWO_FA_STATUS: '/api/v1/auth/2fa/status',
+  TWO_FA_SETUP: '/api/v1/auth/2fa/setup',
+  TWO_FA_ENABLE: '/api/v1/auth/2fa/enable',
+  TWO_FA_VERIFY: '/api/v1/auth/2fa/verify',
+  TWO_FA_DISABLE: '/api/v1/auth/2fa/disable',
+  TWO_FA_RECOVERY: '/api/v1/auth/2fa/recovery',
+  TWO_FA_RECOVERY_CODES: '/api/v1/auth/2fa/recovery-codes',
 }
 
 export class LaravelAdapter extends BaseAdapter {

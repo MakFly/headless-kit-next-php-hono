@@ -3,14 +3,12 @@
 use Illuminate\Support\Facades\Route;
 
 // =========================================================================
-// Auth Routes (BetterAuth + OAuth providers)
-// =========================================================================
-require app_path('Features/Auth/routes.php');
-
-// =========================================================================
 // Versioned API Routes - Accès via BFF uniquement
 // =========================================================================
 Route::prefix('v1')->group(function (): void {
+    // Auth Routes (BetterAuth + OAuth providers)
+    require app_path('Features/Auth/routes.php');
+
     require app_path('Features/Shop/routes.php');
     require app_path('Features/Cart/routes.php');
     require app_path('Features/Orders/routes.php');

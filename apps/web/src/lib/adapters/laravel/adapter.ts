@@ -23,18 +23,18 @@ import {
  * Laravel API endpoints (BetterAuth)
  */
 const ENDPOINTS = {
-  LOGIN: "/api/auth/login",
-  REGISTER: "/api/auth/register",
-  LOGOUT: "/api/auth/logout",
-  REFRESH: "/api/auth/refresh",
-  ME: "/api/auth/me",
-  OAUTH_PROVIDERS: "/api/auth/oauth/providers",
-  OAUTH_REDIRECT: (provider: string) => `/api/auth/oauth/${provider}`,
-  TWO_FACTOR_STATUS: "/api/auth/2fa/status",
-  TWO_FACTOR_SETUP: "/api/auth/2fa/setup",
-  TWO_FACTOR_VERIFY: "/api/auth/2fa/verify",
-  TWO_FACTOR_DISABLE: "/api/auth/2fa/disable",
-  MAGIC_LINK: "/api/auth/magic-link",
+  LOGIN: "/api/v1/auth/login",
+  REGISTER: "/api/v1/auth/register",
+  LOGOUT: "/api/v1/auth/logout",
+  REFRESH: "/api/v1/auth/refresh",
+  ME: "/api/v1/auth/me",
+  OAUTH_PROVIDERS: "/api/v1/auth/oauth/providers",
+  OAUTH_REDIRECT: (provider: string) => `/api/v1/auth/oauth/${provider}`,
+  TWO_FACTOR_STATUS: "/api/v1/auth/2fa/status",
+  TWO_FACTOR_SETUP: "/api/v1/auth/2fa/setup",
+  TWO_FACTOR_VERIFY: "/api/v1/auth/2fa/verify",
+  TWO_FACTOR_DISABLE: "/api/v1/auth/2fa/disable",
+  MAGIC_LINK: "/api/v1/auth/magic-link",
 };
 
 /**

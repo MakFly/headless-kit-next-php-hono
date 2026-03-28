@@ -39,10 +39,13 @@ app.use('*', requestContextMiddleware);
 app.use('*', i18nMiddleware);
 
 // CORS configuration
+const allowedOrigins = [frontendUrl];
+if (process.env.BFF_ORIGIN) allowedOrigins.push(process.env.BFF_ORIGIN);
+
 app.use(
   '*',
   cors({
-    origin: [frontendUrl, 'http://localhost:3300'],
+    origin: allowedOrigins,
     credentials: true,
     allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Request-Id', 'Accept-Language'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

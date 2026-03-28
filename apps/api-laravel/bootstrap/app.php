@@ -30,7 +30,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'org.rbac'     => \App\Shared\Middleware\OrgRbacMiddleware::class,
         ]);
 
-        $middleware->appendToGroup('api', SetLocaleMiddleware::class);
+        $middleware->api(append: [
+            SetLocaleMiddleware::class,
+            ApiSecurityHeadersMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Throwable $e, Request $request) {

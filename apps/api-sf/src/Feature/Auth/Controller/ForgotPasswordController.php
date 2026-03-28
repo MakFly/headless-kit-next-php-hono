@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Feature\Auth\Controller;
 
+use App\Shared\Service\ApiResponseService;
 use BetterAuth\Providers\PasswordResetProvider\PasswordResetProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +18,7 @@ class ForgotPasswordController extends AbstractController
 {
     public function __construct(
         private readonly PasswordResetProvider $passwordResetProvider,
+        private readonly ApiResponseService $api,
         private readonly ?LoggerInterface $logger = null,
         #[Autowire(env: 'FRONTEND_URL')]
         private readonly string $frontendUrl = 'http://localhost:3000',
@@ -30,11 +32,11 @@ class ForgotPasswordController extends AbstractController
             $email = $data['email'] ?? null;
 
             if (!$email) {
-                return $this->json(['error' => 'Email is required'], 400);
+                return $this->api->error('VALIDATION_ERROR', 'auth.email_required', 400);
             }
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return $this->json(['error' => 'Invalid email format'], 422);
+                return $this->api->error('VALIDATION_ERROR', 'auth.invalid_email_format', 422);
             }
 
             $callbackUrl = rtrim($this->frontendUrl, '/') . '/reset-password';
@@ -43,7 +45,7 @@ class ForgotPasswordController extends AbstractController
             $this->logger?->info('Password reset requested', ['email' => $email]);
 
             // Always return success to prevent email enumeration
-            return $this->json([
+            return $this->api->success([
                 'message' => 'If an account exists with this email, a password reset link has been sent.',
                 'expiresIn' => 3600,
             ]);
@@ -54,7 +56,7 @@ class ForgotPasswordController extends AbstractController
             ]);
 
             // Don't expose internal errors for security
-            return $this->json([
+            return $this->api->success([
                 'message' => 'If an account exists with this email, a password reset link has been sent.',
             ]);
         }

@@ -6,7 +6,11 @@ import { SignJWT, jwtVerify, type JWTPayload } from 'jose';
 import { nanoid } from 'nanoid';
 import type { JwtPayload, SafeUser } from '../types/index.ts';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'dev-secret');
+const rawSecret = process.env.JWT_SECRET || 'dev-secret';
+if (process.env.NODE_ENV === 'production' && (rawSecret === 'dev-secret' || rawSecret.length < 32)) {
+  throw new Error('JWT_SECRET must be set to a secure value (min 32 chars) in production');
+}
+const JWT_SECRET = new TextEncoder().encode(rawSecret);
 const JWT_ALGORITHM = 'HS256';
 
 /**

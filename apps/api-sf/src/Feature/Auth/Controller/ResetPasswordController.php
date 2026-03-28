@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Feature\Auth\Controller;
 
+use App\Shared\Service\ApiResponseService;
 use BetterAuth\Providers\PasswordResetProvider\PasswordResetProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,6 +17,7 @@ class ResetPasswordController extends AbstractController
 {
     public function __construct(
         private readonly PasswordResetProvider $passwordResetProvider,
+        private readonly ApiResponseService $api,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -29,11 +31,11 @@ class ResetPasswordController extends AbstractController
             $password = $data['newPassword'] ?? $data['password'] ?? null;
 
             if (!$token || !$password) {
-                return $this->json(['error' => 'Token and new password are required'], 400);
+                return $this->api->error('VALIDATION_ERROR', 'auth.token_password_required', 400);
             }
 
             if (strlen($password) < 8) {
-                return $this->json(['error' => 'Password must be at least 8 characters long'], 400);
+                return $this->api->error('VALIDATION_ERROR', 'auth.password_too_short', 400);
             }
 
             $result = $this->passwordResetProvider->resetPassword($token, $password);
@@ -41,21 +43,18 @@ class ResetPasswordController extends AbstractController
             if (!$result['success']) {
                 $this->logger?->warning('Password reset failed - invalid token');
 
-                return $this->json([
-                    'error' => $result['error'] ?? 'Invalid or expired reset token',
-                ], 400);
+                return $this->api->error('INVALID_TOKEN', $result['error'] ?? 'auth.invalid_reset_token', 400);
             }
 
             $this->logger?->info('Password reset successful');
 
-            return $this->json([
+            return $this->api->success([
                 'message' => 'Password has been reset successfully',
-                'success' => true,
             ]);
         } catch (\Exception $e) {
             $this->logger?->error('Password reset failed', ['error' => $e->getMessage()]);
 
-            return $this->json(['error' => 'Invalid or expired reset token'], 400);
+            return $this->api->error('INVALID_TOKEN', 'auth.invalid_reset_token', 400);
         }
     }
 }

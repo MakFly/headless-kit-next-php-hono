@@ -307,6 +307,10 @@ async function cleanupUnusedBackends(webDir: string, selectedBackend: string): P
     }
   }
 
+  // Detect template type: Next.js has proxy-config.ts, TanStack does not
+  const proxyPath = path.join(adaptersDir, 'proxy-config.ts');
+  const isTanStack = await fs.access(proxyPath).then(() => false).catch(() => true);
+
   // 2. Rewrite adapters/index.ts to only import the selected backend
   const indexPath = path.join(adaptersDir, 'index.ts');
   try {
@@ -319,8 +323,56 @@ async function cleanupUnusedBackends(webDir: string, selectedBackend: string): P
     const defaultUrl = selectedBackend === 'laravel' ? 'http://localhost:8002'
       : selectedBackend === 'symfony' ? 'http://localhost:8001'
       : 'http://localhost:3333';
+    const authPrefix = selectedBackend === 'symfony' ? '/api/v1/auth'
+      : selectedBackend === 'hono' ? '/api/v1/auth'
+      : undefined;
 
-    const newIndex = `/**
+    if (isTanStack) {
+      // TanStack: imports use explicit `./${selectedDir}/adapter` path, no proxy-config exports
+      const importPath = `./${selectedDir}/adapter`;
+      const newIndex = `import type { AuthAdapter, BackendType, AdapterConfig } from './types'
+import { ${adapterClass} } from '${importPath}'
+
+export type { AuthAdapter, BackendType, AdapterConfig } from './types'
+export type {
+  LoginRequest,
+  RegisterRequest,
+  RefreshTokenRequest,
+  AuthResponse,
+  NormalizedUser,
+  TokenStorage,
+} from './types'
+export { toUser } from './types'
+export { ${adapterClass} } from '${importPath}'
+export { AdapterError } from './errors'
+export { COOKIE_NAMES } from './base-adapter'
+
+export function getBackendType(): BackendType {
+  return '${selectedBackend === 'hono' ? 'node' : selectedBackend}'
+}
+
+export function getAdapterConfig(): Partial<AdapterConfig> {
+  return {
+    baseUrl: process.env.${envVar} || '${defaultUrl}',${authPrefix ? `\n    authPrefix: process.env.${selectedBackend === 'symfony' ? 'SYMFONY_AUTH_PREFIX' : 'NODE_AUTH_PREFIX'} || '${authPrefix}',` : ''}
+  }
+}
+
+let adapterInstance: AuthAdapter | null = null
+
+export function getAuthAdapter(): AuthAdapter {
+  if (adapterInstance) return adapterInstance
+  adapterInstance = new ${adapterClass}(getAdapterConfig())
+  return adapterInstance
+}
+
+export function resetAdapter(): void {
+  adapterInstance = null
+}
+`;
+      await fs.writeFile(indexPath, newIndex, 'utf-8');
+    } else {
+      // Next.js: imports use `./${selectedDir}` (directory index), includes proxy-config exports
+      const newIndex = `/**
  * Auth adapter factory — configured for ${selectedBackend} backend
  */
 
@@ -376,41 +428,37 @@ export function resetAdapter(): void {
   delete cachedAdapter.instance;
 }
 `;
-    await fs.writeFile(indexPath, newIndex, 'utf-8');
+      await fs.writeFile(indexPath, newIndex, 'utf-8');
+    }
   } catch {
     // index.ts not present
   }
 
-  // 3. Rewrite proxy-config.ts to only have the selected backend
-  const proxyPath = path.join(adaptersDir, 'proxy-config.ts');
-  try {
-    await fs.access(proxyPath);
-    let content = await fs.readFile(proxyPath, 'utf-8');
+  // 3. Rewrite proxy-config.ts to only have the selected backend (Next.js only)
+  if (!isTanStack) {
+    try {
+      await fs.access(proxyPath);
+      let content = await fs.readFile(proxyPath, 'utf-8');
 
-    // Replace getProxyConfig switch with direct return
-    const configFn = selectedBackend === 'laravel' ? 'getLaravelConfig'
-      : selectedBackend === 'symfony' ? 'getSymfonyConfig'
-      : 'getNodeConfig';
+      // Replace getProxyConfig switch with direct return
+      const configFn = selectedBackend === 'laravel' ? 'getLaravelConfig'
+        : selectedBackend === 'symfony' ? 'getSymfonyConfig'
+        : 'getNodeConfig';
 
-    // Remove the other two config functions and simplify getProxyConfig
-    const otherBackends = ['laravel', 'symfony', 'hono'].filter(b => b !== selectedBackend);
-    const otherFns = otherBackends.map(b =>
-      b === 'laravel' ? 'getLaravelConfig' : b === 'symfony' ? 'getSymfonyConfig' : 'getNodeConfig'
-    );
+      // Simple approach: replace the switch body
+      content = content.replace(
+        /export function getProxyConfig\([^)]*\): ProxyConfig \{[\s\S]*?\n\}/,
+        `export function getProxyConfig(): ProxyConfig {\n  return ${configFn}();\n}`,
+      );
 
-    // Simple approach: replace the switch body
-    content = content.replace(
-      /export function getProxyConfig\([^)]*\): ProxyConfig \{[\s\S]*?\n\}/,
-      `export function getProxyConfig(): ProxyConfig {\n  return ${configFn}();\n}`,
-    );
+      // Remove imports of getBackendType if present
+      content = content.replace(/import \{ getBackendType \} from '\.\/index';\n?/, '');
+      content = content.replace(/import type \{ BackendType \} from '\.\/types';\n?/, '');
 
-    // Remove imports of getBackendType if present
-    content = content.replace(/import \{ getBackendType \} from '\.\/index';\n?/, '');
-    content = content.replace(/import type \{ BackendType \} from '\.\/types';\n?/, '');
-
-    await fs.writeFile(proxyPath, content, 'utf-8');
-  } catch {
-    // proxy-config.ts not present (TanStack doesn't have it)
+      await fs.writeFile(proxyPath, content, 'utf-8');
+    } catch {
+      // proxy-config.ts not accessible
+    }
   }
 
   // 4. Simplify env.ts to only reference the selected backend URL
@@ -424,16 +472,40 @@ export function resetAdapter(): void {
       `export type AuthBackend = '${selectedBackend === 'hono' ? 'node' : selectedBackend}';`,
     );
 
-    // Remove unused backend URL entries
-    const urlEntries: Record<string, RegExp> = {
-      laravel: /\s*\/\/ Laravel API Configuration\n\s*LARAVEL_API_URL:.*\n/,
-      symfony: /\s*\/\/ Symfony API Configuration\n\s*SYMFONY_API_URL:.*\n\s*SYMFONY_AUTH_PREFIX:.*\n/,
-      hono: /\s*\/\/ Node\.js API Configuration\n\s*NODE_API_URL:.*\n\s*NODE_AUTH_PREFIX:.*\n/,
-    };
-
-    for (const [backend, regex] of Object.entries(urlEntries)) {
-      if (backend !== selectedBackend) {
-        envContent = envContent.replace(regex, '\n');
+    if (isTanStack) {
+      // TanStack env.ts has no comments — match bare property lines
+      // e.g. "  LARAVEL_API_URL: process.env.LARAVEL_API_URL || 'http://localhost:8002',"
+      const urlEntries: Record<string, RegExp> = {
+        laravel: /\n\s*LARAVEL_API_URL:.*,/,
+        symfony: /\n\s*SYMFONY_API_URL:.*,\n\s*SYMFONY_AUTH_PREFIX:.*,/,
+        hono: /\n\s*NODE_API_URL:.*,\n\s*NODE_AUTH_PREFIX:.*,/,
+      };
+      for (const [backend, regex] of Object.entries(urlEntries)) {
+        if (backend !== selectedBackend) {
+          envContent = envContent.replace(regex, '');
+        }
+      }
+      // Also fix AuthBackend type — TanStack uses `type AuthBackend = ...` without export keyword
+      envContent = envContent.replace(
+        /^(export )?type AuthBackend = .*$/m,
+        `export type AuthBackend = '${selectedBackend === 'hono' ? 'node' : selectedBackend}'`,
+      );
+      // Fix AUTH_BACKEND cast to match narrowed type
+      envContent = envContent.replace(
+        /AUTH_BACKEND: \(process\.env\.AUTH_BACKEND \|\| '[^']*'\) as AuthBackend,/,
+        `AUTH_BACKEND: '${selectedBackend === 'hono' ? 'node' : selectedBackend}' as AuthBackend,`,
+      );
+    } else {
+      // Next.js env.ts has section comments to anchor the regex
+      const urlEntries: Record<string, RegExp> = {
+        laravel: /\s*\/\/ Laravel API Configuration\n\s*LARAVEL_API_URL:.*\n/,
+        symfony: /\s*\/\/ Symfony API Configuration\n\s*SYMFONY_API_URL:.*\n\s*SYMFONY_AUTH_PREFIX:.*\n/,
+        hono: /\s*\/\/ Node\.js API Configuration\n\s*NODE_API_URL:.*\n\s*NODE_AUTH_PREFIX:.*\n/,
+      };
+      for (const [backend, regex] of Object.entries(urlEntries)) {
+        if (backend !== selectedBackend) {
+          envContent = envContent.replace(regex, '\n');
+        }
       }
     }
 

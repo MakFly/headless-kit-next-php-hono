@@ -4,8 +4,16 @@ import pc from 'picocolors';
 import { runPrompts } from './prompts.js';
 import { scaffold } from './scaffold.js';
 
+const VERSION = '0.2.0';
+
 async function main() {
-  intro(pc.bgCyan(pc.black(' create-headless-app ')));
+  // Handle --version flag
+  if (process.argv.includes('--version') || process.argv.includes('-v')) {
+    console.log(`create-headless-app v${VERSION}`);
+    return;
+  }
+
+  intro(pc.bgCyan(pc.black(` create-headless-app v${VERSION} `)));
 
   const options = await runPrompts();
   if (!options) return;

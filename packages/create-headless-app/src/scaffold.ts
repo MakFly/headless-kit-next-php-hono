@@ -36,8 +36,10 @@ export type TemplateVars = {
   PROJECT_NAME: string;
   DATABASE_URL: string;
   BACKEND: string;
+  FRONTEND: string;
   API_PORT: string;
   FRONTEND_PORT: string;
+  HEADLESS_KIT_VERSION: string;
   // Docker-specific secrets (generated fresh per project)
   APP_KEY: string;
   APP_SECRET: string;
@@ -166,6 +168,7 @@ export async function scaffold(options: ProjectOptions): Promise<void> {
     PROJECT_NAME: options.projectName,
     DATABASE_URL: dbUrl,
     BACKEND: options.backend,
+    FRONTEND: options.frontend,
     API_PORT:
       options.backend === 'laravel'
         ? '8002'
@@ -173,6 +176,7 @@ export async function scaffold(options: ProjectOptions): Promise<void> {
           ? '8001'
           : '3333',
     FRONTEND_PORT: options.frontend === 'nextjs' ? '3300' : '3301',
+    HEADLESS_KIT_VERSION: '0.2.0',
     // Docker-specific secrets
     APP_KEY: `base64:${Buffer.from(generateSecret(32), 'hex').toString('base64')}`,
     APP_SECRET: generateSecret(32),

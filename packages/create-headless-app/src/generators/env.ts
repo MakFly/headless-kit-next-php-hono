@@ -12,12 +12,12 @@ export async function generateEnvFiles(
   const hasAi = options.modules?.includes('ai-assistant') ?? false;
   // Frontend .env.local
   const backendUrlLines = {
-    laravel: 'LARAVEL_API_URL=http://localhost:8000',
-    symfony: 'SYMFONY_API_URL=http://localhost:8002',
-    hono: 'NODE_API_URL=http://localhost:8003',
+    laravel: `LARAVEL_API_URL=http://localhost:${vars.API_PORT}`,
+    symfony: `SYMFONY_API_URL=http://localhost:${vars.API_PORT}`,
+    hono: `NODE_API_URL=http://localhost:${vars.API_PORT}`,
   };
 
-  const frontendPort = options.frontend === 'nextjs' ? '3001' : '3003';
+  const frontendPort = vars.FRONTEND_PORT;
 
   let frontendEnv: string;
   const aiEnvLines = hasAi
@@ -30,13 +30,13 @@ OPENAI_API_KEY=
 
   if (options.frontend === 'nextjs') {
     frontendEnv = `# Frontend (Next.js BFF)
-NEXT_PUBLIC_APP_URL=http://localhost:3001
+NEXT_PUBLIC_APP_URL=http://localhost:${frontendPort}
 AUTH_BACKEND=${options.backend}
 ${backendUrlLines[options.backend]}
 ${aiEnvLines}`;
   } else {
     frontendEnv = `# Frontend (TanStack Start BFF)
-VITE_APP_URL=http://localhost:3003
+VITE_APP_URL=http://localhost:${frontendPort}
 AUTH_BACKEND=${options.backend}
 ${backendUrlLines[options.backend]}
 ${aiEnvLines}`;
@@ -61,7 +61,7 @@ DB_PASSWORD=postgres`
 APP_ENV=local
 APP_KEY=
 APP_DEBUG=true
-APP_URL=http://localhost:8000
+APP_URL=http://localhost:${vars.API_PORT}
 FRONTEND_URL=${frontendUrl}
 DB_CONNECTION=${options.database === 'sqlite' ? 'sqlite' : 'pgsql'}
 ${dbLines}
@@ -80,7 +80,7 @@ FRONTEND_URL=${frontendUrl}
 MAILER_DSN=null://null
 `;
   } else {
-    backendEnv = `PORT=8003
+    backendEnv = `PORT=${vars.API_PORT}
 NODE_ENV=development
 DATABASE_URL=./data.db
 JWT_SECRET=${generateSecret(32)}

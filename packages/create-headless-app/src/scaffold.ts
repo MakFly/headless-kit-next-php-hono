@@ -6,7 +6,31 @@ import { generateEnvFiles } from './generators/env.js';
 import { generatePackageJson } from './generators/package-json.js';
 import { generateDockerCompose } from './generators/docker-compose.js';
 import { generateSecret } from './utils.js';
-import { getModuleTemplatePaths } from './modules.js';
+import { getModuleTemplatePaths, type ModuleId } from './modules.js';
+
+/**
+ * Additional npm dependencies required by each module.
+ * Merged into apps/web/package.json after overlay.
+ */
+const MODULE_FRONTEND_DEPS: Partial<Record<ModuleId, Record<string, string>>> = {
+  'ai-assistant': {
+    'ai': '^4.0.0',
+    '@ai-sdk/anthropic': '^3.0.0',
+    '@ai-sdk/openai': '^3.0.0',
+    '@ai-sdk/google': '^3.0.0',
+    '@ai-sdk/mistral': '^3.0.0',
+    '@ai-sdk/react': '^3.0.0',
+    '@assistant-ui/react': '^0.12.0',
+    '@assistant-ui/react-ai-sdk': '^1.3.0',
+    '@assistant-ui/react-markdown': '^0.12.0',
+    'remark-gfm': '^4.0.0',
+  },
+  'support-chat': {
+    '@radix-ui/react-scroll-area': '^1.0.0',
+    '@radix-ui/react-select': '^2.0.0',
+    '@radix-ui/react-avatar': '^1.0.0',
+  },
+};
 
 export type TemplateVars = {
   PROJECT_NAME: string;
@@ -119,6 +143,9 @@ export async function scaffold(options: ProjectOptions): Promise<void> {
       }
     }
 
+    // Merge module frontend dependencies into apps/web/package.json
+    await mergeModuleDeps(path.join(projectDir, 'apps/web/package.json'), options.modules as ModuleId[]);
+
     spinner.stop(`${options.modules.length} module(s) applied`);
   }
 
@@ -225,5 +252,28 @@ async function replaceVariables(
         }
       }
     }
+  }
+}
+
+/**
+ * Merge additional module dependencies into the frontend package.json.
+ */
+async function mergeModuleDeps(pkgPath: string, modules: ModuleId[]): Promise<void> {
+  const depsToAdd: Record<string, string> = {};
+  for (const mod of modules) {
+    const extra = MODULE_FRONTEND_DEPS[mod];
+    if (extra) {
+      Object.assign(depsToAdd, extra);
+    }
+  }
+  if (Object.keys(depsToAdd).length === 0) return;
+
+  try {
+    const raw = await fs.readFile(pkgPath, 'utf-8');
+    const pkg = JSON.parse(raw);
+    pkg.dependencies = { ...pkg.dependencies, ...depsToAdd };
+    await fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf-8');
+  } catch {
+    // package.json not yet present — will be created by preset overlay
   }
 }

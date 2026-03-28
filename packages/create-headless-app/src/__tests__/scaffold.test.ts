@@ -448,11 +448,11 @@ for (const { backend, apiPort, dbVar } of backends) {
     // Frontend env
     // -----------------------------------------------------------------------
 
-    test('generates .env.local with VITE_APP_URL on port 3003', async () => {
+    test('generates .env.local with VITE_APP_URL on port 3301', async () => {
       const envPath = path.join(projectDir, 'apps/web/.env.local');
       expect(await fileExists(envPath)).toBe(true);
       const env = await readFile(envPath);
-      expect(env).toContain('VITE_APP_URL=http://localhost:3003');
+      expect(env).toContain('VITE_APP_URL=http://localhost:3301');
     });
 
     test('generates .env.local with correct AUTH_BACKEND', async () => {
@@ -461,12 +461,12 @@ for (const { backend, apiPort, dbVar } of backends) {
     });
 
     // -----------------------------------------------------------------------
-    // Backend env uses port 3003
+    // Backend env uses port 3301
     // -----------------------------------------------------------------------
 
-    test('generates apps/api/.env with FRONTEND_URL on port 3003', async () => {
+    test('generates apps/api/.env with FRONTEND_URL on port 3301', async () => {
       const env = await readFile(path.join(projectDir, 'apps/api/.env'));
-      expect(env).toContain('FRONTEND_URL=http://localhost:3003');
+      expect(env).toContain('FRONTEND_URL=http://localhost:3301');
     });
 
     // -----------------------------------------------------------------------
@@ -784,10 +784,10 @@ describe('scaffold with preset none', () => {
     await cleanTempDir(tmpDir);
   });
 
-  test('does NOT have shadcn components/ui directory', async () => {
+  test('has base components/ui directory with sidebar', async () => {
     expect(
-      await fileExists(path.join(projectDir, 'apps/web/src/components/ui')),
-    ).toBe(false);
+      await fileExists(path.join(projectDir, 'apps/web/src/components/ui/sidebar.tsx')),
+    ).toBe(true);
   });
 
   test('has basic auth pages from base template', async () => {

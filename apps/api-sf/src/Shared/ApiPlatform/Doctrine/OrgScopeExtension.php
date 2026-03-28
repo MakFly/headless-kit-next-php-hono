@@ -14,6 +14,7 @@ use App\Shared\Entity\TeamMember;
 use App\Shared\Entity\UsageRecord;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class OrgScopeExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
@@ -69,7 +70,7 @@ final class OrgScopeExtension implements QueryCollectionExtensionInterface, Quer
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $orgId = $request?->headers->get('X-Org-Id') ?? $request?->query->get('orgId');
+        $orgId = $this->resolveOrgId($request);
 
         if ($orgId === null) {
             // No org context — return empty result
@@ -83,5 +84,37 @@ final class OrgScopeExtension implements QueryCollectionExtensionInterface, Quer
         $queryBuilder
             ->andWhere(sprintf('%s.organization = :%s', $rootAlias, $paramName))
             ->setParameter($paramName, $orgId);
+    }
+
+    /**
+     * Resolve orgId from multiple sources (path > query > header).
+     * The frontends send orgId in the URL path: /api/v1/saas/orgs/{orgId}/...
+     */
+    private function resolveOrgId(?Request $request): ?string
+    {
+        if ($request === null) {
+            return null;
+        }
+
+        // 1. Route attribute (set by controllers via path param)
+        $orgId = $request->attributes->get('orgId');
+        if ($orgId !== null) {
+            return (string) $orgId;
+        }
+
+        // 2. Extract from URL path: /api/v1/saas/orgs/{uuid}/...
+        $path = $request->getPathInfo();
+        if (preg_match('#/orgs/([a-f0-9-]{36})(?:/|$)#i', $path, $matches)) {
+            return $matches[1];
+        }
+
+        // 3. Query param fallback
+        $orgId = $request->query->get('orgId');
+        if ($orgId !== null) {
+            return (string) $orgId;
+        }
+
+        // 4. Header fallback (legacy)
+        return $request->headers->get('X-Org-Id');
     }
 }

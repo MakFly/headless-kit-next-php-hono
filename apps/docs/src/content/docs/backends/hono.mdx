@@ -7,7 +7,7 @@ import { Aside, Steps } from '@astrojs/starlight/components';
 
 ## Overview
 
-The Hono backend (`apps/api-hono`) is a TypeScript backend running on Bun (port 8003). It uses **Vertical Slice Architecture** with a 5-file convention per feature.
+The Hono backend (`apps/api-hono`) is a TypeScript backend running on Bun (port 3333). It uses **Vertical Slice Architecture** with a 5-file convention per feature.
 
 | Feature | Details |
 | ------- | ------- |
@@ -38,7 +38,7 @@ The Hono backend (`apps/api-hono`) is a TypeScript backend running on Bun (port 
 3. **Run migrations and seed**
 
    ```bash
-   bun run db:migrate
+   bun run db:push
    bun run db:seed
    ```
 
@@ -123,14 +123,17 @@ All 7 domain modules are implemented with the same 5-file convention: Shop, Cart
 ## Database Commands
 
 ```bash
-bun run db:migrate    # Run pending migrations
+bun run db:push       # Push schema to database (dev)
 bun run db:seed       # Seed with test data
 bun run db:studio     # Open Drizzle Studio (GUI)
 ```
 
-## Testing
+## Quality Assurance
 
 ```bash
-cd apps/api-hono
-bun test
+# Tests
+cd apps/api-hono && bun test
+
+# All checks at once
+make qa-hono
 ```

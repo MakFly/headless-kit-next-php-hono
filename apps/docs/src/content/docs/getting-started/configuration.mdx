@@ -13,22 +13,22 @@ import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
     | Variable | Default | Description |
     | -------- | ------- | ----------- |
-    | `NEXT_PUBLIC_APP_URL` | `http://localhost:3001` | Public URL of the Next.js app |
+    | `NEXT_PUBLIC_APP_URL` | `http://localhost:3300` | Public URL of the Next.js app |
     | `AUTH_BACKEND` | `laravel` | Active backend: `laravel`, `symfony`, or `hono` |
-    | `LARAVEL_API_URL` | `http://localhost:8000` | Laravel backend URL |
-    | `SYMFONY_API_URL` | `http://localhost:8002` | Symfony backend URL |
-    | `HONO_API_URL` | `http://localhost:8003` | Hono backend URL |
+    | `LARAVEL_API_URL` | `http://localhost:8002` | Laravel backend URL |
+    | `SYMFONY_API_URL` | `http://localhost:8001` | Symfony backend URL |
+    | `NODE_API_URL` | `http://localhost:3333` | Hono backend URL |
     | `BFF_SECRET` | -- | HMAC shared secret (must match Laravel's) |
     | `BFF_ID` | `nextjs-bff` | Identifier sent in HMAC headers |
 
     Example `.env.local`:
 
     ```bash
-    NEXT_PUBLIC_APP_URL=http://localhost:3001
+    NEXT_PUBLIC_APP_URL=http://localhost:3300
     AUTH_BACKEND=laravel
-    LARAVEL_API_URL=http://localhost:8000
-    SYMFONY_API_URL=http://localhost:8002
-    HONO_API_URL=http://localhost:8003
+    LARAVEL_API_URL=http://localhost:8002
+    SYMFONY_API_URL=http://localhost:8001
+    NODE_API_URL=http://localhost:3333
     BFF_SECRET=your-secret-key-min-32-chars
     BFF_ID=nextjs-bff
     ```
@@ -38,14 +38,14 @@ import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
     | Variable | Default | Description |
     | -------- | ------- | ----------- |
-    | `VITE_API_URL` | `http://localhost:8003` | Backend API URL |
-    | `VITE_APP_URL` | `http://localhost:3003` | Public URL of the TanStack app |
+    | `VITE_API_URL` | `http://localhost:3333` | Backend API URL |
+    | `VITE_APP_URL` | `http://localhost:3301` | Public URL of the TanStack app |
 
     Example `.env`:
 
     ```bash
-    VITE_API_URL=http://localhost:8003
-    VITE_APP_URL=http://localhost:3003
+    VITE_API_URL=http://localhost:3333
+    VITE_APP_URL=http://localhost:3301
     ```
 
     <Aside type="note">
@@ -62,14 +62,14 @@ import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
     | Variable | Default | Description |
     | -------- | ------- | ----------- |
-    | `APP_URL` | `http://localhost:8000` | Laravel app URL |
+    | `APP_URL` | `http://localhost:8002` | Laravel app URL |
     | `APP_KEY` | -- | Laravel encryption key (generate with `php artisan key:generate`) |
     | `DB_CONNECTION` | `sqlite` | Database driver |
     | `DB_DATABASE` | `database/database.sqlite` | Database path |
     | `BFF_SECRET` | -- | HMAC shared secret (must match BFF's) |
     | `BFF_ID` | `nextjs-bff` | Expected BFF identifier |
-    | `SANCTUM_STATEFUL_DOMAINS` | `localhost:3001` | Domains allowed for stateful auth |
-    | `FRONTEND_URL` | `http://localhost:3001` | Frontend URL for CORS |
+    | `SANCTUM_STATEFUL_DOMAINS` | `localhost:3300` | Domains allowed for stateful auth |
+    | `FRONTEND_URL` | `http://localhost:3300` | Frontend URL for CORS |
     | `GOOGLE_CLIENT_ID` | -- | Google OAuth client ID |
     | `GOOGLE_CLIENT_SECRET` | -- | Google OAuth client secret |
     | `GITHUB_CLIENT_ID` | -- | GitHub OAuth client ID |
@@ -82,7 +82,7 @@ import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
     | -------- | ------- | ----------- |
     | `DATABASE_URL` | `sqlite:///%kernel.project_dir%/var/data_dev.db` | Database DSN |
     | `BETTER_AUTH_SECRET` | -- | Secret for Paseto V4 token signing |
-    | `FRONTEND_URL` | `http://localhost:3001` | Frontend URL for CORS |
+    | `FRONTEND_URL` | `http://localhost:3300` | Frontend URL for CORS |
     | `GOOGLE_CLIENT_ID` | -- | Google OAuth client ID |
     | `GOOGLE_CLIENT_SECRET` | -- | Google OAuth client secret |
     | `GITHUB_CLIENT_ID` | -- | GitHub OAuth client ID |
@@ -93,9 +93,9 @@ import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
     | Variable | Default | Description |
     | -------- | ------- | ----------- |
-    | `PORT` | `8003` | Server port |
+    | `PORT` | `3333` | Server port |
     | `JWT_SECRET` | -- | Secret for HS256 JWT signing |
-    | `FRONTEND_URL` | `http://localhost:3003` | Frontend URL for CORS |
+    | `FRONTEND_URL` | `http://localhost:3301` | Frontend URL for CORS |
     | `DATABASE_URL` | `file:./dev.db` | SQLite database path |
   </TabItem>
 </Tabs>
@@ -150,3 +150,35 @@ The BFF stores auth tokens in HttpOnly cookies. Cookie names are derived from th
 | `auth_backend` | Yes | Active backend identifier |
 
 The `token_expires_at` cookie is intentionally **not** HttpOnly so that client-side JavaScript can check whether a proactive refresh is needed before making API calls.
+
+## CSS Architecture
+
+Since the migration to **Tailwind CSS v4**, configuration is CSS-first — there is no `tailwind.config.ts`.
+
+Each frontend app uses a three-file CSS architecture:
+
+### Next.js (`apps/web`)
+
+| File | Role |
+|------|------|
+| `src/app/globals.css` | Entry point — `@import`, `@theme inline` mappings, `@custom-variant dark` |
+| `src/styles/theme.css` | Design tokens in oklch (`:root` and `.dark` variables) |
+| `src/styles/utilities.css` | Custom utility classes |
+
+### TanStack Start (`apps/web-tanstack`)
+
+| File | Role |
+|------|------|
+| `src/styles.css` | Entry point — `@import` and Tailwind directives |
+| `src/styles/theme.css` | Design tokens with neon accent variables |
+| `src/styles/utilities.css` | Custom utilities and keyframes |
+
+:::caution
+Never add design tokens directly in `globals.css` or `styles.css` — always put them in `theme.css`.
+:::
+
+### Dark Mode
+
+Dark mode uses `next-themes` with the `ThemeProvider` in the root layout. The toggle component is at `src/components/theme-toggle.tsx`.
+
+Dark mode tokens are defined in `theme.css` under the `.dark` selector. Tailwind's `@custom-variant dark (&:is(.dark *))` handles class-based dark mode switching.

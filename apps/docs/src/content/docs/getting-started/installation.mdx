@@ -86,7 +86,7 @@ Then follow steps 4 and 5 above.
     cp .env.example .env
     php artisan key:generate
     php artisan migrate --seed
-    php artisan serve --port=8000
+    php artisan serve --port=8002
     ```
   </TabItem>
   <TabItem label="Symfony">
@@ -96,7 +96,7 @@ Then follow steps 4 and 5 above.
     cp .env .env.local
     php bin/console doctrine:migrations:migrate
     php bin/console doctrine:fixtures:load
-    symfony server:start --port=8002 --no-tls
+    symfony server:start --port=8001 --no-tls
     ```
   </TabItem>
   <TabItem label="Hono">
@@ -107,7 +107,7 @@ Then follow steps 4 and 5 above.
     bun run db:seed
     bun run dev
     ```
-    Hono runs on port 8003 by default.
+    Hono runs on port 3333 by default.
   </TabItem>
 </Tabs>
 
@@ -119,15 +119,33 @@ Then follow steps 4 and 5 above.
 
 Once everything is running, open the URL for the frontend you selected:
 
-- **Next.js**: [http://localhost:3001](http://localhost:3001)
-- **TanStack Start**: [http://localhost:3003](http://localhost:3003)
+- **Next.js**: [http://localhost:3300](http://localhost:3300)
+- **TanStack Start**: [http://localhost:3301](http://localhost:3301)
 
 Navigate to `/auth/login` to confirm auth is working.
 
 | Service          | URL                          |
 | ---------------- | ---------------------------- |
-| Next.js BFF      | http://localhost:3001        |
-| TanStack Start   | http://localhost:3003        |
-| Laravel API      | http://localhost:8000        |
-| Symfony API      | http://localhost:8002        |
-| Hono API         | http://localhost:8003        |
+| Next.js BFF      | http://localhost:3300        |
+| TanStack Start   | http://localhost:3301        |
+| Laravel API      | http://localhost:8002        |
+| Symfony API      | http://localhost:8001        |
+| Hono API         | http://localhost:3333        |
+
+### Using Make
+
+For a more targeted setup, use the Makefile targets to start only what you need:
+
+```bash
+# Next.js + Hono
+make dev-next-hono
+
+# Next.js + Laravel
+make dev-next-laravel
+
+# Next.js + Symfony
+make dev-next-sf
+
+# TanStack Start + Hono
+make dev-tanstack-hono
+```

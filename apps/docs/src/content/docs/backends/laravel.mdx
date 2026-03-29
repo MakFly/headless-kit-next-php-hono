@@ -7,7 +7,7 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## Overview
 
-The Laravel backend (`apps/api-laravel`) runs on port 8000 and is the most feature-complete backend. It uses **Vertical Slice Architecture** with all code organized under `app/Features/`.
+The Laravel backend (`apps/api-laravel`) runs on port 8002 and is the most feature-complete backend. It uses **Vertical Slice Architecture** with all code organized under `app/Features/`.
 
 | Feature | Details |
 | ------- | ------- |
@@ -46,7 +46,7 @@ The Laravel backend (`apps/api-laravel`) runs on port 8000 and is the most featu
 4. **Start the server**
 
    ```bash
-   php artisan serve --port=8000
+   php artisan serve --port=8002
    ```
 
 </Steps>
@@ -171,9 +171,18 @@ Route::middleware('role:admin')->group(function () { /* ... */ });
 Route::middleware('permission:users:manage')->group(function () { /* ... */ });
 ```
 
-## Testing
+## Quality Assurance
 
 ```bash
-cd apps/api-laravel
-php artisan test
+# Code style (Laravel Pint)
+cd apps/api-laravel && composer lint
+
+# Static analysis (Larastan level 6)
+cd apps/api-laravel && composer analyse
+
+# Tests
+cd apps/api-laravel && php artisan test
+
+# All checks at once
+make qa-laravel
 ```

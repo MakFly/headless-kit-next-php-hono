@@ -66,6 +66,21 @@ FRONTEND_URL=https://app.example.com
 - [ ] Set up automated backups
 - [ ] Use connection pooling if applicable
 
+## Pre-deploy QA
+
+Run all quality checks before deploying:
+
+```bash
+# Run all checks (lint + tests for all backends)
+make qa
+
+# Or individually
+make qa-lint      # TypeScript lint + PHP lint (both backends)
+make qa-hono      # Hono tests
+make qa-laravel   # Pint + Larastan level 6 + PHPUnit
+make qa-sf        # CS-Fixer + PHPStan level 6 + PHPUnit
+```
+
 ## Deployment Architecture
 
 ### Recommended Setup
@@ -81,12 +96,12 @@ Internet
   │     ├── Rate limiting
   │     └── Request routing
   │
-  ├── Next.js BFF (port 3001)
+  ├── Next.js BFF (port 3300)
   │     ├── SSR rendering
   │     ├── API proxy
   │     └── Cookie management
   │
-  └── Backend API (port 8000/8002/8003)
+  └── Backend API (port 8002/8001/3333)
         ├── Auth processing
         ├── Business logic
         └── Database access
@@ -97,7 +112,7 @@ Internet
 ```bash
 # Production
 NEXT_PUBLIC_APP_URL=https://app.example.com
-LARAVEL_API_URL=http://api-internal:8000  # Internal network
+LARAVEL_API_URL=http://api-internal:8002  # Internal network
 ```
 
 <Aside type="tip">
@@ -117,7 +132,7 @@ limit_req_zone $binary_remote_addr zone=api:10m rate=30r/m;
 server {
     location /api/ {
         limit_req zone=api burst=10 nodelay;
-        proxy_pass http://nextjs:3001;
+        proxy_pass http://nextjs:3300;
     }
 }
 ```
@@ -129,7 +144,7 @@ limit_req_zone $binary_remote_addr zone=auth:10m rate=5r/m;
 
 location /api/v1/auth/login {
     limit_req zone=auth burst=3 nodelay;
-    proxy_pass http://nextjs:3001;
+    proxy_pass http://nextjs:3300;
 }
 ```
 
@@ -171,13 +186,13 @@ Each backend should expose a health endpoint for load balancers:
 
 ```bash
 # Laravel
-curl http://localhost:8000/api/health
-
-# Symfony
 curl http://localhost:8002/api/health
 
+# Symfony
+curl http://localhost:8001/api/health
+
 # Hono
-curl http://localhost:8003/api/health
+curl http://localhost:3333/api/health
 ```
 
 ### Logging

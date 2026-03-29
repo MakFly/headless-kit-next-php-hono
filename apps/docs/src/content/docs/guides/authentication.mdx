@@ -13,16 +13,15 @@ import { Tabs, TabItem, Aside, Steps } from '@astrojs/starlight/components';
 // apps/web/src/actions/auth.ts
 'use server';
 
-import { bff } from '@/lib/bff';
+import { bffPost } from '@/lib/actions/_shared/bff-client';
 import { redirect } from 'next/navigation';
 
 export async function loginAction(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
-  const result = await bff.post('/api/v1/auth/login', {
-    email,
-    password,
+  const result = await bffPost('/api/v1/auth/login', {
+    body: { email, password },
   });
 
   // Tokens are automatically stored in HttpOnly cookies by the proxy
@@ -58,14 +57,16 @@ export function LoginForm() {
 ```typescript
 'use server';
 
-import { bff } from '@/lib/bff';
+import { bffPost } from '@/lib/actions/_shared/bff-client';
 
 export async function registerAction(formData: FormData) {
-  const result = await bff.post('/api/v1/auth/register', {
-    name: formData.get('name') as string,
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-    password_confirmation: formData.get('password_confirmation') as string,
+  const result = await bffPost('/api/v1/auth/register', {
+    body: {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      password_confirmation: formData.get('password_confirmation') as string,
+    },
   });
 
   redirect('/dashboard');
@@ -77,11 +78,11 @@ export async function registerAction(formData: FormData) {
 ```typescript
 'use server';
 
-import { bff } from '@/lib/bff';
+import { bffPost } from '@/lib/actions/_shared/bff-client';
 import { redirect } from 'next/navigation';
 
 export async function logoutAction() {
-  await bff.post('/api/v1/auth/logout');
+  await bffPost('/api/v1/auth/logout', { body: {} });
   // The proxy clears all auth cookies automatically
   redirect('/auth/login');
 }
@@ -92,12 +93,12 @@ export async function logoutAction() {
 ```typescript
 'use server';
 
-import { bff } from '@/lib/bff';
+import { bffGet } from '@/lib/actions/_shared/bff-client';
 // User type is defined inline in each app
 
 export async function getCurrentUser() {
   try {
-    const response = await bff.get('/api/v1/auth/me');
+    const response = await bffGet('/api/v1/auth/me');
     return response.user;
   } catch {
     return null;
@@ -175,7 +176,7 @@ The BFF client throws `BffActionError` on failure:
 import { BffActionError } from '@/lib/actions/_shared/errors';
 
 try {
-  await bff.post('/api/v1/auth/login', credentials);
+  await bffPost('/api/v1/auth/login', { body: credentials });
 } catch (error) {
   if (error instanceof BffActionError) {
     console.error(error.statusCode); // 401, 422, etc.

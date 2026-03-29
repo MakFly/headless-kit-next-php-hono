@@ -15,7 +15,7 @@ TanStack Start is an alternative frontend option in Headless Kit. It uses **Vite
 
 | Feature | Next.js | TanStack Start |
 | ------- | ------- | -------------- |
-| Port | 3001 | 3003 |
+| Port | 3300 | 3301 |
 | Bundler | Webpack / Turbopack | Vite |
 | Router | App Router (file-based) | TanStack Router (file-based) |
 | SSR | React Server Components | `Route.useRouteContext()` |
@@ -25,10 +25,10 @@ TanStack Start is an alternative frontend option in Headless Kit. It uses **Vite
 
 ## How Routing Works
 
-TanStack Start uses **file-based routing** powered by TanStack Router. Routes live in `app/routes/`:
+TanStack Start uses **file-based routing** powered by TanStack Router. Routes live in `src/routes/`:
 
 ```
-app/routes/
+src/routes/
 ├── __root.tsx           # Root layout
 ├── index.tsx            # Home page (/)
 ├── auth/
@@ -44,10 +44,10 @@ Routes are type-safe -- TanStack Router generates types for route params, search
 
 ## BFF Proxy
 
-The BFF proxy is implemented as a catch-all route at `app/routes/api/v1/$.ts`. It intercepts all requests to `/api/v1/*` and forwards them to the configured backend:
+The BFF proxy is implemented as a catch-all route at `src/routes/api/v1/$.ts`. It intercepts all requests to `/api/v1/*` and forwards them to the configured backend:
 
 ```typescript
-// app/routes/api/v1/$.ts
+// src/routes/api/v1/$.ts
 import { createAPIFileRoute } from '@tanstack/react-start/api';
 
 export const APIRoute = createAPIFileRoute('/api/v1/$')({
@@ -124,7 +124,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 TanStack Start supports SSR by loading auth data in the route context. This avoids the "flash of unauthenticated content" that can occur with client-only state:
 
 ```typescript
-// app/routes/dashboard.tsx
+// src/routes/dashboard.tsx
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/dashboard')({
@@ -181,8 +181,8 @@ In **TanStack Start**, there are no React Server Components. Instead:
    Edit `apps/web-tanstack/.env`:
 
    ```bash
-   VITE_API_URL=http://localhost:8003
-   VITE_APP_URL=http://localhost:3003
+   VITE_API_URL=http://localhost:3333
+   VITE_APP_URL=http://localhost:3301
    ```
 
 3. **Start development**
@@ -191,7 +191,7 @@ In **TanStack Start**, there are no React Server Components. Instead:
    bun run dev
    ```
 
-   TanStack Start runs on [http://localhost:3003](http://localhost:3003).
+   TanStack Start runs on [http://localhost:3301](http://localhost:3301).
 
 </Steps>
 

@@ -7,7 +7,7 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## Overview
 
-The Symfony backend (`apps/api-sf`) runs on port 8002 and uses **Vertical Slice Architecture** with invokable controllers organized under `src/Feature/`.
+The Symfony backend (`apps/api-sf`) runs on port 8001 and uses **Vertical Slice Architecture** with invokable controllers organized under `src/Feature/`.
 
 | Feature | Details |
 | ------- | ------- |
@@ -47,7 +47,7 @@ The Symfony backend (`apps/api-sf`) runs on port 8002 and uses **Vertical Slice 
 4. **Start the server**
 
    ```bash
-   symfony server:start --port=8002 --no-tls
+   symfony server:start --port=8001 --no-tls
    ```
 
 </Steps>
@@ -138,9 +138,18 @@ $this->denyAccessUnlessGranted('ROLE_CHECK', 'admin');
 $this->denyAccessUnlessGranted('PERMISSION_CHECK', 'users:manage');
 ```
 
-## Testing
+## Quality Assurance
 
 ```bash
-cd apps/api-sf
-php bin/phpunit
+# Code style (PHP-CS-Fixer)
+cd apps/api-sf && composer lint
+
+# Static analysis (PHPStan level 6)
+cd apps/api-sf && composer analyse
+
+# Tests
+cd apps/api-sf && php bin/phpunit
+
+# All checks at once
+make qa-sf
 ```

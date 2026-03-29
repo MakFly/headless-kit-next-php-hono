@@ -19,13 +19,13 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     ports:
-      - "3001:3001"
+      - "3300:3300"
     environment:
-      - NEXT_PUBLIC_APP_URL=http://localhost:3001
+      - NEXT_PUBLIC_APP_URL=http://localhost:3300
       - AUTH_BACKEND=laravel
-      - LARAVEL_API_URL=http://api-laravel:8000
-      - SYMFONY_API_URL=http://api-sf:8002
-      - HONO_API_URL=http://api-hono:8003
+      - LARAVEL_API_URL=http://api-laravel:8002
+      - SYMFONY_API_URL=http://api-sf:8001
+      - HONO_API_URL=http://api-hono:3333
       - BFF_SECRET=${BFF_SECRET}
       - BFF_ID=nextjs-bff
     depends_on:
@@ -36,10 +36,10 @@ services:
       context: .
       dockerfile: apps/web-tanstack/Dockerfile
     ports:
-      - "3003:3003"
+      - "3301:3301"
     environment:
-      - VITE_API_URL=http://api-hono:8003
-      - VITE_APP_URL=http://localhost:3003
+      - VITE_API_URL=http://api-hono:3333
+      - VITE_APP_URL=http://localhost:3301
     depends_on:
       - api-hono
 
@@ -48,15 +48,15 @@ services:
       context: .
       dockerfile: apps/api-laravel/Dockerfile
     ports:
-      - "8000:8000"
+      - "8002:8002"
     environment:
-      - APP_URL=http://localhost:8000
+      - APP_URL=http://localhost:8002
       - APP_KEY=${LARAVEL_APP_KEY}
       - DB_CONNECTION=sqlite
       - DB_DATABASE=/app/database/database.sqlite
       - BFF_SECRET=${BFF_SECRET}
       - BFF_ID=nextjs-bff
-      - FRONTEND_URL=http://localhost:3001
+      - FRONTEND_URL=http://localhost:3300
     volumes:
       - laravel-data:/app/database
 
@@ -65,11 +65,11 @@ services:
       context: .
       dockerfile: apps/api-sf/Dockerfile
     ports:
-      - "8002:8002"
+      - "8001:8001"
     environment:
       - DATABASE_URL=sqlite:///app/var/data.db
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-      - FRONTEND_URL=http://localhost:3001
+      - FRONTEND_URL=http://localhost:3300
     volumes:
       - symfony-data:/app/var
 
@@ -78,11 +78,11 @@ services:
       context: .
       dockerfile: apps/api-hono/Dockerfile
     ports:
-      - "8003:8003"
+      - "3333:3333"
     environment:
-      - PORT=8003
+      - PORT=3333
       - JWT_SECRET=${JWT_SECRET}
-      - FRONTEND_URL=http://localhost:3003
+      - FRONTEND_URL=http://localhost:3301
       - DATABASE_URL=file:/app/data/dev.db
     volumes:
       - hono-data:/app/data
@@ -121,7 +121,7 @@ COPY --from=builder /app/apps/web/.next/standalone ./
 COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder /app/apps/web/public ./apps/web/public
 
-EXPOSE 3001
+EXPOSE 3300
 CMD ["bun", "apps/web/server.js"]
 ```
 
@@ -144,8 +144,8 @@ RUN composer install --no-dev --optimize-autoloader
 RUN php artisan config:cache && \
     php artisan route:cache
 
-EXPOSE 8000
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+EXPOSE 8002
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8002"]
 ```
 
 ### TanStack Start
@@ -172,7 +172,7 @@ FROM base AS runner
 ENV NODE_ENV=production
 COPY --from=builder /app/apps/web-tanstack/.output ./
 
-EXPOSE 3003
+EXPOSE 3301
 CMD ["bun", "run", "server/index.mjs"]
 ```
 
@@ -188,7 +188,7 @@ RUN bun install --production
 
 COPY apps/api-hono/ .
 
-EXPOSE 8003
+EXPOSE 3333
 CMD ["bun", "run", "src/index.ts"]
 ```
 

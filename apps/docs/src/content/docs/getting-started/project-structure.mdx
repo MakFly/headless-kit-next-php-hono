@@ -10,11 +10,11 @@ import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 ```
 headless-kit/
 ├── apps/
-│   ├── web/              # Next.js 16 App Router (BFF) -- port 3001
-│   ├── web-tanstack/     # TanStack Start + Vite -- port 3003
-│   ├── api-laravel/      # Laravel 12 + BetterAuth -- port 8000
-│   ├── api-sf/           # Symfony 8 + BetterAuth -- port 8002
-│   ├── api-hono/         # Hono + Drizzle + Bun -- port 8003
+│   ├── web/              # Next.js 16 App Router (BFF) -- port 3300
+│   ├── web-tanstack/     # TanStack Start + Vite -- port 3301
+│   ├── api-laravel/      # Laravel 12 + BetterAuth -- port 8002
+│   ├── api-sf/           # Symfony 8 + BetterAuth -- port 8001
+│   ├── api-hono/         # Hono + Drizzle + Bun -- port 3333
 │   ├── docs/             # This documentation site (Starlight)
 │   └── landing/          # Marketing landing page
 │
@@ -34,7 +34,7 @@ Headless Kit ships with two frontend options. Both implement the same BFF proxy 
   <TabItem label="Next.js (Recommended)">
     ### `apps/web` -- Next.js BFF
 
-    The primary frontend. It runs on port 3001 and acts as the Backend-for-Frontend:
+    The primary frontend. It runs on port 3300 and acts as the Backend-for-Frontend:
 
     - **App Router** with server components and server actions
     - **Route Handlers** at `/api/v1/[...path]` that proxy requests to the active backend
@@ -47,8 +47,15 @@ Headless Kit ships with two frontend options. Both implement the same BFF proxy 
     ├── src/
     │   ├── app/                    # App Router pages and layouts
     │   │   └── api/v1/[...path]/   # BFF proxy catch-all route
+    │   ├── components/
+    │   │   ├── theme-provider.tsx  # next-themes ThemeProvider wrapper
+    │   │   └── theme-toggle.tsx    # Dark mode toggle component
     │   ├── lib/
-    │   │   └── bff.ts              # BFF client for server actions
+    │   │   └── actions/_shared/
+    │   │       └── bff-client.ts   # BFF client for server actions
+    │   ├── styles/
+    │   │   ├── theme.css           # Design tokens (oklch variables)
+    │   │   └── utilities.css       # Custom utility classes
     │   └── middleware.ts           # Auth middleware
     ├── .env.local                  # Environment variables
     └── package.json
@@ -57,7 +64,7 @@ Headless Kit ships with two frontend options. Both implement the same BFF proxy 
   <TabItem label="TanStack Start">
     ### `apps/web-tanstack` -- TanStack Start BFF
 
-    An alternative frontend using TanStack Start + Vite on port 3003:
+    An alternative frontend using TanStack Start + Vite on port 3301:
 
     - **File-based routing** with TanStack Router
     - **SSR** with `Route.useRouteContext()` for hydrated auth state
@@ -81,7 +88,7 @@ Headless Kit ships with two frontend options. Both implement the same BFF proxy 
 
 ### `apps/api-laravel` -- Laravel Backend
 
-Full-featured PHP backend on port 8000:
+Full-featured PHP backend on port 8002:
 
 - BetterAuth for authentication (Bearer tokens)
 - HMAC request signing verification
@@ -90,7 +97,7 @@ Full-featured PHP backend on port 8000:
 
 ### `apps/api-sf` -- Symfony Backend
 
-PHP backend on port 8002:
+PHP backend on port 8001:
 
 - BetterAuth with Paseto V4 tokens
 - Symfony voters for RBAC
@@ -99,7 +106,7 @@ PHP backend on port 8002:
 
 ### `apps/api-hono` -- Hono Backend
 
-Lightweight TypeScript backend on port 8003:
+Lightweight TypeScript backend on port 3333:
 
 - JWT auth with `jose` library
 - Drizzle ORM with SQLite

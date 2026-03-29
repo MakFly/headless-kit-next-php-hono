@@ -20,6 +20,7 @@ TMP_DIR   := /tmp/headless-test
         dev-tanstack-laravel dev-tanstack-hono dev-tanstack-sf \
         dev-all dev-landing dev-docs \
         api-reset api-sf-reset api-hono-reset \
+        qa qa-hono qa-laravel qa-sf qa-lint \
         cli-build cli-test cli-try cli-try-all cli-clean \
         cli-try-admin cli-try-landing cli-try-saas cli-try-ecommerce cli-try-none
 
@@ -33,21 +34,28 @@ help:
 	@echo ""
 	@echo "  $(C_BOLD)Dev Servers$(C_RESET)  $(C_DIM)frontend + backend en parallele$(C_RESET)"
 	@echo ""
-	@echo "  $(C_BOLD)  Next.js :3001$(C_RESET)"
-	@echo "  $(C_GREEN)dev-next-laravel$(C_RESET)     Next.js + Laravel $(C_DIM):8000$(C_RESET)  $(C_YELLOW)(defaut)$(C_RESET)"
-	@echo "  $(C_GREEN)dev-next-hono$(C_RESET)        Next.js + Hono    $(C_DIM):8003$(C_RESET)"
-	@echo "  $(C_GREEN)dev-next-sf$(C_RESET)          Next.js + Symfony $(C_DIM):8002$(C_RESET)"
+	@echo "  $(C_BOLD)  Next.js :3300$(C_RESET)"
+	@echo "  $(C_GREEN)dev-next-hono$(C_RESET)        Next.js + Hono    $(C_DIM):3333$(C_RESET)"
+	@echo "  $(C_GREEN)dev-next-laravel$(C_RESET)     Next.js + Laravel $(C_DIM):8002$(C_RESET)"
+	@echo "  $(C_GREEN)dev-next-sf$(C_RESET)          Next.js + Symfony $(C_DIM):8001$(C_RESET)"
 	@echo ""
-	@echo "  $(C_BOLD)  TanStack :3003$(C_RESET)"
-	@echo "  $(C_GREEN)dev-tanstack-laravel$(C_RESET)  TanStack + Laravel $(C_DIM):8000$(C_RESET)"
-	@echo "  $(C_GREEN)dev-tanstack-hono$(C_RESET)     TanStack + Hono    $(C_DIM):8003$(C_RESET)"
-	@echo "  $(C_GREEN)dev-tanstack-sf$(C_RESET)       TanStack + Symfony $(C_DIM):8002$(C_RESET)"
+	@echo "  $(C_BOLD)  TanStack :3301$(C_RESET)"
+	@echo "  $(C_GREEN)dev-tanstack-hono$(C_RESET)     TanStack + Hono    $(C_DIM):3333$(C_RESET)"
+	@echo "  $(C_GREEN)dev-tanstack-laravel$(C_RESET)  TanStack + Laravel $(C_DIM):8002$(C_RESET)"
+	@echo "  $(C_GREEN)dev-tanstack-sf$(C_RESET)       TanStack + Symfony $(C_DIM):8001$(C_RESET)"
 	@echo ""
 	@echo "  $(C_GREEN)dev-all$(C_RESET)              Tout $(C_DIM)(6 apps)$(C_RESET)"
 	@echo ""
 	@echo "  $(C_BOLD)  Sites$(C_RESET)"
 	@echo "  $(C_GREEN)dev-landing$(C_RESET)          Landing page  $(C_DIM):4000$(C_RESET)"
 	@echo "  $(C_GREEN)dev-docs$(C_RESET)             Documentation $(C_DIM):4001$(C_RESET)"
+	@echo ""
+	@echo "  $(C_BOLD)QA$(C_RESET)  $(C_DIM)lint + analyse + tests$(C_RESET)"
+	@echo "  $(C_GREEN)qa$(C_RESET)                   Tous les checks $(C_DIM)(lint + hono + laravel + sf)$(C_RESET)"
+	@echo "  $(C_GREEN)qa-lint$(C_RESET)              Lint TS $(C_DIM)(turbo)$(C_RESET) + PHP $(C_DIM)(pint + cs-fixer)$(C_RESET)"
+	@echo "  $(C_GREEN)qa-hono$(C_RESET)              Hono tests $(C_DIM)(bun test)$(C_RESET)"
+	@echo "  $(C_GREEN)qa-laravel$(C_RESET)           Pint + Larastan + PHPUnit"
+	@echo "  $(C_GREEN)qa-sf$(C_RESET)                CS-Fixer + PHPStan + PHPUnit"
 	@echo ""
 	@echo "  $(C_BOLD)Setup$(C_RESET)"
 	@echo "  $(C_GREEN)install$(C_RESET)              Install all deps $(C_DIM)(bun + composer)$(C_RESET)"
@@ -63,7 +71,7 @@ help:
 	@echo ""
 	@echo "  $(C_BOLD)CLI$(C_RESET)  $(C_DIM)(create-headless-app)$(C_RESET)"
 	@echo "  $(C_GREEN)cli-build$(C_RESET)            Build the CLI"
-	@echo "  $(C_GREEN)cli-test$(C_RESET)             Unit tests $(C_DIM)(228 tests)$(C_RESET)"
+	@echo "  $(C_GREEN)cli-test$(C_RESET)             Unit tests"
 	@echo "  $(C_GREEN)cli-try$(C_RESET)              Interactive $(C_DIM)(opens prompts)$(C_RESET)"
 	@echo "  $(C_GREEN)cli-try-saas$(C_RESET)         $(C_YELLOW)Recommended$(C_RESET) — SaaS + Next.js + Laravel"
 	@echo "  $(C_GREEN)cli-try-admin$(C_RESET)        Admin + Next.js + Laravel"
@@ -75,36 +83,36 @@ help:
 	@echo ""
 	@echo "  $(C_BOLD)$(C_YELLOW)Quick start:$(C_RESET)"
 	@echo "    make install            $(C_DIM)# une seule fois$(C_RESET)"
-	@echo "    make api-reset          $(C_DIM)# init la DB$(C_RESET)"
-	@echo "    make dev-next-laravel   $(C_DIM)# lance Next.js + Laravel$(C_RESET)"
+	@echo "    make api-hono-reset     $(C_DIM)# init la DB Hono$(C_RESET)"
+	@echo "    make dev-next-hono      $(C_DIM)# lance Next.js :3300 + Hono :3333$(C_RESET)"
 	@echo ""
 
 # ============================================================================
-# Dev Servers — frontend × backend
+# Dev Servers — frontend x backend
 # ============================================================================
 
 dev-next-laravel:
-	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3001$(C_RESET)  +  $(C_BOLD)Laravel$(C_RESET) $(C_DIM):8000$(C_RESET)"
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3300$(C_RESET)  +  $(C_BOLD)Laravel$(C_RESET) $(C_DIM):8002$(C_RESET)"
 	@bun run dev:next-laravel
 
 dev-next-hono:
-	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3001$(C_RESET)  +  $(C_BOLD)Hono$(C_RESET) $(C_DIM):8003$(C_RESET)"
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3300$(C_RESET)  +  $(C_BOLD)Hono$(C_RESET) $(C_DIM):3333$(C_RESET)"
 	@bun run dev:next-hono
 
 dev-next-sf:
-	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3001$(C_RESET)  +  $(C_BOLD)Symfony$(C_RESET) $(C_DIM):8002$(C_RESET)"
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Next.js$(C_RESET) $(C_DIM):3300$(C_RESET)  +  $(C_BOLD)Symfony$(C_RESET) $(C_DIM):8001$(C_RESET)"
 	@bun run dev:next-sf
 
 dev-tanstack-laravel:
-	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3003$(C_RESET)  +  $(C_BOLD)Laravel$(C_RESET) $(C_DIM):8000$(C_RESET)"
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3301$(C_RESET)  +  $(C_BOLD)Laravel$(C_RESET) $(C_DIM):8002$(C_RESET)"
 	@bun run dev:tanstack-laravel
 
 dev-tanstack-hono:
-	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3003$(C_RESET)  +  $(C_BOLD)Hono$(C_RESET) $(C_DIM):8003$(C_RESET)"
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3301$(C_RESET)  +  $(C_BOLD)Hono$(C_RESET) $(C_DIM):3333$(C_RESET)"
 	@bun run dev:tanstack-hono
 
 dev-tanstack-sf:
-	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3003$(C_RESET)  +  $(C_BOLD)Symfony$(C_RESET) $(C_DIM):8002$(C_RESET)"
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)TanStack$(C_RESET) $(C_DIM):3301$(C_RESET)  +  $(C_BOLD)Symfony$(C_RESET) $(C_DIM):8001$(C_RESET)"
 	@bun run dev:tanstack-sf
 
 dev-all:
@@ -118,6 +126,48 @@ dev-landing:
 dev-docs:
 	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Docs$(C_RESET) $(C_DIM):4001$(C_RESET)"
 	@cd apps/docs && bun run dev
+
+# ============================================================================
+# QA — lint + analyse + tests
+# ============================================================================
+
+qa: qa-lint qa-hono qa-laravel qa-sf
+	@echo ""
+	@echo "  $(C_GREEN)$(C_BOLD)✓ All QA checks passed$(C_RESET)"
+	@echo ""
+
+qa-lint:
+	@echo ""
+	@echo "  $(C_CYAN)━━━ Lint TS (Turbo) ━━━$(C_RESET)"
+	@bun run lint
+	@echo "  $(C_CYAN)━━━ Lint PHP (Laravel — Pint) ━━━$(C_RESET)"
+	@cd apps/api-laravel && composer lint
+	@echo "  $(C_CYAN)━━━ Lint PHP (Symfony — CS-Fixer) ━━━$(C_RESET)"
+	@cd apps/api-sf && composer lint
+	@echo "  $(C_GREEN)✓$(C_RESET) All lint passed"
+
+qa-hono:
+	@echo ""
+	@echo "  $(C_CYAN)━━━ Hono ━━━$(C_RESET)"
+	@cd apps/api-hono && bun test
+	@echo "  $(C_GREEN)✓$(C_RESET) Hono tests passed"
+
+qa-laravel:
+	@echo ""
+	@echo "  $(C_CYAN)━━━ Laravel ━━━$(C_RESET)"
+	@cd apps/api-laravel && composer lint
+	@cd apps/api-laravel && composer analyse
+	@cd apps/api-laravel && php artisan test
+	@echo "  $(C_GREEN)✓$(C_RESET) Laravel QA passed"
+
+qa-sf:
+	@echo ""
+	@echo "  $(C_CYAN)━━━ Symfony ━━━$(C_RESET)"
+	@cd apps/api-sf && composer lint
+	@cd apps/api-sf && php bin/console cache:warmup --env=dev 2>/dev/null
+	@cd apps/api-sf && composer analyse
+	@cd apps/api-sf && php bin/phpunit
+	@echo "  $(C_GREEN)✓$(C_RESET) Symfony QA passed"
 
 # ============================================================================
 # Setup

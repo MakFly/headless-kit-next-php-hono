@@ -111,7 +111,7 @@ function AuthenticatedHome({ userName }: { userName: string }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.04),transparent_50%)]" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,color-mix(in oklch,var(--primary) 4%,transparent),transparent_50%)]" />
 
       <div className="relative max-w-5xl mx-auto px-6 py-24">
         <div className="space-y-2 mb-12">
@@ -148,10 +148,10 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
       {/* Subtle background pattern */}
-      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-[size:24px_24px] opacity-50" />
+      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(to_right,color-mix(in oklch,var(--border) 30%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in oklch,var(--border) 30%,transparent)_1px,transparent_1px)] bg-[size:24px_24px] opacity-50" />
 
       {/* Gradient orb */}
-      <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.06),transparent_70%)]" />
+      <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[radial-gradient(ellipse_at_center,color-mix(in oklch,var(--primary) 6%,transparent),transparent_70%)]" />
 
       {/* Nav */}
       <nav className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -374,7 +374,7 @@ function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 pb-24">
         <Card className="overflow-hidden border-border/50">
           <CardContent className="p-12 md:p-16 text-center relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.04),transparent_70%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,color-mix(in oklch,var(--primary) 4%,transparent),transparent_70%)]" />
             <div className="relative space-y-6">
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
                 Ready to build?

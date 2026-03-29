@@ -1,0 +1,33 @@
+/*
+ * Custom utilities — non-Tailwind classes
+ * Convention: add custom utility classes here, never in styles.css
+ */
+
+@layer utilities {
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+  .grain {
+    background-image: url('/noise.svg');
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+  .text-neon {
+    color: var(--neon);
+  }
+  .glow-neon {
+    box-shadow: 0 0 24px var(--neon-glow);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -7,7 +7,7 @@
 | Next.js | 16.1.6 (App Router) |
 | React | 19.2.4 |
 | TypeScript | 5.7+ |
-| Tailwind CSS | 3.4+ |
+| Tailwind CSS | 4.2+ |
 | shadcn/ui | latest (Radix UI primitives) |
 | Zustand | 5.0 |
 | TanStack Query | 5.90 (opt-in only) |
@@ -264,6 +264,16 @@ bun run dev         # Dev server on port 3300
 bun run build       # Production build (only when explicitly asked)
 bun run lint        # ESLint
 ```
+
+## CSS Architecture (Tailwind v4)
+
+| File | Purpose |
+|------|---------|
+| `src/app/globals.css` | Entry point — Tailwind imports, `@theme inline` mappings, `@custom-variant dark`, base layer resets |
+| `src/styles/theme.css` | Design tokens — `:root` (light) and `.dark` CSS custom properties in oklch |
+| `src/styles/utilities.css` | Custom utilities — `.scrollbar-none`, `.auth-panel-bg`, `.auth-glow` |
+
+**Convention :** ne jamais ajouter de tokens/couleurs dans `globals.css` — les mettre dans `theme.css`. Les classes utilitaires custom vont dans `utilities.css`.
 
 ## Key Rules
 

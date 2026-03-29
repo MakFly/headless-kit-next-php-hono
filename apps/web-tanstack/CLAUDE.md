@@ -1,5 +1,15 @@
 # Web Tanstack - Règles de développement
 
+## CSS Architecture (Tailwind v4)
+
+| File | Purpose |
+|------|---------|
+| `src/styles.css` | Entry point — Tailwind/font imports, `@theme inline` mappings, `@custom-variant dark`, base layer resets |
+| `src/styles/theme.css` | Design tokens — `:root` (light), `.dark`, `:root:not(.dark)` CSS custom properties in oklch. Neon accent variables. |
+| `src/styles/utilities.css` | Custom utilities — `.animate-spin-slow`, `.font-mono`, `.grain`, `.text-neon`, `.glow-neon`, keyframes |
+
+**Convention :** ne jamais ajouter de tokens/couleurs dans `styles.css` — les mettre dans `theme.css`. Les classes utilitaires custom vont dans `utilities.css`.
+
 ## Authentification & État
 
 ### Contexte Route vs Zustand

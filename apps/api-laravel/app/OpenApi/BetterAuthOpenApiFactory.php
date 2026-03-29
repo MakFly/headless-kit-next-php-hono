@@ -10,9 +10,7 @@ use ApiPlatform\OpenApi\OpenApi;
 
 final class BetterAuthOpenApiFactory implements OpenApiFactoryInterface
 {
-    public function __construct(private readonly OpenApiFactoryInterface $decorated)
-    {
-    }
+    public function __construct(private readonly OpenApiFactoryInterface $decorated) {}
 
     public function __invoke(array $context = []): OpenApi
     {
@@ -48,7 +46,7 @@ final class BetterAuthOpenApiFactory implements OpenApiFactoryInterface
     {
         $components = $openApi->getComponents();
         $schemeName = (string) config('betterauth_openapi.security_scheme', 'betterAuthBearer');
-        $securitySchemes = $components->getSecuritySchemes() ?? new \ArrayObject();
+        $securitySchemes = $components->getSecuritySchemes() ?? new \ArrayObject;
 
         if (! isset($securitySchemes[$schemeName])) {
             $securitySchemes[$schemeName] = new Model\SecurityScheme(

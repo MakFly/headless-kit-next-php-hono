@@ -21,7 +21,7 @@ class ResetPasswordAction
     public function __invoke(Request $request): JsonResponse
     {
         $request->validate([
-            'token'       => ['required', 'string'],
+            'token' => ['required', 'string'],
             'newPassword' => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
         ]);
 

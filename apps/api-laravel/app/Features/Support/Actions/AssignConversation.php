@@ -17,7 +17,7 @@ class AssignConversation
     public function __invoke(Request $request, string $id): JsonResponse
     {
         /** @var \App\Shared\Models\User $user */
-        $user         = $request->user();
+        $user = $request->user();
         $conversation = Conversation::find($id);
 
         if ($conversation === null) {
@@ -30,7 +30,7 @@ class AssignConversation
 
         $conversation->update([
             'agent_id' => $user->id,
-            'status'   => 'assigned',
+            'status' => 'assigned',
         ]);
 
         return $this->success(ConversationFormatter::format($conversation));

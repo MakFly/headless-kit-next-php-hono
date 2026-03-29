@@ -21,24 +21,24 @@ class CreateConversation
         $user = $request->user();
 
         $validated = $request->validate([
-            'subject'  => ['required', 'string', 'max:255'],
-            'message'  => ['required', 'string'],
+            'subject' => ['required', 'string', 'max:255'],
+            'message' => ['required', 'string'],
             'priority' => ['sometimes', 'in:low,medium,high,urgent'],
         ]);
 
         $conversation = Conversation::create([
-            'user_id'         => $user->id,
-            'subject'         => $validated['subject'],
-            'status'          => 'open',
-            'priority'        => $validated['priority'] ?? 'medium',
+            'user_id' => $user->id,
+            'subject' => $validated['subject'],
+            'status' => 'open',
+            'priority' => $validated['priority'] ?? 'medium',
             'last_message_at' => now(),
         ]);
 
         Message::create([
             'conversation_id' => $conversation->id,
-            'sender_id'       => $user->id,
-            'sender_type'     => 'user',
-            'content'         => $validated['message'],
+            'sender_id' => $user->id,
+            'sender_type' => 'user',
+            'content' => $validated['message'],
         ]);
 
         return $this->created(ConversationFormatter::format($conversation));

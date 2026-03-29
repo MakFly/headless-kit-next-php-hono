@@ -45,8 +45,8 @@ class ForgotPasswordAction
         // Upsert: one token per email at a time
         DB::table('password_reset_tokens')->upsert(
             [
-                'email'      => $user->email,
-                'token'      => $hashedToken,
+                'email' => $user->email,
+                'token' => $hashedToken,
                 'created_at' => now(),
             ],
             uniqueBy: ['email'],

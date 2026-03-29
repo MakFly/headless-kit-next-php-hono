@@ -25,29 +25,29 @@ class CreateOrg
             'slug' => ['sometimes', 'string', 'regex:/^[a-z0-9-]+$/', 'unique:organizations,slug'],
         ]);
 
-        $slug = $validated['slug'] ?? Str::slug($validated['name']) . '-' . Str::lower(Str::random(6));
+        $slug = $validated['slug'] ?? Str::slug($validated['name']).'-'.Str::lower(Str::random(6));
 
         if (! isset($validated['slug'])) {
             while (Organization::where('slug', $slug)->exists()) {
-                $slug = Str::slug($validated['name']) . '-' . Str::lower(Str::random(6));
+                $slug = Str::slug($validated['name']).'-'.Str::lower(Str::random(6));
             }
         }
 
         $org = Organization::create([
-            'name'     => $validated['name'],
-            'slug'     => $slug,
+            'name' => $validated['name'],
+            'slug' => $slug,
             'owner_id' => $user->id,
         ]);
 
         TeamMember::create([
             'organization_id' => $org->id,
-            'user_id'         => $user->id,
-            'role'            => 'owner',
-            'joined_at'       => now(),
+            'user_id' => $user->id,
+            'role' => 'owner',
+            'joined_at' => now(),
         ]);
 
         return $this->created([
-            'id'   => $org->id,
+            'id' => $org->id,
             'name' => $org->name,
             'slug' => $org->slug,
             'role' => 'owner',

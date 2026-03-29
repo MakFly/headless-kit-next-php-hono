@@ -14,7 +14,7 @@ class BulkApproveReviews
     public function __invoke(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'ids'   => ['required', 'array'],
+            'ids' => ['required', 'array'],
             'ids.*' => ['uuid'],
         ]);
 

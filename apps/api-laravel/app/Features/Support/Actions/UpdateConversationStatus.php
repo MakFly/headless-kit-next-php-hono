@@ -27,15 +27,15 @@ class UpdateConversationStatus
         ]);
 
         $validTransitions = [
-            'open'     => ['assigned', 'closed'],
+            'open' => ['assigned', 'closed'],
             'assigned' => ['waiting', 'resolved', 'closed'],
-            'waiting'  => ['assigned', 'resolved', 'closed'],
+            'waiting' => ['assigned', 'resolved', 'closed'],
             'resolved' => ['closed', 'open'],
-            'closed'   => [],
+            'closed' => [],
         ];
 
         $currentStatus = $conversation->status;
-        $newStatus     = $validated['status'];
+        $newStatus = $validated['status'];
 
         if (! in_array($newStatus, $validTransitions[$currentStatus] ?? [])) {
             return $this->error(

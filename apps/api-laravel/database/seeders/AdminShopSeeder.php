@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Shared\Models\Category;
 use App\Shared\Models\Customer;
 use App\Shared\Models\Product;
 use App\Shared\Models\Review;
@@ -49,11 +48,11 @@ class AdminShopSeeder extends Seeder
         $createdCustomers = [];
         foreach ($customersData as $customerData) {
             $createdCustomers[] = Customer::create(array_merge($customerData, [
-                'phone' => '+33 6 ' . rand(10, 99) . ' ' . rand(10, 99) . ' ' . rand(10, 99) . ' ' . rand(10, 99),
+                'phone' => '+33 6 '.rand(10, 99).' '.rand(10, 99).' '.rand(10, 99).' '.rand(10, 99),
                 'address' => [
-                    'street' => rand(1, 200) . ' rue de la Paix',
+                    'street' => rand(1, 200).' rue de la Paix',
                     'city' => 'Paris',
-                    'zip' => '750' . rand(01, 20),
+                    'zip' => '750'.rand(01, 20),
                     'country' => 'France',
                 ],
             ]));

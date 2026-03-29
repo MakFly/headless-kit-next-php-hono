@@ -6,8 +6,6 @@ namespace Tests\Feature;
 
 use App\Shared\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Routing\Middleware\ThrottleRequests;
-use Illuminate\Routing\Middleware\ThrottleRequestsWithRedirection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -21,7 +19,9 @@ final class PasswordResetTest extends TestCase
     use RefreshDatabase;
 
     private string $email = 'reset@example.com';
+
     private string $password = 'OldPassword1!';
+
     private string $newPassword = 'NewPassword1!';
 
     protected function setUp(): void
@@ -33,18 +33,18 @@ final class PasswordResetTest extends TestCase
     private function createUser(): User
     {
         return User::create([
-            'id'       => Str::uuid()->toString(),
-            'email'    => $this->email,
+            'id' => Str::uuid()->toString(),
+            'email' => $this->email,
             'password' => Hash::make($this->password),
-            'name'     => 'Reset User',
+            'name' => 'Reset User',
         ]);
     }
 
     private function insertResetToken(string $plainToken, int $ageSeconds = 0): void
     {
         DB::table('password_reset_tokens')->insert([
-            'email'      => $this->email,
-            'token'      => Hash::make($plainToken),
+            'email' => $this->email,
+            'token' => Hash::make($plainToken),
             'created_at' => now()->subSeconds($ageSeconds),
         ]);
     }
@@ -172,7 +172,7 @@ final class PasswordResetTest extends TestCase
         $this->insertResetToken($plainToken);
 
         $response = $this->postJson('/auth/password/reset', [
-            'token'       => $plainToken,
+            'token' => $plainToken,
             'newPassword' => $this->newPassword,
         ]);
 
@@ -188,7 +188,7 @@ final class PasswordResetTest extends TestCase
         $this->insertResetToken($plainToken);
 
         $this->postJson('/auth/password/reset', [
-            'token'       => $plainToken,
+            'token' => $plainToken,
             'newPassword' => $this->newPassword,
         ]);
 
@@ -203,7 +203,7 @@ final class PasswordResetTest extends TestCase
         $this->insertResetToken($plainToken);
 
         $this->postJson('/auth/password/reset', [
-            'token'       => $plainToken,
+            'token' => $plainToken,
             'newPassword' => $this->newPassword,
         ]);
 
@@ -217,7 +217,7 @@ final class PasswordResetTest extends TestCase
         $this->insertResetToken($plainToken, ageSeconds: 7201); // 2 hours ago
 
         $response = $this->postJson('/auth/password/reset', [
-            'token'       => $plainToken,
+            'token' => $plainToken,
             'newPassword' => $this->newPassword,
         ]);
 
@@ -228,7 +228,7 @@ final class PasswordResetTest extends TestCase
     public function test_reset_password_fails_with_invalid_token(): void
     {
         $response = $this->postJson('/auth/password/reset', [
-            'token'       => 'wrong-token',
+            'token' => 'wrong-token',
             'newPassword' => $this->newPassword,
         ]);
 
@@ -247,7 +247,7 @@ final class PasswordResetTest extends TestCase
     public function test_reset_password_fails_with_weak_password(): void
     {
         $response = $this->postJson('/auth/password/reset', [
-            'token'       => 'some-token',
+            'token' => 'some-token',
             'newPassword' => 'weak',
         ]);
 

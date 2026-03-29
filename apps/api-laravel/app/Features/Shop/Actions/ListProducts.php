@@ -22,7 +22,7 @@ class ListProducts
         }
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('min_price')) {
@@ -34,15 +34,15 @@ class ListProducts
         }
 
         match ($request->input('sort', 'newest')) {
-            'price_asc'  => $query->orderBy('price', 'asc'),
+            'price_asc' => $query->orderBy('price', 'asc'),
             'price_desc' => $query->orderBy('price', 'desc'),
-            'name_asc'   => $query->orderBy('name', 'asc'),
-            default      => $query->orderBy('created_at', 'desc'),
+            'name_asc' => $query->orderBy('name', 'asc'),
+            default => $query->orderBy('created_at', 'desc'),
         };
 
-        $perPage  = (int) $request->input('per_page', 12);
-        $page     = (int) $request->input('page', 1);
-        $total    = $query->count();
+        $perPage = (int) $request->input('per_page', 12);
+        $page = (int) $request->input('page', 1);
+        $total = $query->count();
         $products = $query->forPage($page, $perPage)->get();
 
         return $this->paginated($products, $page, $perPage, $total);

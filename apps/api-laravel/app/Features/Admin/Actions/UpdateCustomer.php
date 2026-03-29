@@ -23,11 +23,11 @@ class UpdateCustomer
 
         $validated = $request->validate([
             'first_name' => ['sometimes', 'string', 'max:255'],
-            'last_name'  => ['sometimes', 'string', 'max:255'],
-            'email'      => ['sometimes', 'email', 'unique:customers,email,' . $id],
-            'phone'      => ['nullable', 'string'],
-            'address'    => ['nullable', 'array'],
-            'segment'    => ['nullable', 'string'],
+            'last_name' => ['sometimes', 'string', 'max:255'],
+            'email' => ['sometimes', 'email', 'unique:customers,email,'.$id],
+            'phone' => ['nullable', 'string'],
+            'address' => ['nullable', 'array'],
+            'segment' => ['nullable', 'string'],
         ]);
 
         $customer->update($validated);

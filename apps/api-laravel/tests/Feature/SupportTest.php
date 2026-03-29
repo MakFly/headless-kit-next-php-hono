@@ -18,7 +18,9 @@ class SupportTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private User $otherUser;
+
     private User $admin;
 
     protected function setUp(): void

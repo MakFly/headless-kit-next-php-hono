@@ -16,23 +16,23 @@ class Dashboard
 
     public function __invoke(): JsonResponse
     {
-        $now          = now();
+        $now = now();
         $startOfMonth = $now->copy()->startOfMonth();
 
         $monthlyRevenue = Order::whereBetween('created_at', [$startOfMonth, $now])
             ->whereNotIn('status', ['cancelled'])
             ->sum('total');
 
-        $nbNewOrders    = Order::whereBetween('created_at', [$startOfMonth, $now])->count();
-        $newCustomers   = Customer::whereBetween('created_at', [$startOfMonth, $now])->count();
-        $pendingOrders  = Order::where('status', 'pending')->count();
+        $nbNewOrders = Order::whereBetween('created_at', [$startOfMonth, $now])->count();
+        $newCustomers = Customer::whereBetween('created_at', [$startOfMonth, $now])->count();
+        $pendingOrders = Order::where('status', 'pending')->count();
         $pendingReviews = Review::where('status', 'pending')->count();
 
         return $this->success([
             'monthlyRevenue' => $monthlyRevenue,
-            'nbNewOrders'    => $nbNewOrders,
-            'newCustomers'   => $newCustomers,
-            'pendingOrders'  => $pendingOrders,
+            'nbNewOrders' => $nbNewOrders,
+            'newCustomers' => $newCustomers,
+            'pendingOrders' => $pendingOrders,
             'pendingReviews' => $pendingReviews,
         ]);
     }

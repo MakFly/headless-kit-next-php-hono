@@ -16,7 +16,7 @@ class RatingsStats
     {
         $conversations = Conversation::whereNotNull('rating')->get();
 
-        $total   = $conversations->count();
+        $total = $conversations->count();
         $average = $total > 0 ? round($conversations->avg('rating'), 1) : 0;
 
         $distribution = ['1' => 0, '2' => 0, '3' => 0, '4' => 0, '5' => 0];
@@ -29,8 +29,8 @@ class RatingsStats
         }
 
         return $this->success([
-            'average'      => $average,
-            'total'        => $total,
+            'average' => $average,
+            'total' => $total,
             'distribution' => $distribution,
         ]);
     }

@@ -7,7 +7,6 @@ namespace Tests\Feature;
 use App\Shared\Models\Category;
 use App\Shared\Models\Customer;
 use App\Shared\Models\Order;
-use App\Shared\Models\OrderItem;
 use App\Shared\Models\Product;
 use App\Shared\Models\Review;
 use App\Shared\Models\Role;
@@ -21,8 +20,11 @@ class AdminShopTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private User $regularUser;
+
     private Product $product;
+
     private Category $category;
 
     protected function setUp(): void

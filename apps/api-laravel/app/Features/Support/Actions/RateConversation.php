@@ -16,7 +16,7 @@ class RateConversation
     public function __invoke(Request $request, string $id): JsonResponse
     {
         /** @var \App\Shared\Models\User $user */
-        $user         = $request->user();
+        $user = $request->user();
         $conversation = Conversation::find($id);
 
         if ($conversation === null) {
@@ -42,7 +42,7 @@ class RateConversation
         $conversation->update(['rating' => $validated['rating']]);
 
         return $this->success([
-            'id'     => $conversation->id,
+            'id' => $conversation->id,
             'rating' => $conversation->rating,
         ]);
     }

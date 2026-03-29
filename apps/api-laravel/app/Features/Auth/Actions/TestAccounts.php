@@ -25,10 +25,10 @@ class TestAccounts
             ->limit(20)
             ->get()
             ->map(fn (User $user) => [
-                'email'    => $user->email,
-                'name'     => $user->name,
+                'email' => $user->email,
+                'name' => $user->name,
                 'password' => self::DEV_PASSWORD,
-                'role'     => collect($user->roles)->first()?->slug ?? 'user',
+                'role' => collect($user->roles)->first()?->slug ?? 'user',
             ]);
 
         return $this->success($users);

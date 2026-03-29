@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Shared\Helpers\ApiResponse;
+use App\Shared\Middleware\ApiSecurityHeadersMiddleware;
 use App\Shared\Middleware\CheckPermission;
 use App\Shared\Middleware\CheckRole;
-use App\Shared\Middleware\ApiSecurityHeadersMiddleware;
 use App\Shared\Middleware\SetLocaleMiddleware;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -24,10 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role'         => CheckRole::class,
-            'permission'   => CheckPermission::class,
+            'role' => CheckRole::class,
+            'permission' => CheckPermission::class,
             'api.security' => ApiSecurityHeadersMiddleware::class,
-            'org.rbac'     => \App\Shared\Middleware\OrgRbacMiddleware::class,
+            'org.rbac' => \App\Shared\Middleware\OrgRbacMiddleware::class,
         ]);
 
         $middleware->api(append: [

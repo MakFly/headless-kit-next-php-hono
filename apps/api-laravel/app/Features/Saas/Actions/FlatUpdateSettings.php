@@ -23,7 +23,7 @@ class FlatUpdateSettings
 
         $validated = $request->validate([
             'organizationName' => ['sometimes', 'string', 'max:255'],
-            'slug'             => ['sometimes', 'string', 'regex:/^[a-z0-9-]+$/', 'unique:organizations,slug,' . $org->id],
+            'slug' => ['sometimes', 'string', 'regex:/^[a-z0-9-]+$/', 'unique:organizations,slug,'.$org->id],
         ]);
 
         $update = [];
@@ -41,7 +41,7 @@ class FlatUpdateSettings
 
         return $this->success([
             'organizationName' => $org->name,
-            'slug'             => $org->slug,
+            'slug' => $org->slug,
         ]);
     }
 }

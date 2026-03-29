@@ -37,7 +37,7 @@ class FlatChangeTeamRole
         $member->update(['role' => $validated['role']]);
 
         return $this->success([
-            'id'   => $member->id,
+            'id' => $member->id,
             'role' => $member->role,
         ]);
     }

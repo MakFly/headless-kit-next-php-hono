@@ -36,19 +36,19 @@ class Subscribe
 
         $now = now();
         $sub = Subscription::create([
-            'organization_id'      => $org->id,
-            'plan_id'              => $plan->id,
-            'status'               => 'active',
+            'organization_id' => $org->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
             'current_period_start' => $now,
-            'current_period_end'   => $now->copy()->addDays(30),
+            'current_period_end' => $now->copy()->addDays(30),
         ]);
 
         Invoice::create([
             'organization_id' => $org->id,
-            'amount'          => $plan->price_monthly,
-            'status'          => 'pending',
-            'period_start'    => $sub->current_period_start,
-            'period_end'      => $sub->current_period_end,
+            'amount' => $plan->price_monthly,
+            'status' => 'pending',
+            'period_start' => $sub->current_period_start,
+            'period_end' => $sub->current_period_end,
         ]);
 
         $org->update(['plan_id' => $plan->id]);

@@ -22,18 +22,18 @@ class AdminUpdateProduct
         }
 
         $validated = $request->validate([
-            'name'             => ['sometimes', 'string', 'max:255'],
-            'slug'             => ['sometimes', 'string', 'unique:products,slug,' . $id],
-            'description'      => ['nullable', 'string'],
-            'price'            => ['sometimes', 'integer', 'min:0'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'slug' => ['sometimes', 'string', 'unique:products,slug,'.$id],
+            'description' => ['nullable', 'string'],
+            'price' => ['sometimes', 'integer', 'min:0'],
             'compare_at_price' => ['nullable', 'integer', 'min:0'],
-            'sku'              => ['nullable', 'string'],
-            'stock_quantity'   => ['sometimes', 'integer', 'min:0'],
-            'category_id'      => ['nullable', 'uuid', 'exists:categories,id'],
-            'image_url'        => ['nullable', 'string'],
-            'images'           => ['nullable', 'array'],
-            'status'           => ['in:active,draft,archived'],
-            'featured'         => ['boolean'],
+            'sku' => ['nullable', 'string'],
+            'stock_quantity' => ['sometimes', 'integer', 'min:0'],
+            'category_id' => ['nullable', 'uuid', 'exists:categories,id'],
+            'image_url' => ['nullable', 'string'],
+            'images' => ['nullable', 'array'],
+            'status' => ['in:active,draft,archived'],
+            'featured' => ['boolean'],
         ]);
 
         $product->update($validated);

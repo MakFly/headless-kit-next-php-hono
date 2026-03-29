@@ -37,16 +37,16 @@ class FlatSubscribe
         $org = Organization::where('owner_id', $user->id)->first();
         if ($org === null) {
             $org = Organization::create([
-                'name'     => $user->name . '\'s Organization',
-                'slug'     => Str::slug($user->name) . '-' . Str::lower(Str::random(6)),
+                'name' => $user->name.'\'s Organization',
+                'slug' => Str::slug($user->name).'-'.Str::lower(Str::random(6)),
                 'owner_id' => $user->id,
             ]);
 
             TeamMember::create([
                 'organization_id' => $org->id,
-                'user_id'         => $user->id,
-                'role'            => 'owner',
-                'joined_at'       => now(),
+                'user_id' => $user->id,
+                'role' => 'owner',
+                'joined_at' => now(),
             ]);
         }
 
@@ -56,19 +56,19 @@ class FlatSubscribe
 
         $now = now();
         $sub = Subscription::create([
-            'organization_id'      => $org->id,
-            'plan_id'              => $plan->id,
-            'status'               => 'active',
+            'organization_id' => $org->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
             'current_period_start' => $now,
-            'current_period_end'   => $now->copy()->addDays(30),
+            'current_period_end' => $now->copy()->addDays(30),
         ]);
 
         Invoice::create([
             'organization_id' => $org->id,
-            'amount'          => $plan->price_monthly,
-            'status'          => 'pending',
-            'period_start'    => $sub->current_period_start,
-            'period_end'      => $sub->current_period_end,
+            'amount' => $plan->price_monthly,
+            'status' => 'pending',
+            'period_start' => $sub->current_period_start,
+            'period_end' => $sub->current_period_end,
         ]);
 
         $org->update(['plan_id' => $plan->id]);

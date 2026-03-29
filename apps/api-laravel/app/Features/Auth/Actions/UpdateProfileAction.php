@@ -16,11 +16,11 @@ class UpdateProfileAction
     public function __invoke(Request $request): JsonResponse
     {
         $request->validate([
-            'name'  => ['sometimes', 'string', 'min:2', 'max:255'],
+            'name' => ['sometimes', 'string', 'min:2', 'max:255'],
             'email' => ['sometimes', 'email', 'max:255'],
         ]);
 
-        if (!$request->hasAny(['name', 'email'])) {
+        if (! $request->hasAny(['name', 'email'])) {
             return $this->error('VALIDATION_ERROR', 'No fields provided for update.', 422);
         }
 

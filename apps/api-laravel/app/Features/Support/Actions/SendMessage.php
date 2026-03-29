@@ -17,7 +17,7 @@ class SendMessage
     public function __invoke(Request $request, string $id): JsonResponse
     {
         /** @var \App\Shared\Models\User $user */
-        $user         = $request->user();
+        $user = $request->user();
         $conversation = Conversation::find($id);
 
         if ($conversation === null) {
@@ -38,19 +38,19 @@ class SendMessage
 
         $message = Message::create([
             'conversation_id' => $conversation->id,
-            'sender_id'       => $user->id,
-            'sender_type'     => 'user',
-            'content'         => $validated['content'],
+            'sender_id' => $user->id,
+            'sender_type' => 'user',
+            'content' => $validated['content'],
         ]);
 
         $conversation->update(['last_message_at' => now()]);
 
         return $this->created([
-            'id'         => $message->id,
-            'senderId'   => $message->sender_id,
+            'id' => $message->id,
+            'senderId' => $message->sender_id,
             'senderType' => $message->sender_type,
-            'content'    => $message->content,
-            'createdAt'  => $message->created_at,
+            'content' => $message->content,
+            'createdAt' => $message->created_at,
         ]);
     }
 }

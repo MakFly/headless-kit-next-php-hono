@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Shared\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,7 +31,7 @@ class Permission extends Model
             self::firstOrCreate(
                 ['resource' => $resource, 'action' => $action],
                 [
-                    'name' => ucfirst($action) . ' ' . ucfirst($resource),
+                    'name' => ucfirst($action).' '.ucfirst($resource),
                     'slug' => "{$resource}.{$action}",
                 ]
             );

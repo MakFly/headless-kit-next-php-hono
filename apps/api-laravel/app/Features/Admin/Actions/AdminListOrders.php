@@ -18,15 +18,15 @@ class AdminListOrders
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(fn ($order) => [
-                'id'              => $order->id,
-                'status'          => $order->status,
-                'total'           => $order->total,
-                'paymentStatus'   => $order->payment_status,
+                'id' => $order->id,
+                'status' => $order->status,
+                'total' => $order->total,
+                'paymentStatus' => $order->payment_status,
                 'shippingAddress' => $order->shipping_address,
-                'notes'           => $order->notes,
-                'userId'          => $order->user_id,
-                'itemCount'       => $order->items->count(),
-                'createdAt'       => $order->created_at,
+                'notes' => $order->notes,
+                'userId' => $order->user_id,
+                'itemCount' => $order->items->count(),
+                'createdAt' => $order->created_at,
             ]);
 
         return $this->success($orders);

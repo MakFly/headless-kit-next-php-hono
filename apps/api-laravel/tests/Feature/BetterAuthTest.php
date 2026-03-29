@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 /**
  * BetterAuth Authentication Test.
@@ -17,7 +17,9 @@ final class BetterAuthTest extends TestCase
     use RefreshDatabase;
 
     private string $email = 'test@example.com';
+
     private string $password = 'SecurePassword123!';
+
     private string $name = 'Test User';
 
     /**

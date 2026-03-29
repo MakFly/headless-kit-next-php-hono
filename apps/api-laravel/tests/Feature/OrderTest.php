@@ -17,7 +17,9 @@ class OrderTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private User $otherUser;
+
     private Product $product;
 
     private array $shippingAddress = [

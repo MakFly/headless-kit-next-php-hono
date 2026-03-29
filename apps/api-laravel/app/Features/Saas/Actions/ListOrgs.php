@@ -22,7 +22,7 @@ class ListOrgs
             ->get();
 
         $orgs = $memberships->map(fn ($m) => [
-            'id'   => $m->organization->id,
+            'id' => $m->organization->id,
             'name' => $m->organization->name,
             'slug' => $m->organization->slug,
             'role' => $m->role,

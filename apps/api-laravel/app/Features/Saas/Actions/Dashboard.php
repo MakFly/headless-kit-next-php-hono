@@ -34,19 +34,19 @@ class Dashboard
             ->latest('recorded_at')
             ->value('value') ?? 0;
 
-        $sub         = $org->activeSubscription();
+        $sub = $org->activeSubscription();
         $currentPlan = $sub ? [
-            'id'   => $sub->plan->id,
+            'id' => $sub->plan->id,
             'name' => $sub->plan->name,
             'slug' => $sub->plan->slug,
         ] : null;
 
         return $this->success([
-            'activeMembers'     => $activeMembers,
-            'totalProjects'     => (int) $projects,
+            'activeMembers' => $activeMembers,
+            'totalProjects' => (int) $projects,
             'apiCallsThisMonth' => (int) $apiCalls,
-            'storageUsed'       => (int) $storage,
-            'currentPlan'       => $currentPlan,
+            'storageUsed' => (int) $storage,
+            'currentPlan' => $currentPlan,
         ]);
     }
 }

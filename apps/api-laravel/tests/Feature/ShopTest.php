@@ -14,6 +14,7 @@ class ShopTest extends TestCase
     use RefreshDatabase;
 
     private Category $electronics;
+
     private Category $clothing;
 
     protected function setUp(): void

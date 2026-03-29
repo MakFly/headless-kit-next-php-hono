@@ -28,7 +28,7 @@ class UpdateInventory
         $product->update(['stock_quantity' => $validated['stock_quantity']]);
 
         return $this->success([
-            'id'            => $product->id,
+            'id' => $product->id,
             'stockQuantity' => $product->stock_quantity,
         ]);
     }

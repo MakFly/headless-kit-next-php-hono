@@ -16,7 +16,9 @@ class CartTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private User $otherUser;
+
     private Product $product;
 
     protected function setUp(): void

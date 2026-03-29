@@ -15,7 +15,7 @@ class RemoveTeamMember
     public function __invoke(Request $request, string $id): JsonResponse
     {
         /** @var \App\Shared\Models\Organization $org */
-        $org    = $request->attributes->get('org');
+        $org = $request->attributes->get('org');
         $member = $org->teamMembers()->find($id);
 
         if ($member === null) {

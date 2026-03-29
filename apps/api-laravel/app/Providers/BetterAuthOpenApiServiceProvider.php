@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Command\OpenApiCommand;
+use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use App\OpenApi\BetterAuthOpenApiFactory;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;

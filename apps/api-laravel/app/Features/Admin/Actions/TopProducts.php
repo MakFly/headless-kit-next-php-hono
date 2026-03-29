@@ -29,11 +29,11 @@ class TopProducts
             ->limit(10)
             ->get()
             ->map(fn ($row) => [
-                'id'           => $row->id,
-                'name'         => $row->name,
-                'slug'         => $row->slug,
-                'price'        => $row->price,
-                'totalSold'    => (int) $row->total_sold,
+                'id' => $row->id,
+                'name' => $row->name,
+                'slug' => $row->slug,
+                'price' => $row->price,
+                'totalSold' => (int) $row->total_sold,
                 'totalRevenue' => (int) $row->total_revenue,
             ]);
 

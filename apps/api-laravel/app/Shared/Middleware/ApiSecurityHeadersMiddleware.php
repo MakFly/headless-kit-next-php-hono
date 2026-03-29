@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Shared\Middleware;
 
 use Closure;
@@ -29,4 +31,3 @@ class ApiSecurityHeadersMiddleware
         return $response;
     }
 }
-

@@ -15,8 +15,8 @@ class OrgRbacMiddleware
     private const ROLE_HIERARCHY = [
         'viewer' => 1,
         'member' => 2,
-        'admin'  => 3,
-        'owner'  => 4,
+        'admin' => 3,
+        'owner' => 4,
     ];
 
     public function handle(Request $request, Closure $next, string $minRole = 'viewer'): Response
@@ -39,7 +39,7 @@ class OrgRbacMiddleware
             return ApiResponse::error('ACCESS_DENIED', __('api.org.forbidden'), 403);
         }
 
-        $userLevel     = self::ROLE_HIERARCHY[$membership->role] ?? 0;
+        $userLevel = self::ROLE_HIERARCHY[$membership->role] ?? 0;
         $requiredLevel = self::ROLE_HIERARCHY[$minRole] ?? 0;
 
         if ($userLevel < $requiredLevel) {

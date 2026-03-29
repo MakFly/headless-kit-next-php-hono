@@ -11,9 +11,9 @@ class ApiResponse
     public static function success(mixed $data, int $status = 200, ?array $meta = null): JsonResponse
     {
         $payload = [
-            'success'    => true,
-            'data'       => $data,
-            'status'     => $status,
+            'success' => true,
+            'data' => $data,
+            'status' => $status,
             'request_id' => bin2hex(random_bytes(8)),
         ];
 
@@ -29,7 +29,7 @@ class ApiResponse
     public static function error(string $code, string $message, int $status, mixed $details = null): JsonResponse
     {
         $error = [
-            'code'    => $code,
+            'code' => $code,
             'message' => $message,
         ];
 
@@ -38,9 +38,9 @@ class ApiResponse
         }
 
         return response()->json([
-            'success'    => false,
-            'error'      => $error,
-            'status'     => $status,
+            'success' => false,
+            'error' => $error,
+            'status' => $status,
             'request_id' => bin2hex(random_bytes(8)),
         ], $status)->withHeaders([
             'Cache-Control' => 'no-store',
@@ -50,15 +50,15 @@ class ApiResponse
     public static function paginated(mixed $data, int $page, int $perPage, int $total, int $status = 200): JsonResponse
     {
         $payload = [
-            'success'    => true,
-            'data'       => $data,
+            'success' => true,
+            'data' => $data,
             'pagination' => [
-                'page'       => $page,
-                'perPage'    => $perPage,
-                'total'      => $total,
+                'page' => $page,
+                'perPage' => $perPage,
+                'total' => $total,
                 'totalPages' => (int) ceil($total / max(1, $perPage)),
             ],
-            'status'     => $status,
+            'status' => $status,
             'request_id' => bin2hex(random_bytes(8)),
         ];
 

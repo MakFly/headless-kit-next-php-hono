@@ -25,16 +25,16 @@ class ShowOrg
         $sub = $org->activeSubscription()?->load('plan');
 
         return $this->success([
-            'id'           => $org->id,
-            'name'         => $org->name,
-            'slug'         => $org->slug,
-            'role'         => $membership->role,
-            'plan'         => $org->plan ? [
+            'id' => $org->id,
+            'name' => $org->name,
+            'slug' => $org->slug,
+            'role' => $membership->role,
+            'plan' => $org->plan ? [
                 'name' => $org->plan->name,
                 'slug' => $org->plan->slug,
             ] : null,
             'subscription' => $sub ? [
-                'status'           => $sub->status,
+                'status' => $sub->status,
                 'currentPeriodEnd' => $sub->current_period_end,
             ] : null,
             'membersCount' => $org->teamMembers()->count(),

@@ -16,18 +16,18 @@ class AdminCreateProduct
     public function __invoke(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name'             => ['required', 'string', 'max:255'],
-            'slug'             => ['required', 'string', 'unique:products,slug'],
-            'description'      => ['nullable', 'string'],
-            'price'            => ['required', 'integer', 'min:0'],
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => ['required', 'string', 'unique:products,slug'],
+            'description' => ['nullable', 'string'],
+            'price' => ['required', 'integer', 'min:0'],
             'compare_at_price' => ['nullable', 'integer', 'min:0'],
-            'sku'              => ['nullable', 'string'],
-            'stock_quantity'   => ['required', 'integer', 'min:0'],
-            'category_id'      => ['nullable', 'uuid', 'exists:categories,id'],
-            'image_url'        => ['nullable', 'string'],
-            'images'           => ['nullable', 'array'],
-            'status'           => ['in:active,draft,archived'],
-            'featured'         => ['boolean'],
+            'sku' => ['nullable', 'string'],
+            'stock_quantity' => ['required', 'integer', 'min:0'],
+            'category_id' => ['nullable', 'uuid', 'exists:categories,id'],
+            'image_url' => ['nullable', 'string'],
+            'images' => ['nullable', 'array'],
+            'status' => ['in:active,draft,archived'],
+            'featured' => ['boolean'],
         ]);
 
         $product = Product::create($validated);

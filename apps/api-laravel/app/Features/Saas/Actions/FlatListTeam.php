@@ -22,9 +22,9 @@ class FlatListTeam
         }
 
         $members = $org->teamMembers()->with('user')->get()->map(fn ($m) => [
-            'id'       => $m->id,
-            'user'     => ['name' => $m->user->name, 'email' => $m->user->email],
-            'role'     => $m->role,
+            'id' => $m->id,
+            'user' => ['name' => $m->user->name, 'email' => $m->user->email],
+            'role' => $m->role,
             'joinedAt' => $m->joined_at,
         ]);
 

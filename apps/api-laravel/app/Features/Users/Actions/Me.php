@@ -18,24 +18,24 @@ class Me
         $user->load('roles.permissions');
 
         return $this->success([
-            'id'                => $user->id,
-            'name'              => $user->name,
-            'email'             => $user->email,
-            'avatar'            => $user->avatar ?? null,
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'avatar' => $user->avatar ?? null,
             'email_verified_at' => $user->email_verified_at,
-            'created_at'        => $user->created_at,
-            'updated_at'        => $user->updated_at,
-            'roles'             => $user->roles->map(fn ($role) => [
-                'id'   => $role->id,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+            'roles' => $user->roles->map(fn ($role) => [
+                'id' => $role->id,
                 'name' => $role->name,
                 'slug' => $role->slug,
             ]),
             'permissions' => $user->getAllPermissions()->map(fn ($perm) => [
-                'id'       => $perm->id,
-                'name'     => $perm->name,
-                'slug'     => $perm->slug,
+                'id' => $perm->id,
+                'name' => $perm->name,
+                'slug' => $perm->slug,
                 'resource' => $perm->resource,
-                'action'   => $perm->action,
+                'action' => $perm->action,
             ])->values(),
         ]);
     }

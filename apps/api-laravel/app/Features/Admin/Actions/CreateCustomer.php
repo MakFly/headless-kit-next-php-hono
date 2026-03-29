@@ -17,11 +17,11 @@ class CreateCustomer
     {
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
-            'last_name'  => ['required', 'string', 'max:255'],
-            'email'      => ['required', 'email', 'unique:customers,email'],
-            'phone'      => ['nullable', 'string'],
-            'address'    => ['nullable', 'array'],
-            'segment'    => ['nullable', 'string'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:customers,email'],
+            'phone' => ['nullable', 'string'],
+            'address' => ['nullable', 'array'],
+            'segment' => ['nullable', 'string'],
         ]);
 
         return $this->created(Customer::create($validated));

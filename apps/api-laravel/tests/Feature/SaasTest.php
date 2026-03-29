@@ -17,7 +17,9 @@ class SaasTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private User $otherUser;
+
     private Plan $plan;
 
     protected function setUp(): void

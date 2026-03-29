@@ -15,13 +15,13 @@ class ListPlans
     public function __invoke(): JsonResponse
     {
         $plans = Plan::orderBy('price_monthly')->get()->map(fn ($p) => [
-            'id'           => $p->id,
-            'name'         => $p->name,
-            'slug'         => $p->slug,
+            'id' => $p->id,
+            'name' => $p->name,
+            'slug' => $p->slug,
             'priceMonthly' => $p->price_monthly,
-            'priceYearly'  => $p->price_yearly,
-            'features'     => $p->features ?? [],
-            'limits'       => $p->limits ?? [],
+            'priceYearly' => $p->price_yearly,
+            'features' => $p->features ?? [],
+            'limits' => $p->limits ?? [],
         ]);
 
         return $this->success($plans);

@@ -15,11 +15,11 @@ class ListTeam
     public function __invoke(Request $request): JsonResponse
     {
         /** @var \App\Shared\Models\Organization $org */
-        $org     = $request->attributes->get('org');
+        $org = $request->attributes->get('org');
         $members = $org->teamMembers()->with('user')->get()->map(fn ($m) => [
-            'id'       => $m->id,
-            'user'     => ['name' => $m->user->name, 'email' => $m->user->email],
-            'role'     => $m->role,
+            'id' => $m->id,
+            'user' => ['name' => $m->user->name, 'email' => $m->user->email],
+            'role' => $m->role,
             'joinedAt' => $m->joined_at,
         ]);
 

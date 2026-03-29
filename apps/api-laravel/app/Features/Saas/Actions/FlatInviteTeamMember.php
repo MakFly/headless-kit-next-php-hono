@@ -25,7 +25,7 @@ class FlatInviteTeamMember
 
         $validated = $request->validate([
             'email' => ['required', 'email'],
-            'role'  => ['required', 'in:admin,member,viewer'],
+            'role' => ['required', 'in:admin,member,viewer'],
         ]);
 
         $invitee = User::where('email', $validated['email'])->first();
@@ -48,15 +48,15 @@ class FlatInviteTeamMember
 
         $member = TeamMember::create([
             'organization_id' => $org->id,
-            'user_id'         => $invitee->id,
-            'role'            => $validated['role'],
-            'joined_at'       => now(),
+            'user_id' => $invitee->id,
+            'role' => $validated['role'],
+            'joined_at' => now(),
         ]);
 
         return $this->created([
-            'id'       => $member->id,
-            'user'     => ['name' => $invitee->name, 'email' => $invitee->email],
-            'role'     => $member->role,
+            'id' => $member->id,
+            'user' => ['name' => $invitee->name, 'email' => $invitee->email],
+            'role' => $member->role,
             'joinedAt' => $member->joined_at,
         ]);
     }

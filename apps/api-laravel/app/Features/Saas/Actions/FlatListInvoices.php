@@ -22,12 +22,12 @@ class FlatListInvoices
         }
 
         $invoices = $org->invoices()->orderByDesc('created_at')->get()->map(fn ($inv) => [
-            'id'          => $inv->id,
-            'amount'      => $inv->amount,
-            'status'      => $inv->status,
+            'id' => $inv->id,
+            'amount' => $inv->amount,
+            'status' => $inv->status,
             'periodStart' => $inv->period_start,
-            'periodEnd'   => $inv->period_end,
-            'paidAt'      => $inv->paid_at,
+            'periodEnd' => $inv->period_end,
+            'paidAt' => $inv->paid_at,
         ]);
 
         return $this->success($invoices);

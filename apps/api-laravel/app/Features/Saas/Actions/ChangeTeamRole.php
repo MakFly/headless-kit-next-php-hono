@@ -15,7 +15,7 @@ class ChangeTeamRole
     public function __invoke(Request $request, string $id): JsonResponse
     {
         /** @var \App\Shared\Models\Organization $org */
-        $org    = $request->attributes->get('org');
+        $org = $request->attributes->get('org');
         $member = $org->teamMembers()->find($id);
 
         if ($member === null) {
@@ -33,7 +33,7 @@ class ChangeTeamRole
         $member->update(['role' => $validated['role']]);
 
         return $this->success([
-            'id'   => $member->id,
+            'id' => $member->id,
             'role' => $member->role,
         ]);
     }

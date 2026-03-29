@@ -23,12 +23,12 @@ class RevenueAnalytics
             ->limit(12)
             ->get()
             ->map(fn ($row) => [
-                'month'   => $row->month,
+                'month' => $row->month,
                 'revenue' => (int) $row->revenue,
             ]);
 
         return $this->success([
-            'totalRevenue'   => $totalRevenue,
+            'totalRevenue' => $totalRevenue,
             'revenueByMonth' => $revenueByMonth,
         ]);
     }

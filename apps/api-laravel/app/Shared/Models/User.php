@@ -1,20 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Shared\Models;
 
+use BetterAuth\Laravel\Models\Traits\HasBetterAuth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use BetterAuth\Laravel\Models\Traits\HasBetterAuth;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasBetterAuth;
-
     use HasApiTokens, HasFactory, Notifiable;
+    use HasBetterAuth;
 
     protected $fillable = ['name', 'email', 'password', 'avatar', 'roles', 'metadata'];
 
@@ -27,7 +28,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            ];
+        ];
     }
 
     // =========================================================================

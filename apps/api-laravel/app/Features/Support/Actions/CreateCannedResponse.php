@@ -20,8 +20,8 @@ class CreateCannedResponse
         $user = $request->user();
 
         $validated = $request->validate([
-            'title'    => ['required', 'string', 'max:255'],
-            'content'  => ['required', 'string'],
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
             'category' => ['nullable', 'string'],
             'shortcut' => ['nullable', 'string'],
         ]);

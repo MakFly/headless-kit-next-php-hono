@@ -19,7 +19,7 @@ class AddItem
     {
         $request->validate([
             'product_id' => ['required', 'string'],
-            'quantity'   => ['required', 'integer', 'min:1'],
+            'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
         $product = Product::where('id', $request->product_id)
@@ -30,9 +30,9 @@ class AddItem
             return $this->error('NOT_FOUND', __('api.shop.product_not_found'), 404);
         }
 
-        $cart         = Cart::firstOrCreate(['user_id' => $request->user()->id]);
+        $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
         $existingItem = $cart->items()->where('product_id', $product->id)->first();
-        $newQuantity  = ($existingItem?->quantity ?? 0) + $request->quantity;
+        $newQuantity = ($existingItem?->quantity ?? 0) + $request->quantity;
 
         if ($newQuantity > $product->stock_quantity) {
             return $this->error(
@@ -48,7 +48,7 @@ class AddItem
         } else {
             $cart->items()->create([
                 'product_id' => $product->id,
-                'quantity'   => $request->quantity,
+                'quantity' => $request->quantity,
             ]);
         }
 

@@ -22,9 +22,9 @@ class FlatGetUsage
         }
 
         $records = $org->usageRecords()->orderByDesc('recorded_at')->get()->map(fn ($r) => [
-            'metric'     => $r->metric,
-            'value'      => $r->value,
-            'limit'      => $r->limit_value,
+            'metric' => $r->metric,
+            'value' => $r->value,
+            'limit' => $r->limit_value,
             'recordedAt' => $r->recorded_at,
         ]);
 

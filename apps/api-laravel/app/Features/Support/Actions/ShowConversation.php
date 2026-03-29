@@ -17,7 +17,7 @@ class ShowConversation
     public function __invoke(Request $request, string $id): JsonResponse
     {
         /** @var \App\Shared\Models\User $user */
-        $user         = $request->user();
+        $user = $request->user();
         $conversation = Conversation::with('messages')->find($id);
 
         if ($conversation === null) {

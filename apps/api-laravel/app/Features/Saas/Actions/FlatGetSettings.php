@@ -23,7 +23,7 @@ class FlatGetSettings
 
         return $this->success([
             'organizationName' => $org->name,
-            'slug'             => $org->slug,
+            'slug' => $org->slug,
         ]);
     }
 }

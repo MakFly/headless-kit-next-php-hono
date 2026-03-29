@@ -19,13 +19,13 @@ class Inventory
             ->orderBy('stock_quantity', 'asc')
             ->get()
             ->map(fn ($p) => [
-                'id'            => $p->id,
-                'name'          => $p->name,
-                'slug'          => $p->slug,
-                'sku'           => $p->sku,
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'sku' => $p->sku,
                 'stockQuantity' => $p->stock_quantity,
-                'status'        => $p->status,
-                'category'      => $p->category ? ['id' => $p->category->id, 'name' => $p->category->name] : null,
+                'status' => $p->status,
+                'category' => $p->category ? ['id' => $p->category->id, 'name' => $p->category->name] : null,
             ]);
 
         return $this->success($products);

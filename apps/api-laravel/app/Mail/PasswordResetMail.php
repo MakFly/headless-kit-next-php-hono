@@ -29,7 +29,7 @@ class PasswordResetMail extends Mailable
     public function content(): Content
     {
         $frontendUrl = config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3300'));
-        $resetUrl = $frontendUrl . '/auth/reset-password?token=' . $this->resetToken;
+        $resetUrl = $frontendUrl.'/auth/reset-password?token='.$this->resetToken;
 
         return new Content(
             htmlString: <<<HTML

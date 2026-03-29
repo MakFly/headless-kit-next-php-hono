@@ -23,8 +23,8 @@ class UpdateCannedResponse
         }
 
         $validated = $request->validate([
-            'title'    => ['sometimes', 'string', 'max:255'],
-            'content'  => ['sometimes', 'string'],
+            'title' => ['sometimes', 'string', 'max:255'],
+            'content' => ['sometimes', 'string'],
             'category' => ['nullable', 'string'],
             'shortcut' => ['nullable', 'string'],
         ]);

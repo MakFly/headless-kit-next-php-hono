@@ -8,8 +8,8 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
-use App\Shared\Entity\Order;
 use App\Shared\Entity\Conversation;
+use App\Shared\Entity\Order;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -48,7 +48,7 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
 
     private function addWhere(QueryBuilder $queryBuilder, string $resourceClass): void
     {
-        if (!in_array($resourceClass, self::SUPPORTED_CLASSES, true)) {
+        if (!\in_array($resourceClass, self::SUPPORTED_CLASSES, true)) {
             return;
         }
 
@@ -66,7 +66,7 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
         $paramName = 'current_user_ext';
 
         $queryBuilder
-            ->andWhere(sprintf('%s.user = :%s', $rootAlias, $paramName))
+            ->andWhere(\sprintf('%s.user = :%s', $rootAlias, $paramName))
             ->setParameter($paramName, $user);
     }
 }

@@ -28,7 +28,7 @@ final class ReviewProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Review
     {
         $user = $this->security->getUser();
-        assert($user instanceof User);
+        \assert($user instanceof User);
 
         $data->setUser($user);
         $data->setStatus('pending');

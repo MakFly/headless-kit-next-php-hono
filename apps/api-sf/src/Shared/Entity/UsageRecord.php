@@ -6,6 +6,8 @@ namespace App\Shared\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -44,30 +46,78 @@ class UsageRecord
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['usage:read'])]
-    private \DateTimeImmutable $recordedAt;
+    private DateTimeImmutable $recordedAt;
 
     public function __construct()
     {
         $this->id = Uuid::uuid7()->toString();
-        $this->recordedAt = new \DateTimeImmutable();
+        $this->recordedAt = new DateTimeImmutable();
     }
 
-    public function getId(): string { return $this->id; }
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-    public function getOrganization(): Organization { return $this->organization; }
-    public function setOrganization(Organization $organization): static { $this->organization = $organization; return $this; }
+    public function getOrganization(): Organization
+    {
+        return $this->organization;
+    }
 
-    public function getMetric(): string { return $this->metric; }
-    public function setMetric(string $metric): static { $this->metric = $metric; return $this; }
+    public function setOrganization(Organization $organization): static
+    {
+        $this->organization = $organization;
 
-    public function getValue(): int { return $this->value; }
-    public function setValue(int $value): static { $this->value = $value; return $this; }
+        return $this;
+    }
 
-    public function getLimitValue(): int { return $this->limitValue; }
-    public function setLimitValue(int $limitValue): static { $this->limitValue = $limitValue; return $this; }
+    public function getMetric(): string
+    {
+        return $this->metric;
+    }
 
-    public function getRecordedAt(): \DateTimeImmutable { return $this->recordedAt; }
-    public function setRecordedAt(\DateTimeImmutable $recordedAt): static { $this->recordedAt = $recordedAt; return $this; }
+    public function setMetric(string $metric): static
+    {
+        $this->metric = $metric;
+
+        return $this;
+    }
+
+    public function getValue(): int
+    {
+        return $this->value;
+    }
+
+    public function setValue(int $value): static
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function getLimitValue(): int
+    {
+        return $this->limitValue;
+    }
+
+    public function setLimitValue(int $limitValue): static
+    {
+        $this->limitValue = $limitValue;
+
+        return $this;
+    }
+
+    public function getRecordedAt(): DateTimeImmutable
+    {
+        return $this->recordedAt;
+    }
+
+    public function setRecordedAt(DateTimeImmutable $recordedAt): static
+    {
+        $this->recordedAt = $recordedAt;
+
+        return $this;
+    }
 
     public function toArray(): array
     {
@@ -76,7 +126,7 @@ class UsageRecord
             'metric' => $this->metric,
             'value' => $this->value,
             'limitValue' => $this->limitValue,
-            'recordedAt' => $this->recordedAt->format(\DateTimeInterface::ATOM),
+            'recordedAt' => $this->recordedAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

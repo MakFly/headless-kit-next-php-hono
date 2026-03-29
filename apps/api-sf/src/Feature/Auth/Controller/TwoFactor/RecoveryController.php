@@ -8,6 +8,7 @@ use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\AuthManager;
 use BetterAuth\Core\Interfaces\TotpStorageInterface;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,7 +71,7 @@ class RecoveryController extends AbstractController
             $this->totpStorage->updateLast2faVerifiedAt((string) $userId);
 
             return $this->api->success($result);
-        } catch (\Exception) {
+        } catch (Exception) {
             return $this->api->error('INVALID_CREDENTIALS', 'auth.invalid_credentials', 401);
         }
     }

@@ -113,7 +113,7 @@ class CartTest extends WebTestCase
     {
         return [
             'CONTENT_TYPE' => 'application/json',
-            'HTTP_AUTHORIZATION' => 'Bearer ' . ($token ?: $this->accessToken),
+            'HTTP_AUTHORIZATION' => 'Bearer '.($token ?: $this->accessToken),
         ];
     }
 
@@ -241,7 +241,7 @@ class CartTest extends WebTestCase
         $itemId = $envelope['data']['items'][0]['id'];
 
         // Update quantity
-        $this->client->request('PATCH', '/api/v1/cart/items/' . $itemId, [], [], $this->authHeaders(), json_encode([
+        $this->client->request('PATCH', '/api/v1/cart/items/'.$itemId, [], [], $this->authHeaders(), json_encode([
             'quantity' => 5,
         ]));
 
@@ -275,7 +275,7 @@ class CartTest extends WebTestCase
         $itemId = $envelope['data']['items'][0]['id'];
 
         // Remove
-        $this->client->request('DELETE', '/api/v1/cart/items/' . $itemId, [], [], $this->authHeaders());
+        $this->client->request('DELETE', '/api/v1/cart/items/'.$itemId, [], [], $this->authHeaders());
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());

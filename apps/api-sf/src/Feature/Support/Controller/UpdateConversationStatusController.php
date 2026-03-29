@@ -33,7 +33,7 @@ class UpdateConversationStatusController extends AbstractController
         $data = json_decode($request->getContent(), true) ?? [];
         $status = $data['status'] ?? null;
 
-        if (!$status || !in_array($status, ['open', 'assigned', 'waiting', 'resolved', 'closed'])) {
+        if (!$status || !\in_array($status, ['open', 'assigned', 'waiting', 'resolved', 'closed'])) {
             return $this->api->error('VALIDATION_ERROR', 'support.invalid_status', 400);
         }
 

@@ -95,7 +95,7 @@ class User extends BaseUser
     public function hasAnyRole(array $slugs): bool
     {
         return $this->rbacRoles->exists(
-            fn (int $key, Role $role) => in_array($role->getSlug(), $slugs, true)
+            fn (int $key, Role $role) => \in_array($role->getSlug(), $slugs, true)
         );
     }
 

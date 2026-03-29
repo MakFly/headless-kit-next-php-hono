@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Auth;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Functional tests for BetterAuth authentication endpoints.
@@ -81,7 +81,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(),
-            'Registration should return 201 Created. Response: ' . $response->getContent());
+            'Registration should return 201 Created. Response: '.$response->getContent());
 
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('user', $data);
@@ -112,7 +112,7 @@ class AuthenticationTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_CONFLICT],
-            'Duplicate registration should return 400 or 409. Response: ' . $response->getContent()
+            'Duplicate registration should return 400 or 409. Response: '.$response->getContent()
         );
     }
 
@@ -135,7 +135,7 @@ class AuthenticationTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
-            'Invalid email should return 400 or 422. Response: ' . $response->getContent()
+            'Invalid email should return 400 or 422. Response: '.$response->getContent()
         );
     }
 
@@ -158,7 +158,7 @@ class AuthenticationTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY, Response::HTTP_CREATED],
-            'Weak password should return 400/422 (or 201 if no validation). Response: ' . $response->getContent()
+            'Weak password should return 400/422 (or 201 if no validation). Response: '.$response->getContent()
         );
     }
 
@@ -182,7 +182,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Login should return 200 OK. Response: ' . $response->getContent());
+            'Login should return 200 OK. Response: '.$response->getContent());
 
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('access_token', $data);
@@ -209,7 +209,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Invalid password should return 401 Unauthorized. Response: ' . $response->getContent());
+            'Invalid password should return 401 Unauthorized. Response: '.$response->getContent());
     }
 
     public function testLoginWithNonExistentUser(): void
@@ -228,7 +228,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Non-existent user should return 401 Unauthorized. Response: ' . $response->getContent());
+            'Non-existent user should return 401 Unauthorized. Response: '.$response->getContent());
     }
 
     public function testGetCurrentUserWithValidToken(): void
@@ -247,13 +247,13 @@ class AuthenticationTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $access_token,
+                'HTTP_AUTHORIZATION' => 'Bearer '.$access_token,
             ]
         );
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Get me should return 200 OK. Response: ' . $response->getContent());
+            'Get me should return 200 OK. Response: '.$response->getContent());
 
         $data = json_decode($response->getContent(), true);
         // BetterAuth returns user data directly or wrapped in 'user' key
@@ -274,7 +274,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Get me without token should return 401 Unauthorized. Response: ' . $response->getContent());
+            'Get me without token should return 401 Unauthorized. Response: '.$response->getContent());
     }
 
     public function testGetCurrentUserWithInvalidToken(): void
@@ -292,7 +292,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Get me with invalid token should return 401 Unauthorized. Response: ' . $response->getContent());
+            'Get me with invalid token should return 401 Unauthorized. Response: '.$response->getContent());
     }
 
     public function testRefreshToken(): void
@@ -319,7 +319,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Refresh should return 200 OK. Response: ' . $response->getContent());
+            'Refresh should return 200 OK. Response: '.$response->getContent());
 
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('access_token', $data);
@@ -339,7 +339,7 @@ class AuthenticationTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $access_token,
+                'HTTP_AUTHORIZATION' => 'Bearer '.$access_token,
             ]
         );
 
@@ -347,7 +347,7 @@ class AuthenticationTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
-            'Logout should return 200 or 204. Response: ' . $response->getContent()
+            'Logout should return 200 or 204. Response: '.$response->getContent()
         );
     }
 
@@ -363,7 +363,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'OAuth providers list should return 200 OK. Response: ' . $response->getContent());
+            'OAuth providers list should return 200 OK. Response: '.$response->getContent());
 
         $data = json_decode($response->getContent(), true);
         $this->assertIsArray($data);
@@ -381,7 +381,7 @@ class AuthenticationTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            '2FA status without auth should return 401. Response: ' . $response->getContent());
+            '2FA status without auth should return 401. Response: '.$response->getContent());
     }
 
     public function test2FAStatusWithAuthentication(): void
@@ -398,13 +398,13 @@ class AuthenticationTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $access_token,
+                'HTTP_AUTHORIZATION' => 'Bearer '.$access_token,
             ]
         );
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            '2FA status with auth should return 200. Response: ' . $response->getContent());
+            '2FA status with auth should return 200. Response: '.$response->getContent());
     }
 
     public function testListSessionsWithAuthentication(): void
@@ -421,7 +421,7 @@ class AuthenticationTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $access_token,
+                'HTTP_AUTHORIZATION' => 'Bearer '.$access_token,
             ]
         );
 
@@ -431,7 +431,7 @@ class AuthenticationTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_OK, Response::HTTP_BAD_REQUEST],
-            'Sessions list should return 200 or 400 (depending on auth mode). Response: ' . $response->getContent()
+            'Sessions list should return 200 or 400 (depending on auth mode). Response: '.$response->getContent()
         );
     }
 }

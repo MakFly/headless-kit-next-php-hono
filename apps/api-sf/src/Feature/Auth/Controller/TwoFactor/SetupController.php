@@ -8,6 +8,7 @@ use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Providers\TotpProvider\TotpProvider;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,7 +50,7 @@ class SetupController extends AbstractController
                 'manualEntryKey' => $result['manualEntryKey'] ?? $result['secret'],
                 'backupCodes' => $result['backupCodes'],
             ], 201);
-        } catch (\Exception) {
+        } catch (Exception) {
             return $this->api->error('SETUP_FAILED', 'auth.two_factor_setup_failed', 500);
         }
     }

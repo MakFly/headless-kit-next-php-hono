@@ -34,4 +34,3 @@ describe('entity identifier casting', function () {
             ->and($session->getUserId())->toBe('42');
     });
 });
-

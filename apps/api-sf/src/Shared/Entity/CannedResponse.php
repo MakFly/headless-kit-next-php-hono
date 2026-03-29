@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -57,44 +59,99 @@ class CannedResponse
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['canned:read'])]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['canned:read'])]
-    private \DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $updatedAt;
 
     public function __construct()
     {
         $this->id = Uuid::uuid7()->toString();
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function getId(): string { return $this->id; }
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-    public function getTitle(): string { return $this->title; }
-    public function setTitle(string $title): static { $this->title = $title; return $this; }
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
 
-    public function getContent(): string { return $this->content; }
-    public function setContent(string $content): static { $this->content = $content; return $this; }
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
 
-    public function getCategory(): ?string { return $this->category; }
-    public function setCategory(?string $category): static { $this->category = $category; return $this; }
+        return $this;
+    }
 
-    public function getShortcut(): ?string { return $this->shortcut; }
-    public function setShortcut(?string $shortcut): static { $this->shortcut = $shortcut; return $this; }
+    public function getContent(): string
+    {
+        return $this->content;
+    }
 
-    public function getCreatedBy(): string { return $this->createdBy; }
-    public function setCreatedBy(string $createdBy): static { $this->createdBy = $createdBy; return $this; }
+    public function setContent(string $content): static
+    {
+        $this->content = $content;
 
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
+        return $this;
+    }
+
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?string $category): static
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    public function getShortcut(): ?string
+    {
+        return $this->shortcut;
+    }
+
+    public function setShortcut(?string $shortcut): static
+    {
+        $this->shortcut = $shortcut;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): string
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(string $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
 
     public function toArray(): array
     {
@@ -105,8 +162,8 @@ class CannedResponse
             'category' => $this->category,
             'shortcut' => $this->shortcut,
             'createdBy' => $this->createdBy,
-            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
-            'updatedAt' => $this->updatedAt->format(\DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
+            'updatedAt' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

@@ -30,7 +30,7 @@ class EndpointAccessTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             $expectedCodes,
-            sprintf(
+            \sprintf(
                 '%s %s should return one of [%s], got %d. Response: %s',
                 $method,
                 $uri,
@@ -117,7 +117,7 @@ class EndpointAccessTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_OK, Response::HTTP_INTERNAL_SERVER_ERROR],
-            'OAuth providers endpoint should be accessible. Response: ' . $response->getContent()
+            'OAuth providers endpoint should be accessible. Response: '.$response->getContent()
         );
 
         if ($response->getStatusCode() === Response::HTTP_OK) {
@@ -139,7 +139,7 @@ class EndpointAccessTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_OK, Response::HTTP_MOVED_PERMANENTLY, Response::HTTP_FOUND, Response::HTTP_NOT_FOUND],
-            'API documentation should be accessible or return 404. Response: ' . $response->getContent()
+            'API documentation should be accessible or return 404. Response: '.$response->getContent()
         );
     }
 

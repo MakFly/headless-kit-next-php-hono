@@ -8,6 +8,7 @@ use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Providers\TotpProvider\TotpProvider;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,7 +54,7 @@ class DisableController extends AbstractController
             }
 
             return $this->api->success(['enabled' => false]);
-        } catch (\Exception) {
+        } catch (Exception) {
             return $this->api->error('DISABLE_FAILED', 'auth.two_factor_disable_failed', 500);
         }
     }

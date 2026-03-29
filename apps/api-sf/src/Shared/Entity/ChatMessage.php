@@ -7,6 +7,8 @@ namespace App\Shared\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -48,29 +50,71 @@ class ChatMessage
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['message:read', 'conversation:read'])]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct()
     {
         $this->id = Uuid::uuid7()->toString();
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
-    public function getId(): string { return $this->id; }
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-    public function getConversation(): Conversation { return $this->conversation; }
-    public function setConversation(Conversation $conversation): static { $this->conversation = $conversation; return $this; }
+    public function getConversation(): Conversation
+    {
+        return $this->conversation;
+    }
 
-    public function getSenderId(): string { return $this->senderId; }
-    public function setSenderId(string $senderId): static { $this->senderId = $senderId; return $this; }
+    public function setConversation(Conversation $conversation): static
+    {
+        $this->conversation = $conversation;
 
-    public function getSenderType(): string { return $this->senderType; }
-    public function setSenderType(string $senderType): static { $this->senderType = $senderType; return $this; }
+        return $this;
+    }
 
-    public function getContent(): string { return $this->content; }
-    public function setContent(string $content): static { $this->content = $content; return $this; }
+    public function getSenderId(): string
+    {
+        return $this->senderId;
+    }
 
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
+    public function setSenderId(string $senderId): static
+    {
+        $this->senderId = $senderId;
+
+        return $this;
+    }
+
+    public function getSenderType(): string
+    {
+        return $this->senderType;
+    }
+
+    public function setSenderType(string $senderType): static
+    {
+        $this->senderType = $senderType;
+
+        return $this;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    public function setContent(string $content): static
+    {
+        $this->content = $content;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
 
     public function toArray(): array
     {
@@ -79,7 +123,7 @@ class ChatMessage
             'senderId' => $this->senderId,
             'senderType' => $this->senderType,
             'content' => $this->content,
-            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

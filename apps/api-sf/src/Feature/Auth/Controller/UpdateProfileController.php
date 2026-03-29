@@ -8,7 +8,10 @@ use App\Shared\Entity\User;
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,7 +82,7 @@ class UpdateProfileController extends AbstractController
                 $doctrineUser->setEmail($email);
             }
 
-            $doctrineUser->setUpdatedAt(new \DateTimeImmutable());
+            $doctrineUser->setUpdatedAt(new DateTimeImmutable());
             $this->em->flush();
 
             return $this->api->success([
@@ -89,12 +92,12 @@ class UpdateProfileController extends AbstractController
                     'name' => $doctrineUser->getUsername(),
                     'avatar' => $doctrineUser->getAvatar(),
                     'emailVerified' => $doctrineUser->isEmailVerified(),
-                    'emailVerifiedAt' => $doctrineUser->getEmailVerifiedAt()?->format(\DateTimeInterface::ATOM),
-                    'createdAt' => $doctrineUser->getCreatedAt()->format(\DateTimeInterface::ATOM),
-                    'updatedAt' => $doctrineUser->getUpdatedAt()->format(\DateTimeInterface::ATOM),
+                    'emailVerifiedAt' => $doctrineUser->getEmailVerifiedAt()?->format(DateTimeInterface::ATOM),
+                    'createdAt' => $doctrineUser->getCreatedAt()->format(DateTimeInterface::ATOM),
+                    'updatedAt' => $doctrineUser->getUpdatedAt()->format(DateTimeInterface::ATOM),
                 ],
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->api->error('INTERNAL_ERROR', 'auth.update_failed', 500);
         }
     }

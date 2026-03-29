@@ -28,7 +28,7 @@ final class ConversationProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Conversation
     {
         $user = $this->security->getUser();
-        assert($user instanceof User);
+        \assert($user instanceof User);
 
         $data->setUser($user);
         $data->setStatus('open');

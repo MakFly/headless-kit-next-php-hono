@@ -7,6 +7,7 @@ namespace App\Feature\Auth\Controller;
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\AuthManager;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +36,7 @@ class LogoutController extends AbstractController
             $this->authManager->signOut($token);
 
             return $this->api->success(['message' => 'auth.logged_out']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->api->error('LOGOUT_FAILED', 'auth.logout_failed', 400);
         }
     }

@@ -126,9 +126,9 @@ class OrderItem
         return $this;
     }
 
-    public static function fromCartItem(CartItem $cartItem): static
+    public static function fromCartItem(CartItem $cartItem): self
     {
-        $orderItem = new static();
+        $orderItem = new self();
         $product = $cartItem->getProduct();
         $orderItem->setProduct($product);
         $orderItem->setProductName($product->getName());

@@ -25,16 +25,16 @@ final class RateLimiterService
         string $scope,
         string $identifier,
         int $maxAttempts,
-        int $windowSeconds
+        int $windowSeconds,
     ): ?JsonResponse {
         $now = time();
         $window = intdiv($now, $windowSeconds);
-        $fingerprint = sha1(($request->getClientIp() ?? 'unknown') . ':' . $identifier);
-        $cacheKey = sprintf('auth_rl_%s_%s_%d', $scope, $fingerprint, $window);
+        $fingerprint = sha1(($request->getClientIp() ?? 'unknown').':'.$identifier);
+        $cacheKey = \sprintf('auth_rl_%s_%s_%d', $scope, $fingerprint, $window);
 
         $item = $this->cache->getItem($cacheKey);
         $count = $item->isHit() ? (int) $item->get() : 0;
-        $count++;
+        ++$count;
 
         $retryAfter = max(1, (($window + 1) * $windowSeconds) - $now);
 

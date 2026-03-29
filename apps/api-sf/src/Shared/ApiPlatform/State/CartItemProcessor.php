@@ -29,7 +29,7 @@ final class CartItemProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): CartItem
     {
         $user = $this->security->getUser();
-        assert($user instanceof User);
+        \assert($user instanceof User);
 
         // Find or create user's cart
         $cart = $this->em->getRepository(Cart::class)->findOneBy(['user' => $user]);

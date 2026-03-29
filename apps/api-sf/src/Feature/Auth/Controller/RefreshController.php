@@ -7,6 +7,7 @@ namespace App\Feature\Auth\Controller;
 use App\Feature\Auth\Service\RateLimiterService;
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\AuthManager;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,7 +35,7 @@ class RefreshController extends AbstractController
                 return $this->api->error('VALIDATION_ERROR', 'auth.refresh_token_required', 400);
             }
 
-            $limiterKey = sprintf(
+            $limiterKey = \sprintf(
                 'refresh:%s:%s',
                 $request->getClientIp() ?? 'unknown',
                 substr(hash('sha256', (string) $refreshToken), 0, 16)
@@ -47,7 +48,7 @@ class RefreshController extends AbstractController
             $result = $this->authManager->refresh($refreshToken);
 
             return $this->api->success($result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger?->warning('Token refresh failed', ['error' => $e->getMessage()]);
 
             return $this->api->error('INVALID_REFRESH_TOKEN', 'auth.invalid_refresh_token', 401);

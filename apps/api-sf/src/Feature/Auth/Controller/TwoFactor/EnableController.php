@@ -9,6 +9,7 @@ use BetterAuth\Core\Interfaces\TotpStorageInterface;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Providers\TotpProvider\TotpProvider;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,13 +56,13 @@ class EnableController extends AbstractController
 
             // Retrieve remaining backup codes count after enabling
             $totpData = $this->totpStorage->findByUserId((string) $user->getId());
-            $backupCodesCount = count($totpData['backup_codes'] ?? []);
+            $backupCodesCount = \count($totpData['backup_codes'] ?? []);
 
             return $this->api->success([
                 'enabled' => true,
                 'backupCodesRemaining' => $backupCodesCount,
             ]);
-        } catch (\Exception) {
+        } catch (Exception) {
             return $this->api->error('ENABLE_FAILED', 'auth.two_factor_enable_failed', 500);
         }
     }

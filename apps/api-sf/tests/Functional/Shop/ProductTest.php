@@ -104,7 +104,7 @@ class ProductTest extends WebTestCase
     private function getProductIdBySlug(string $slug): string
     {
         $product = $this->em->getRepository(Product::class)->findOneBy(['slug' => $slug]);
-        $this->assertNotNull($product, sprintf('Product with slug "%s" not found', $slug));
+        $this->assertNotNull($product, \sprintf('Product with slug "%s" not found', $slug));
 
         return $product->getId();
     }
@@ -155,7 +155,7 @@ class ProductTest extends WebTestCase
     public function testProductDetail(): void
     {
         $id = $this->getProductIdBySlug('wireless-headphones');
-        $this->client->request('GET', '/api/v1/products/' . $id);
+        $this->client->request('GET', '/api/v1/products/'.$id);
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -182,7 +182,7 @@ class ProductTest extends WebTestCase
     public function testProductDetailIncludesCategory(): void
     {
         $id = $this->getProductIdBySlug('clean-code-book');
-        $this->client->request('GET', '/api/v1/products/' . $id);
+        $this->client->request('GET', '/api/v1/products/'.$id);
 
         $envelope = json_decode($this->client->getResponse()->getContent(), true);
         $product = $envelope['data'];

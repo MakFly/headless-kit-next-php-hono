@@ -32,7 +32,7 @@ class RoleVoter extends Voter
             return false;
         }
 
-        $roleSlug = substr($attribute, strlen(self::PREFIX));
+        $roleSlug = substr($attribute, \strlen(self::PREFIX));
 
         return $user->hasRole($roleSlug);
     }

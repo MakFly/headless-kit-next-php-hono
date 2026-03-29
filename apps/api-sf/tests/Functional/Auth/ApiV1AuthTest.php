@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Auth;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Functional tests for /api/v1/auth/* endpoints (custom controllers).
@@ -85,7 +85,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(),
-            'Registration should return 201 Created. Response: ' . $response->getContent());
+            'Registration should return 201 Created. Response: '.$response->getContent());
 
         $envelope = json_decode($response->getContent(), true);
         $this->assertTrue($envelope['success']);
@@ -116,7 +116,7 @@ class ApiV1AuthTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_CONFLICT],
-            'Duplicate registration should return 400 or 409. Response: ' . $response->getContent()
+            'Duplicate registration should return 400 or 409. Response: '.$response->getContent()
         );
     }
 
@@ -136,7 +136,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(),
-            'Registration without email should return 400. Response: ' . $response->getContent());
+            'Registration without email should return 400. Response: '.$response->getContent());
     }
 
     public function testRegisterWithInvalidEmail(): void
@@ -156,7 +156,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode(),
-            'Registration with invalid email should return 422. Response: ' . $response->getContent());
+            'Registration with invalid email should return 422. Response: '.$response->getContent());
     }
 
     // ==================== LOGIN TESTS ====================
@@ -179,7 +179,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Login should return 200 OK. Response: ' . $response->getContent());
+            'Login should return 200 OK. Response: '.$response->getContent());
 
         $envelope = json_decode($response->getContent(), true);
         $this->assertTrue($envelope['success']);
@@ -207,7 +207,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Login with invalid password should return 401. Response: ' . $response->getContent());
+            'Login with invalid password should return 401. Response: '.$response->getContent());
     }
 
     public function testLoginWithoutCredentials(): void
@@ -223,7 +223,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(),
-            'Login without credentials should return 400. Response: ' . $response->getContent());
+            'Login without credentials should return 400. Response: '.$response->getContent());
     }
 
     // ==================== ME TESTS ====================
@@ -240,13 +240,13 @@ class ApiV1AuthTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $accessToken,
+                'HTTP_AUTHORIZATION' => 'Bearer '.$accessToken,
             ]
         );
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Get me should return 200 OK. Response: ' . $response->getContent());
+            'Get me should return 200 OK. Response: '.$response->getContent());
 
         $envelope = json_decode($response->getContent(), true);
         $this->assertTrue($envelope['success']);
@@ -283,7 +283,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Get me with invalid token should return 401. Response: ' . $response->getContent());
+            'Get me with invalid token should return 401. Response: '.$response->getContent());
     }
 
     // ==================== REFRESH TESTS ====================
@@ -306,7 +306,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Refresh should return 200 OK. Response: ' . $response->getContent());
+            'Refresh should return 200 OK. Response: '.$response->getContent());
 
         $envelope = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('access_token', $envelope['data']);
@@ -325,7 +325,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode(),
-            'Refresh with invalid token should return 401. Response: ' . $response->getContent());
+            'Refresh with invalid token should return 401. Response: '.$response->getContent());
     }
 
     public function testRefreshWithoutToken(): void
@@ -341,7 +341,7 @@ class ApiV1AuthTest extends WebTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(),
-            'Refresh without token should return 400. Response: ' . $response->getContent());
+            'Refresh without token should return 400. Response: '.$response->getContent());
     }
 
     // ==================== LOGOUT TESTS ====================
@@ -358,13 +358,13 @@ class ApiV1AuthTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $accessToken,
+                'HTTP_AUTHORIZATION' => 'Bearer '.$accessToken,
             ]
         );
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Logout should return 200 OK. Response: ' . $response->getContent());
+            'Logout should return 200 OK. Response: '.$response->getContent());
     }
 
     public function testLogoutWithoutToken(): void
@@ -396,13 +396,13 @@ class ApiV1AuthTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $accessToken,
+                'HTTP_AUTHORIZATION' => 'Bearer '.$accessToken,
             ]
         );
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Revoke all should return 200 OK. Response: ' . $response->getContent());
+            'Revoke all should return 200 OK. Response: '.$response->getContent());
     }
 
     public function testRevokeAllWithoutToken(): void

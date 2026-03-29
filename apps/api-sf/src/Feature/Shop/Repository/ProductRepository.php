@@ -69,7 +69,7 @@ class ProductRepository extends ServiceEntityRepository
 
         if (!empty($filters['search'])) {
             $qb->andWhere('p.name LIKE :search')
-                ->setParameter('search', '%' . $filters['search'] . '%');
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (isset($filters['min_price'])) {

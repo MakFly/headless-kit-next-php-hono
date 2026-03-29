@@ -29,7 +29,7 @@ class RateConversationController extends AbstractController
             return $conversation;
         }
 
-        if (!in_array($conversation->getStatus(), ['resolved', 'closed'])) {
+        if (!\in_array($conversation->getStatus(), ['resolved', 'closed'])) {
             return $this->api->error('VALIDATION_ERROR', 'support.conversation_not_resolved', 422);
         }
 
@@ -40,7 +40,7 @@ class RateConversationController extends AbstractController
         $data = json_decode($request->getContent(), true) ?? [];
         $rating = $data['rating'] ?? null;
 
-        if (!is_int($rating) || $rating < 1 || $rating > 5) {
+        if (!\is_int($rating) || $rating < 1 || $rating > 5) {
             return $this->api->error('VALIDATION_ERROR', 'support.invalid_rating', 422);
         }
 

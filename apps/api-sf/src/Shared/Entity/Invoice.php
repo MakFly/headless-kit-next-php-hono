@@ -6,6 +6,8 @@ namespace App\Shared\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -41,47 +43,107 @@ class Invoice
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['invoice:read'])]
-    private \DateTimeImmutable $periodStart;
+    private DateTimeImmutable $periodStart;
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['invoice:read'])]
-    private \DateTimeImmutable $periodEnd;
+    private DateTimeImmutable $periodEnd;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Groups(['invoice:read'])]
-    private ?\DateTimeImmutable $paidAt = null;
+    private ?DateTimeImmutable $paidAt = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['invoice:read'])]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct()
     {
         $this->id = Uuid::uuid7()->toString();
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
-    public function getId(): string { return $this->id; }
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-    public function getOrganization(): Organization { return $this->organization; }
-    public function setOrganization(Organization $organization): static { $this->organization = $organization; return $this; }
+    public function getOrganization(): Organization
+    {
+        return $this->organization;
+    }
 
-    public function getAmount(): int { return $this->amount; }
-    public function setAmount(int $amount): static { $this->amount = $amount; return $this; }
+    public function setOrganization(Organization $organization): static
+    {
+        $this->organization = $organization;
 
-    public function getStatus(): string { return $this->status; }
-    public function setStatus(string $status): static { $this->status = $status; return $this; }
+        return $this;
+    }
 
-    public function getPeriodStart(): \DateTimeImmutable { return $this->periodStart; }
-    public function setPeriodStart(\DateTimeImmutable $periodStart): static { $this->periodStart = $periodStart; return $this; }
+    public function getAmount(): int
+    {
+        return $this->amount;
+    }
 
-    public function getPeriodEnd(): \DateTimeImmutable { return $this->periodEnd; }
-    public function setPeriodEnd(\DateTimeImmutable $periodEnd): static { $this->periodEnd = $periodEnd; return $this; }
+    public function setAmount(int $amount): static
+    {
+        $this->amount = $amount;
 
-    public function getPaidAt(): ?\DateTimeImmutable { return $this->paidAt; }
-    public function setPaidAt(?\DateTimeImmutable $paidAt): static { $this->paidAt = $paidAt; return $this; }
+        return $this;
+    }
 
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getPeriodStart(): DateTimeImmutable
+    {
+        return $this->periodStart;
+    }
+
+    public function setPeriodStart(DateTimeImmutable $periodStart): static
+    {
+        $this->periodStart = $periodStart;
+
+        return $this;
+    }
+
+    public function getPeriodEnd(): DateTimeImmutable
+    {
+        return $this->periodEnd;
+    }
+
+    public function setPeriodEnd(DateTimeImmutable $periodEnd): static
+    {
+        $this->periodEnd = $periodEnd;
+
+        return $this;
+    }
+
+    public function getPaidAt(): ?DateTimeImmutable
+    {
+        return $this->paidAt;
+    }
+
+    public function setPaidAt(?DateTimeImmutable $paidAt): static
+    {
+        $this->paidAt = $paidAt;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
 
     public function toArray(): array
     {
@@ -89,10 +151,10 @@ class Invoice
             'id' => $this->id,
             'amount' => $this->amount,
             'status' => $this->status,
-            'periodStart' => $this->periodStart->format(\DateTimeInterface::ATOM),
-            'periodEnd' => $this->periodEnd->format(\DateTimeInterface::ATOM),
-            'paidAt' => $this->paidAt?->format(\DateTimeInterface::ATOM),
-            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
+            'periodStart' => $this->periodStart->format(DateTimeInterface::ATOM),
+            'periodEnd' => $this->periodEnd->format(DateTimeInterface::ATOM),
+            'paidAt' => $this->paidAt?->format(DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

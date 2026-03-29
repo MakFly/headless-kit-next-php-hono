@@ -23,7 +23,7 @@ function requestJson(
     string $method,
     string $uri,
     ?array $payload = null,
-    array $server = []
+    array $server = [],
 ): void {
     $headers = array_merge(['CONTENT_TYPE' => 'application/json'], $server);
     $content = $payload === null ? null : json_encode($payload, JSON_THROW_ON_ERROR);

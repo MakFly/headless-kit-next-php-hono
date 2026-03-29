@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Auth;
 
+use Exception;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Functional tests for password reset endpoints.
@@ -42,7 +43,7 @@ class PasswordResetTest extends WebTestCase
         // Clear password reset tokens if table exists
         try {
             $connection->executeStatement('DELETE FROM password_reset_tokens');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Table may not exist
         }
 
@@ -87,7 +88,7 @@ class PasswordResetTest extends WebTestCase
 
         // Should always return 200 to prevent email enumeration
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Password forgot should return 200. Response: ' . $response->getContent());
+            'Password forgot should return 200. Response: '.$response->getContent());
 
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('message', $data);
@@ -109,7 +110,7 @@ class PasswordResetTest extends WebTestCase
 
         // Should still return 200 to prevent email enumeration
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(),
-            'Password forgot should return 200 even for non-existent email. Response: ' . $response->getContent());
+            'Password forgot should return 200 even for non-existent email. Response: '.$response->getContent());
     }
 
     public function testForgotPasswordWithoutEmail(): void
@@ -128,7 +129,7 @@ class PasswordResetTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
-            'Password forgot without email should return 400/422. Response: ' . $response->getContent()
+            'Password forgot without email should return 400/422. Response: '.$response->getContent()
         );
     }
 
@@ -148,7 +149,7 @@ class PasswordResetTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY, Response::HTTP_OK],
-            'Password forgot with invalid email should return 400/422 or 200. Response: ' . $response->getContent()
+            'Password forgot with invalid email should return 400/422 or 200. Response: '.$response->getContent()
         );
     }
 
@@ -171,7 +172,7 @@ class PasswordResetTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_UNAUTHORIZED],
-            'Password reset with invalid token should return 400/401. Response: ' . $response->getContent()
+            'Password reset with invalid token should return 400/401. Response: '.$response->getContent()
         );
     }
 
@@ -191,7 +192,7 @@ class PasswordResetTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
-            'Password reset without token should return 400/422. Response: ' . $response->getContent()
+            'Password reset without token should return 400/422. Response: '.$response->getContent()
         );
     }
 
@@ -211,7 +212,7 @@ class PasswordResetTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
-            'Password reset without password should return 400/422. Response: ' . $response->getContent()
+            'Password reset without password should return 400/422. Response: '.$response->getContent()
         );
     }
 
@@ -230,7 +231,7 @@ class PasswordResetTest extends WebTestCase
 
         // Bundle returns 400 for invalid tokens
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(),
-            'Verify token with invalid token should return 400. Response: ' . $response->getContent());
+            'Verify token with invalid token should return 400. Response: '.$response->getContent());
 
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('valid', $data);
@@ -253,7 +254,7 @@ class PasswordResetTest extends WebTestCase
         $this->assertContains(
             $response->getStatusCode(),
             [Response::HTTP_BAD_REQUEST, Response::HTTP_OK],
-            'Verify token without token should return 400 or 200 with valid=false. Response: ' . $response->getContent()
+            'Verify token without token should return 400 or 200 with valid=false. Response: '.$response->getContent()
         );
     }
 }

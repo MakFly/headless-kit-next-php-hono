@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Shared\ApiPlatform\State\TeamMemberProcessor;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -58,26 +60,59 @@ class TeamMember
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['team:read'])]
-    private \DateTimeImmutable $joinedAt;
+    private DateTimeImmutable $joinedAt;
 
     public function __construct()
     {
         $this->id = Uuid::uuid7()->toString();
-        $this->joinedAt = new \DateTimeImmutable();
+        $this->joinedAt = new DateTimeImmutable();
     }
 
-    public function getId(): string { return $this->id; }
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-    public function getOrganization(): Organization { return $this->organization; }
-    public function setOrganization(Organization $organization): static { $this->organization = $organization; return $this; }
+    public function getOrganization(): Organization
+    {
+        return $this->organization;
+    }
 
-    public function getUser(): User { return $this->user; }
-    public function setUser(User $user): static { $this->user = $user; return $this; }
+    public function setOrganization(Organization $organization): static
+    {
+        $this->organization = $organization;
 
-    public function getRole(): string { return $this->role; }
-    public function setRole(string $role): static { $this->role = $role; return $this; }
+        return $this;
+    }
 
-    public function getJoinedAt(): \DateTimeImmutable { return $this->joinedAt; }
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): static
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    public function getJoinedAt(): DateTimeImmutable
+    {
+        return $this->joinedAt;
+    }
 
     public function toArray(): array
     {
@@ -88,7 +123,7 @@ class TeamMember
                 'username' => $this->user->getUsername(),
             ],
             'role' => $this->role,
-            'joinedAt' => $this->joinedAt->format(\DateTimeInterface::ATOM),
+            'joinedAt' => $this->joinedAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

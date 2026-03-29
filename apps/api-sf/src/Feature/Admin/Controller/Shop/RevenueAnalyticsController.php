@@ -6,6 +6,7 @@ namespace App\Feature\Admin\Controller\Shop;
 
 use App\Shared\Entity\Order;
 use App\Shared\Service\ApiResponseService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,7 +27,7 @@ class RevenueAnalyticsController extends AbstractController
     public function __invoke(Request $request): JsonResponse
     {
         $days = min(365, max(1, (int) $request->query->get('days', 30)));
-        $since = new \DateTimeImmutable("-{$days} days");
+        $since = new DateTimeImmutable("-{$days} days");
 
         $orders = $this->em->createQueryBuilder()
             ->select('o')
@@ -47,9 +48,9 @@ class RevenueAnalyticsController extends AbstractController
                 $dailyRevenue[$day] = ['date' => $day, 'revenue' => 0, 'orders' => 0];
             }
             $dailyRevenue[$day]['revenue'] += $order->getTotal();
-            $dailyRevenue[$day]['orders']++;
+            ++$dailyRevenue[$day]['orders'];
             $totalRevenue += $order->getTotal();
-            $orderCount++;
+            ++$orderCount;
         }
 
         return $this->api->success([

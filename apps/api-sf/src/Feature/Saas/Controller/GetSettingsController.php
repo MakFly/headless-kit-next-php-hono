@@ -7,7 +7,6 @@ namespace App\Feature\Saas\Controller;
 use App\Feature\Saas\Service\OrgLoader;
 use App\Shared\Security\OrgVoter;
 use App\Shared\Service\ApiResponseService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,7 +15,6 @@ use Symfony\Component\Routing\Attribute\Route;
 class GetSettingsController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
         private readonly OrgLoader $orgLoader,
         private readonly ApiResponseService $api,
     ) {

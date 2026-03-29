@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Service;
 
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -91,7 +92,7 @@ final class ApiResponseService
 
         $request = $this->requestStack->getCurrentRequest();
         $incoming = $request?->headers->get('X-Request-Id');
-        if (is_string($incoming) && $incoming !== '') {
+        if (\is_string($incoming) && $incoming !== '') {
             $requestId = $incoming;
 
             return $requestId;
@@ -99,7 +100,7 @@ final class ApiResponseService
 
         try {
             $requestId = bin2hex(random_bytes(8));
-        } catch (\Exception) {
+        } catch (Exception) {
             $requestId = uniqid('req_', true);
         }
 

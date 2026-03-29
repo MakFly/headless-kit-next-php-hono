@@ -34,7 +34,7 @@ class UpdateOrderStatusController extends AbstractController
         $status = $data['status'] ?? null;
 
         $validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
-        if (!$status || !in_array($status, $validStatuses, true)) {
+        if (!$status || !\in_array($status, $validStatuses, true)) {
             return $this->api->error('VALIDATION_ERROR', 'shop.invalid_order_status', 400);
         }
 
@@ -42,7 +42,7 @@ class UpdateOrderStatusController extends AbstractController
 
         if (isset($data['paymentStatus'])) {
             $validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
-            if (in_array($data['paymentStatus'], $validPaymentStatuses, true)) {
+            if (\in_array($data['paymentStatus'], $validPaymentStatuses, true)) {
                 $order->setPaymentStatus($data['paymentStatus']);
             }
         }

@@ -102,7 +102,7 @@ class CategoryTest extends WebTestCase
     private function getCategoryIdBySlug(string $slug): string
     {
         $category = $this->em->getRepository(Category::class)->findOneBy(['slug' => $slug]);
-        $this->assertNotNull($category, sprintf('Category with slug "%s" not found', $slug));
+        $this->assertNotNull($category, \sprintf('Category with slug "%s" not found', $slug));
 
         return $category->getId();
     }
@@ -137,7 +137,7 @@ class CategoryTest extends WebTestCase
     public function testCategoryDetail(): void
     {
         $id = $this->getCategoryIdBySlug('electronics');
-        $this->client->request('GET', '/api/v1/categories/' . $id);
+        $this->client->request('GET', '/api/v1/categories/'.$id);
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -162,7 +162,7 @@ class CategoryTest extends WebTestCase
     public function testCategoryDetailIncludesImageUrl(): void
     {
         $id = $this->getCategoryIdBySlug('electronics');
-        $this->client->request('GET', '/api/v1/categories/' . $id);
+        $this->client->request('GET', '/api/v1/categories/'.$id);
 
         $envelope = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertNotNull($envelope['data']['imageUrl']);

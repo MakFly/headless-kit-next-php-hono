@@ -9,6 +9,7 @@ use App\Shared\Entity\Product;
 use App\Shared\Entity\User;
 use App\Shared\Repository\ReviewRepository;
 use App\Shared\Service\ApiResponseService;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -45,12 +46,12 @@ class DashboardController extends AbstractController
             ->from(Order::class, 'o')
             ->getQuery()->getSingleScalarResult();
 
-        $totalRevenue = (int) ($this->em->createQueryBuilder()
+        $totalRevenue = (int) $this->em->createQueryBuilder()
             ->select('COALESCE(SUM(o.total), 0)')
             ->from(Order::class, 'o')
             ->where('o.paymentStatus = :paid')
             ->setParameter('paid', 'paid')
-            ->getQuery()->getSingleScalarResult());
+            ->getQuery()->getSingleScalarResult();
 
         $totalCustomers = (int) $this->em->createQueryBuilder()
             ->select('COUNT(u.id)')
@@ -100,7 +101,7 @@ class DashboardController extends AbstractController
                     'total' => $o->getTotal(),
                     'paymentStatus' => $o->getPaymentStatus(),
                     'customerEmail' => $o->getUser()->getEmail(),
-                    'createdAt' => $o->getCreatedAt()->format(\DateTimeInterface::ATOM),
+                    'createdAt' => $o->getCreatedAt()->format(DateTimeInterface::ATOM),
                 ];
             }, $recentOrders),
         ]);

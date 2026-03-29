@@ -8,6 +8,7 @@ use App\Feature\Auth\Service\RateLimiterService;
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\AuthManager;
 use BetterAuth\Providers\TotpProvider\TotpProvider;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,7 +39,7 @@ class LoginController extends AbstractController
                 return $this->api->error('VALIDATION_ERROR', 'auth.email_password_required', 400);
             }
 
-            $limiterKey = sprintf(
+            $limiterKey = \sprintf(
                 'login:%s:%s',
                 $request->getClientIp() ?? 'unknown',
                 strtolower((string) $email)
@@ -68,7 +69,7 @@ class LoginController extends AbstractController
             $this->logger?->info('User logged in', ['email' => $email]);
 
             return $this->api->success($result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger?->warning('Login failed', [
                 'email' => $data['email'] ?? 'unknown',
                 'error' => $e->getMessage(),

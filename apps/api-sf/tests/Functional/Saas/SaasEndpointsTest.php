@@ -35,7 +35,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testDashboardRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/dashboard');
+        $client->request('GET', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/dashboard');
 
         $this->assertSame(401, $client->getResponse()->getStatusCode());
     }
@@ -47,7 +47,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testGetSubscriptionRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/subscription');
+        $client->request('GET', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/subscription');
 
         $this->assertSame(401, $client->getResponse()->getStatusCode());
     }
@@ -55,7 +55,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testCreateSubscriptionRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('POST', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/subscription', [], [], [
+        $client->request('POST', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/subscription', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['planId' => 'fake-plan']));
 
@@ -65,7 +65,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testCancelSubscriptionRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('DELETE', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/subscription');
+        $client->request('DELETE', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/subscription');
 
         $this->assertSame(401, $client->getResponse()->getStatusCode());
     }
@@ -97,7 +97,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testInviteMemberRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('POST', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/team/invite', [], [], [
+        $client->request('POST', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/team/invite', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['email' => 'test@example.com', 'role' => 'member']));
 
@@ -107,7 +107,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testUpdateMemberRoleRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('PATCH', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/team/fake-id/role', [], [], [
+        $client->request('PATCH', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/team/fake-id/role', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['role' => 'admin']));
 
@@ -117,7 +117,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testRemoveMemberRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('DELETE', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/team/fake-id');
+        $client->request('DELETE', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/team/fake-id');
 
         $this->assertSame(401, $client->getResponse()->getStatusCode());
     }
@@ -129,7 +129,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testGetUsageRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/usage');
+        $client->request('GET', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/usage');
 
         $this->assertSame(401, $client->getResponse()->getStatusCode());
     }
@@ -141,7 +141,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testGetSettingsRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/settings');
+        $client->request('GET', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/settings');
 
         $this->assertSame(401, $client->getResponse()->getStatusCode());
     }
@@ -149,7 +149,7 @@ class SaasEndpointsTest extends WebTestCase
     public function testUpdateSettingsRequiresAuth(): void
     {
         $client = static::createClient();
-        $client->request('PATCH', '/api/v1/saas/orgs/' . self::FAKE_ORG . '/settings', [], [], [
+        $client->request('PATCH', '/api/v1/saas/orgs/'.self::FAKE_ORG.'/settings', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['name' => 'Updated']));
 

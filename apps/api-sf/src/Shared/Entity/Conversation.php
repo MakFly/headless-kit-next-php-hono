@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Shared\ApiPlatform\State\ConversationProcessor;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -69,7 +71,7 @@ class Conversation
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Groups(['conversation:read'])]
-    private ?\DateTimeImmutable $lastMessageAt = null;
+    private ?DateTimeImmutable $lastMessageAt = null;
 
     /** @var Collection<int, ChatMessage> */
     #[ORM\OneToMany(targetEntity: ChatMessage::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -79,54 +81,130 @@ class Conversation
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['conversation:read'])]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['conversation:read'])]
-    private \DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $updatedAt;
 
     public function __construct()
     {
         $this->id = Uuid::uuid7()->toString();
         $this->messages = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function getId(): string { return $this->id; }
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-    public function getUser(): User { return $this->user; }
-    public function setUser(User $user): static { $this->user = $user; return $this; }
+    public function getUser(): User
+    {
+        return $this->user;
+    }
 
-    public function getAgent(): ?User { return $this->agent; }
-    public function setAgent(?User $agent): static { $this->agent = $agent; return $this; }
+    public function setUser(User $user): static
+    {
+        $this->user = $user;
 
-    public function getSubject(): string { return $this->subject; }
-    public function setSubject(string $subject): static { $this->subject = $subject; return $this; }
+        return $this;
+    }
 
-    public function getStatus(): string { return $this->status; }
-    public function setStatus(string $status): static { $this->status = $status; return $this; }
+    public function getAgent(): ?User
+    {
+        return $this->agent;
+    }
 
-    public function getPriority(): string { return $this->priority; }
-    public function setPriority(string $priority): static { $this->priority = $priority; return $this; }
+    public function setAgent(?User $agent): static
+    {
+        $this->agent = $agent;
 
-    public function getRating(): ?int { return $this->rating; }
-    public function setRating(?int $rating): static { $this->rating = $rating; return $this; }
+        return $this;
+    }
 
-    public function getLastMessageAt(): ?\DateTimeImmutable { return $this->lastMessageAt; }
-    public function setLastMessageAt(?\DateTimeImmutable $lastMessageAt): static { $this->lastMessageAt = $lastMessageAt; return $this; }
+    public function getSubject(): string
+    {
+        return $this->subject;
+    }
+
+    public function setSubject(string $subject): static
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getPriority(): string
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(string $priority): static
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function getRating(): ?int
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?int $rating): static
+    {
+        $this->rating = $rating;
+
+        return $this;
+    }
+
+    public function getLastMessageAt(): ?DateTimeImmutable
+    {
+        return $this->lastMessageAt;
+    }
+
+    public function setLastMessageAt(?DateTimeImmutable $lastMessageAt): static
+    {
+        $this->lastMessageAt = $lastMessageAt;
+
+        return $this;
+    }
 
     /** @return Collection<int, ChatMessage> */
-    public function getMessages(): Collection { return $this->messages; }
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
 
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
 
     public function toArray(bool $withMessages = false): array
     {
@@ -140,14 +218,14 @@ class Conversation
             'status' => $this->status,
             'priority' => $this->priority,
             'rating' => $this->rating,
-            'lastMessageAt' => $this->lastMessageAt?->format(\DateTimeInterface::ATOM),
-            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
-            'updatedAt' => $this->updatedAt->format(\DateTimeInterface::ATOM),
+            'lastMessageAt' => $this->lastMessageAt?->format(DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
+            'updatedAt' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
 
         if ($withMessages) {
             $data['messages'] = array_map(
-                fn(ChatMessage $m) => $m->toArray(),
+                fn (ChatMessage $m) => $m->toArray(),
                 $this->messages->toArray(),
             );
         }

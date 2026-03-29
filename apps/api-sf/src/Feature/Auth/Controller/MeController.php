@@ -6,11 +6,14 @@ namespace App\Feature\Auth\Controller;
 
 use App\Shared\Entity\Permission;
 use App\Shared\Entity\Role;
-use App\Shared\Entity\User;
+use App\Shared\Entity\User as DoctrineUser;
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,28 +52,23 @@ class MeController extends AbstractController
 
             $response = ['user' => $this->formatUser($user)];
 
-            // Enrich with RBAC data if the User entity supports it
-            if ($user instanceof User) {
-                // Reload user with roles/permissions from Doctrine
-                $doctrineUser = $this->em->getRepository(User::class)->find($user->getId());
-                if ($doctrineUser !== null) {
-                    $response['user']['roles'] = $doctrineUser->getUserRoles()->map(
-                        fn (Role $role) => $role->toArray()
-                    )->toArray();
+            // Enrich with RBAC data from the Doctrine entity
+            $doctrineUser = $this->em->getRepository(DoctrineUser::class)->find($user->getId());
+            if ($doctrineUser !== null) {
+                $response['user']['roles'] = $doctrineUser->getUserRoles()->map(
+                    fn (Role $role) => $role->toArray()
+                )->toArray();
 
-                    $response['user']['permissions'] = array_map(
-                        fn (Permission $p) => $p->toArray(),
-                        $doctrineUser->getAllPermissions()
-                    );
-                }
+                $response['user']['permissions'] = array_map(
+                    fn (Permission $p) => $p->toArray(),
+                    $doctrineUser->getAllPermissions()
+                );
             }
 
-            if (isset($payload['exp'])) {
-                $response['expiresAt'] = (new \DateTimeImmutable('@' . $payload['exp']))->format(\DateTimeInterface::ATOM);
-            }
+            $response['expiresAt'] = (new DateTimeImmutable('@'.$payload['exp']))->format(DateTimeInterface::ATOM);
 
             return $this->api->success($response);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->api->error('UNAUTHORIZED', 'auth.invalid_token', 401);
         }
     }

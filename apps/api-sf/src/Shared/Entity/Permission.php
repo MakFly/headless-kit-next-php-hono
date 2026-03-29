@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\Entity;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,10 +33,10 @@ class Permission
     private string $action;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime_immutable')]
-    private \DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $updatedAt;
 
     /** @var Collection<int, Role> */
     #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'permissions')]
@@ -43,14 +45,14 @@ class Permission
     public function __construct()
     {
         $this->roles = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -106,12 +108,12 @@ class Permission
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -130,8 +132,8 @@ class Permission
             'slug' => $this->slug,
             'resource' => $this->resource,
             'action' => $this->action,
-            'created_at' => $this->createdAt->format(\DateTimeInterface::ATOM),
-            'updated_at' => $this->updatedAt->format(\DateTimeInterface::ATOM),
+            'created_at' => $this->createdAt->format(DateTimeInterface::ATOM),
+            'updated_at' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

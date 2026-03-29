@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\ApiPlatform\Serializer;
 
+use Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -49,7 +50,7 @@ final class ApiPlatformEnvelopeSubscriber implements EventSubscriberInterface
         }
 
         $decoded = json_decode($content, true);
-        if (!is_array($decoded)) {
+        if (!\is_array($decoded)) {
             return;
         }
 
@@ -77,7 +78,7 @@ final class ApiPlatformEnvelopeSubscriber implements EventSubscriberInterface
             $envelope = [
                 'success' => true,
                 'data' => $items,
-                'meta' => $this->extractPaginationMeta($decoded, count($items)),
+                'meta' => $this->extractPaginationMeta($decoded, \count($items)),
                 'status' => $status,
                 'request_id' => $requestId,
             ];
@@ -146,13 +147,13 @@ final class ApiPlatformEnvelopeSubscriber implements EventSubscriberInterface
         $request = $this->requestStack->getCurrentRequest();
         $incoming = $request?->headers->get('X-Request-Id');
 
-        if (is_string($incoming) && $incoming !== '') {
+        if (\is_string($incoming) && $incoming !== '') {
             return $incoming;
         }
 
         try {
             return bin2hex(random_bytes(8));
-        } catch (\Exception) {
+        } catch (Exception) {
             return uniqid('req_', true);
         }
     }

@@ -11,7 +11,6 @@ use App\Shared\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @implements ProcessorInterface<TeamMember, TeamMember>
@@ -21,7 +20,6 @@ final class TeamMemberProcessor implements ProcessorInterface
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly Security $security,
-        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -31,7 +29,7 @@ final class TeamMemberProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeamMember
     {
         $user = $this->security->getUser();
-        assert($user instanceof User);
+        \assert($user instanceof User);
 
         // If creating, verify user has access to the org
         $org = $data->getOrganization();
@@ -39,7 +37,7 @@ final class TeamMemberProcessor implements ProcessorInterface
             // Check if user is admin/owner of the org
             $isOrgAdmin = false;
             foreach ($org->getTeamMembers() as $member) {
-                if ($member->getUser()->getId() === $user->getId() && in_array($member->getRole(), ['owner', 'admin'], true)) {
+                if ($member->getUser()->getId() === $user->getId() && \in_array($member->getRole(), ['owner', 'admin'], true)) {
                     $isOrgAdmin = true;
                     break;
                 }

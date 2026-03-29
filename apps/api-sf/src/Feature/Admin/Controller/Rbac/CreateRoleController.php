@@ -47,7 +47,7 @@ class CreateRoleController extends AbstractController
         $role->setDescription($description);
 
         $permissionSlugs = $data['permissions'] ?? [];
-        if (is_array($permissionSlugs) && count($permissionSlugs) > 0) {
+        if (\is_array($permissionSlugs) && \count($permissionSlugs) > 0) {
             $permRepo = $this->em->getRepository(Permission::class);
             foreach ($permissionSlugs as $permSlug) {
                 $permission = $permRepo->findOneBy(['slug' => $permSlug]);

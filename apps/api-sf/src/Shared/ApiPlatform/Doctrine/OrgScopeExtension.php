@@ -55,7 +55,7 @@ final class OrgScopeExtension implements QueryCollectionExtensionInterface, Quer
 
     private function addWhere(QueryBuilder $queryBuilder, string $resourceClass): void
     {
-        if (!in_array($resourceClass, self::SUPPORTED_CLASSES, true)) {
+        if (!\in_array($resourceClass, self::SUPPORTED_CLASSES, true)) {
             return;
         }
 
@@ -75,6 +75,7 @@ final class OrgScopeExtension implements QueryCollectionExtensionInterface, Quer
         if ($orgId === null) {
             // No org context — return empty result
             $queryBuilder->andWhere('1 = 0');
+
             return;
         }
 
@@ -82,7 +83,7 @@ final class OrgScopeExtension implements QueryCollectionExtensionInterface, Quer
         $paramName = 'org_scope_ext';
 
         $queryBuilder
-            ->andWhere(sprintf('%s.organization = :%s', $rootAlias, $paramName))
+            ->andWhere(\sprintf('%s.organization = :%s', $rootAlias, $paramName))
             ->setParameter($paramName, $orgId);
     }
 

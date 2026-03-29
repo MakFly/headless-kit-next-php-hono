@@ -103,7 +103,7 @@ class OrderTest extends WebTestCase
     {
         return [
             'CONTENT_TYPE' => 'application/json',
-            'HTTP_AUTHORIZATION' => 'Bearer ' . ($token ?: $this->accessToken),
+            'HTTP_AUTHORIZATION' => 'Bearer '.($token ?: $this->accessToken),
         ];
     }
 
@@ -241,7 +241,7 @@ class OrderTest extends WebTestCase
         $createEnvelope = json_decode($this->client->getResponse()->getContent(), true);
         $order = $createEnvelope['data'];
 
-        $this->client->request('GET', '/api/v1/orders/' . $order['id'], [], [], $this->authHeaders());
+        $this->client->request('GET', '/api/v1/orders/'.$order['id'], [], [], $this->authHeaders());
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -272,7 +272,7 @@ class OrderTest extends WebTestCase
         $order = $createEnvelope['data'];
 
         // Other user tries to access
-        $this->client->request('GET', '/api/v1/orders/' . $order['id'], [], [], $this->authHeaders($this->otherAccessToken));
+        $this->client->request('GET', '/api/v1/orders/'.$order['id'], [], [], $this->authHeaders($this->otherAccessToken));
 
         $this->assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
     }

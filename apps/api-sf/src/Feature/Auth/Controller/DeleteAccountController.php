@@ -6,9 +6,11 @@ namespace App\Feature\Auth\Controller;
 
 use App\Shared\Entity\User;
 use App\Shared\Service\ApiResponseService;
+use BetterAuth\Core\Interfaces\RefreshTokenRepositoryInterface;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +23,7 @@ class DeleteAccountController extends AbstractController
 
     public function __construct(
         private readonly TokenManager $tokenManager,
+        private readonly RefreshTokenRepositoryInterface $refreshTokenRepository,
         private readonly EntityManagerInterface $em,
         private readonly ApiResponseService $api,
     ) {
@@ -40,10 +43,10 @@ class DeleteAccountController extends AbstractController
                 return $this->api->error('UNAUTHORIZED', 'auth.invalid_token', 401);
             }
 
-            // Revoke all tokens before deletion
+            // Revoke all refresh tokens before deletion
             try {
-                $this->tokenManager->signOut($token);
-            } catch (\Exception) {
+                $this->refreshTokenRepository->revokeAllForUser((string) $user->getId());
+            } catch (Exception) {
                 // Proceed even if token revocation fails
             }
 
@@ -57,7 +60,7 @@ class DeleteAccountController extends AbstractController
             $this->em->flush();
 
             return $this->api->success(['message' => 'Account deleted successfully']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->api->error('INTERNAL_ERROR', 'auth.delete_failed', 500);
         }
     }

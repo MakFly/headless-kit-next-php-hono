@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Feature\Orders\Controller;
 
 use App\Feature\Cart\Repository\CartRepository;
-use App\Feature\Orders\Repository\OrderRepository;
 use App\Shared\Entity\Order;
 use App\Shared\Entity\OrderItem;
 use App\Shared\Security\Trait\AuthenticatedUserTrait;
@@ -23,7 +22,6 @@ class CreateOrderController extends AbstractController
     use AuthenticatedUserTrait;
 
     public function __construct(
-        private readonly OrderRepository $orderRepository,
         private readonly CartRepository $cartRepository,
         private readonly EntityManagerInterface $em,
         private readonly TokenManager $tokenManager,
@@ -38,7 +36,7 @@ class CreateOrderController extends AbstractController
         $data = json_decode($request->getContent(), true) ?? [];
         $shippingAddress = $data['shippingAddress'] ?? null;
 
-        if (!$shippingAddress || !is_array($shippingAddress)) {
+        if (!$shippingAddress || !\is_array($shippingAddress)) {
             return $this->api->error('VALIDATION_ERROR', 'shop.shipping_address_required', 400);
         }
 
@@ -61,7 +59,7 @@ class CreateOrderController extends AbstractController
             if ($cartItem->getQuantity() > $product->getStockQuantity()) {
                 return $this->api->error(
                     'VALIDATION_ERROR',
-                    sprintf('shop.insufficient_stock_for', $product->getName()),
+                    'shop.insufficient_stock_for',
                     422,
                     ['product' => $product->getName()]
                 );

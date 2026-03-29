@@ -8,6 +8,7 @@ use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Providers\TotpProvider\TotpProvider;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,7 +48,7 @@ class StatusController extends AbstractController
                 'requires2fa' => $status['requires2fa'] ?? false,
                 'last2faVerifiedAt' => $status['last2faVerifiedAt'] ?? null,
             ]);
-        } catch (\Exception) {
+        } catch (Exception) {
             return $this->api->error('UNAUTHORIZED', 'auth.invalid_token', 401);
         }
     }

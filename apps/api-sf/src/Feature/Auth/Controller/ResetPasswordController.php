@@ -6,6 +6,7 @@ namespace App\Feature\Auth\Controller;
 
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Providers\PasswordResetProvider\PasswordResetProvider;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,7 +35,7 @@ class ResetPasswordController extends AbstractController
                 return $this->api->error('VALIDATION_ERROR', 'auth.token_password_required', 400);
             }
 
-            if (strlen($password) < 8) {
+            if (\strlen($password) < 8) {
                 return $this->api->error('VALIDATION_ERROR', 'auth.password_too_short', 400);
             }
 
@@ -51,7 +52,7 @@ class ResetPasswordController extends AbstractController
             return $this->api->success([
                 'message' => 'Password has been reset successfully',
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger?->error('Password reset failed', ['error' => $e->getMessage()]);
 
             return $this->api->error('INVALID_TOKEN', 'auth.invalid_reset_token', 400);

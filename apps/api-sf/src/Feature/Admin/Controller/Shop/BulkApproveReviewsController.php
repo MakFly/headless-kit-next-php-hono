@@ -6,6 +6,7 @@ namespace App\Feature\Admin\Controller\Shop;
 
 use App\Shared\Entity\Review;
 use App\Shared\Service\ApiResponseService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,7 +29,7 @@ class BulkApproveReviewsController extends AbstractController
         $data = json_decode($request->getContent(), true) ?? [];
         $ids = $data['ids'] ?? [];
 
-        if (empty($ids) || !is_array($ids)) {
+        if (empty($ids) || !\is_array($ids)) {
             return $this->api->error('VALIDATION_ERROR', 'shop.review_ids_required', 400);
         }
 
@@ -38,7 +39,7 @@ class BulkApproveReviewsController extends AbstractController
             ->set('r.updatedAt', ':now')
             ->where('r.id IN (:ids)')
             ->setParameter('status', 'approved')
-            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('now', new DateTimeImmutable())
             ->setParameter('ids', $ids)
             ->getQuery()->execute();
 

@@ -8,6 +8,7 @@ use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\AuthManager;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,7 +44,7 @@ class RevokeAllController extends AbstractController
             $this->authManager->revokeAllTokens($user->getId());
 
             return $this->api->success(['message' => 'auth.all_sessions_revoked']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->api->error('REVOKE_FAILED', 'auth.revoke_all_failed', 400);
         }
     }

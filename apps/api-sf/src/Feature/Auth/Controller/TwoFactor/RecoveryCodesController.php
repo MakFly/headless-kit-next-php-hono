@@ -8,6 +8,7 @@ use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\Interfaces\TotpStorageInterface;
 use BetterAuth\Core\TokenManager;
 use BetterAuth\Symfony\Controller\Trait\AuthResponseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,13 +51,13 @@ class RecoveryCodesController extends AbstractController
                 return $this->api->error('NOT_CONFIGURED', 'auth.two_factor_not_configured', 404);
             }
 
-            $remaining = count($totpData['backup_codes'] ?? []);
+            $remaining = \count($totpData['backup_codes'] ?? []);
 
             return $this->api->success([
                 'remainingCodes' => $remaining,
                 'note' => 'Backup codes are not retrievable after initial setup. Generate new ones via POST /api/v1/auth/2fa/setup if needed.',
             ]);
-        } catch (\Exception) {
+        } catch (Exception) {
             return $this->api->error('UNAUTHORIZED', 'auth.invalid_token', 401);
         }
     }

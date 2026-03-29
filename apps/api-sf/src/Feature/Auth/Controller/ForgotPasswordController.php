@@ -6,6 +6,7 @@ namespace App\Feature\Auth\Controller;
 
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Providers\PasswordResetProvider\PasswordResetProvider;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -39,7 +40,7 @@ class ForgotPasswordController extends AbstractController
                 return $this->api->error('VALIDATION_ERROR', 'auth.invalid_email_format', 422);
             }
 
-            $callbackUrl = rtrim($this->frontendUrl, '/') . '/reset-password';
+            $callbackUrl = rtrim($this->frontendUrl, '/').'/reset-password';
             $this->passwordResetProvider->sendResetEmail($email, $callbackUrl);
 
             $this->logger?->info('Password reset requested', ['email' => $email]);
@@ -49,7 +50,7 @@ class ForgotPasswordController extends AbstractController
                 'message' => 'If an account exists with this email, a password reset link has been sent.',
                 'expiresIn' => 3600,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger?->error('Password reset request failed', [
                 'email' => $data['email'] ?? 'unknown',
                 'error' => $e->getMessage(),

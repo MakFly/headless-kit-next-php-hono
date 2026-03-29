@@ -42,7 +42,7 @@ class ChangeTeamRoleController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true) ?? [];
-        if (empty($data['role']) || !in_array($data['role'], ['admin', 'member', 'viewer'], true)) {
+        if (empty($data['role']) || !\in_array($data['role'], ['admin', 'member', 'viewer'], true)) {
             return $this->api->error('VALIDATION_ERROR', 'saas.invalid_role', 400);
         }
 

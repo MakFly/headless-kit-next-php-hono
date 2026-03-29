@@ -37,7 +37,7 @@ class CreateConversationController extends AbstractController
         $conversation->setSubject($data['subject']);
         $conversation->setUser($user);
 
-        if (!empty($data['priority']) && in_array($data['priority'], ['low', 'medium', 'high', 'urgent'])) {
+        if (!empty($data['priority']) && \in_array($data['priority'], ['low', 'medium', 'high', 'urgent'])) {
             $conversation->setPriority($data['priority']);
         }
 

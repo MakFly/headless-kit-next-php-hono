@@ -10,6 +10,7 @@ use App\Shared\Entity\Plan;
 use App\Shared\Entity\Subscription;
 use App\Shared\Security\OrgVoter;
 use App\Shared\Service\ApiResponseService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -59,7 +60,7 @@ class SubscribeController extends AbstractController
         $subscription->setOrganization($org);
         $subscription->setPlan($plan);
         $subscription->setStatus('active');
-        $subscription->setCurrentPeriodEnd(new \DateTimeImmutable('+1 month'));
+        $subscription->setCurrentPeriodEnd(new DateTimeImmutable('+1 month'));
 
         $this->em->persist($subscription);
 
@@ -67,9 +68,9 @@ class SubscribeController extends AbstractController
         $invoice->setOrganization($org);
         $invoice->setAmount($plan->getPriceMonthly());
         $invoice->setStatus('paid');
-        $invoice->setPeriodStart(new \DateTimeImmutable());
-        $invoice->setPeriodEnd(new \DateTimeImmutable('+1 month'));
-        $invoice->setPaidAt(new \DateTimeImmutable());
+        $invoice->setPeriodStart(new DateTimeImmutable());
+        $invoice->setPeriodEnd(new DateTimeImmutable('+1 month'));
+        $invoice->setPaidAt(new DateTimeImmutable());
 
         $this->em->persist($invoice);
         $this->em->flush();

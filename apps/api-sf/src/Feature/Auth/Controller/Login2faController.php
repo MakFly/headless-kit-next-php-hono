@@ -7,6 +7,7 @@ namespace App\Feature\Auth\Controller;
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\AuthManager;
 use BetterAuth\Providers\TotpProvider\TotpProvider;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,7 +58,7 @@ class Login2faController extends AbstractController
             }
 
             return $this->api->success($result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->api->error('INVALID_AUTH_FLOW', 'auth.invalid_auth_flow', 401);
         }
     }

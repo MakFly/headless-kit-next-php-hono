@@ -8,6 +8,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -62,43 +64,85 @@ class Organization
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['org:read'])]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['org:read'])]
-    private \DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $updatedAt;
 
     public function __construct()
     {
         $this->id = Uuid::uuid7()->toString();
         $this->teamMembers = new ArrayCollection();
         $this->subscriptions = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function getId(): string { return $this->id; }
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-    public function getName(): string { return $this->name; }
-    public function setName(string $name): static { $this->name = $name; return $this; }
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
-    public function getSlug(): string { return $this->slug; }
-    public function setSlug(string $slug): static { $this->slug = $slug; return $this; }
+    public function setName(string $name): static
+    {
+        $this->name = $name;
 
-    public function getOwner(): User { return $this->owner; }
-    public function setOwner(User $owner): static { $this->owner = $owner; return $this; }
+        return $this;
+    }
 
-    public function getPlan(): ?Plan { return $this->plan; }
-    public function setPlan(?Plan $plan): static { $this->plan = $plan; return $this; }
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getOwner(): User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(User $owner): static
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getPlan(): ?Plan
+    {
+        return $this->plan;
+    }
+
+    public function setPlan(?Plan $plan): static
+    {
+        $this->plan = $plan;
+
+        return $this;
+    }
 
     /** @return Collection<int, TeamMember> */
-    public function getTeamMembers(): Collection { return $this->teamMembers; }
+    public function getTeamMembers(): Collection
+    {
+        return $this->teamMembers;
+    }
 
     public function addTeamMember(TeamMember $member): static
     {
@@ -106,14 +150,25 @@ class Organization
             $this->teamMembers->add($member);
             $member->setOrganization($this);
         }
+
         return $this;
     }
 
     /** @return Collection<int, Subscription> */
-    public function getSubscriptions(): Collection { return $this->subscriptions; }
+    public function getSubscriptions(): Collection
+    {
+        return $this->subscriptions;
+    }
 
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
 
     public function toArray(): array
     {
@@ -123,8 +178,8 @@ class Organization
             'slug' => $this->slug,
             'ownerId' => $this->owner->getId(),
             'planId' => $this->plan?->getId(),
-            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
-            'updatedAt' => $this->updatedAt->format(\DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
+            'updatedAt' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

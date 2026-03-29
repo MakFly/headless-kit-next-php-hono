@@ -6,6 +6,7 @@ namespace App\Feature\Auth\Controller;
 
 use App\Shared\Service\ApiResponseService;
 use BetterAuth\Core\AuthManager;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +40,7 @@ class RegisterController extends AbstractController
                 return $this->api->error('VALIDATION_ERROR', 'auth.invalid_email_format', 422);
             }
 
-            if (strlen($password) < 8) {
+            if (\strlen($password) < 8) {
                 return $this->api->error('VALIDATION_ERROR', 'auth.password_too_short', 400);
             }
 
@@ -57,7 +58,7 @@ class RegisterController extends AbstractController
             $this->logger?->info('User registered', ['email' => $email]);
 
             return $this->api->success($result, 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger?->error('Registration failed', [
                 'email' => $data['email'] ?? 'unknown',
                 'error' => $e->getMessage(),

@@ -32,10 +32,10 @@ class PermissionVoter extends Voter
             return false;
         }
 
-        $permissionString = substr($attribute, strlen(self::PREFIX));
+        $permissionString = substr($attribute, \strlen(self::PREFIX));
         $parts = explode('.', $permissionString, 2);
 
-        if (count($parts) !== 2) {
+        if (\count($parts) !== 2) {
             return false;
         }
 

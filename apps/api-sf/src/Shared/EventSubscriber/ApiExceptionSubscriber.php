@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Shared\EventSubscriber;
 
 use App\Shared\Service\ApiResponseService;
+use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Throwable;
 
 final class ApiExceptionSubscriber implements EventSubscriberInterface
 {
@@ -44,7 +46,7 @@ final class ApiExceptionSubscriber implements EventSubscriberInterface
     /**
      * @return array{int, string, string}
      */
-    private function mapException(\Throwable $throwable): array
+    private function mapException(Throwable $throwable): array
     {
         if ($throwable instanceof AccessDeniedException) {
             return [403, 'ACCESS_DENIED', 'common.access_denied'];
@@ -67,10 +69,10 @@ final class ApiExceptionSubscriber implements EventSubscriberInterface
                 default => 'HTTP_ERROR',
             };
 
-            return [$status, $code, $throwable->getMessage() ?: 'common.' . strtolower($code)];
+            return [$status, $code, $throwable->getMessage() ?: 'common.'.strtolower($code)];
         }
 
-        if ($throwable instanceof \InvalidArgumentException) {
+        if ($throwable instanceof InvalidArgumentException) {
             return [400, 'BAD_REQUEST', $throwable->getMessage() ?: 'common.bad_request'];
         }
 

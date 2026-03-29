@@ -180,9 +180,9 @@ export class NodeAdapter extends BaseAdapter {
 
   async getRecoveryCodes(): Promise<RecoveryCodesResponse> {
     const response = await this.makeRequest<{
-      codes?: string[]
-      backupCodes?: string[]
-      backup_codes?: string[]
+      codes?: Array<string>
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
     }>('GET', this.endpoints.TWO_FA_RECOVERY_CODES)
     return { codes: response.codes ?? response.backupCodes ?? response.backup_codes ?? [] }
   }

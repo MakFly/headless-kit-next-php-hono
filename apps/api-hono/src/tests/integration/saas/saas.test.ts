@@ -217,10 +217,16 @@ describe('SaaS Endpoints', () => {
     });
 
     it('POST /team/invite - should reject already member (409)', async () => {
+      // Resolve the actual email of the user who is already a member of acme-corp
+      const existingMember = await db.query.users.findFirst({
+        where: eq(schema.users.id, TEST_USER_ID),
+      });
+      const memberEmail = existingMember?.email ?? 'test@test.com';
+
       const res = await adminApp.request('/api/v1/saas/team/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'test@test.com', role: 'member' }),
+        body: JSON.stringify({ email: memberEmail, role: 'member' }),
       });
 
       expect(res.status).toBe(409);

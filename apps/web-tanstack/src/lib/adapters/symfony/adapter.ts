@@ -137,8 +137,8 @@ export class SymfonyAdapter extends BaseAdapter {
       secret: string
       qrCode?: string
       qr_code?: string
-      backupCodes?: string[]
-      backup_codes?: string[]
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
     }>('POST', this.path.TWO_FA_SETUP)
     return {
       secret: response.secret,
@@ -150,8 +150,8 @@ export class SymfonyAdapter extends BaseAdapter {
   async enable2fa(code: string): Promise<TwoFaEnableResponse> {
     const response = await this.makeRequest<{
       enabled: boolean
-      backupCodes?: string[]
-      backup_codes?: string[]
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
     }>('POST', this.path.TWO_FA_ENABLE, { body: { code } })
     return {
       enabled: response.enabled ?? true,
@@ -186,9 +186,9 @@ export class SymfonyAdapter extends BaseAdapter {
 
   async getRecoveryCodes(): Promise<RecoveryCodesResponse> {
     const response = await this.makeRequest<{
-      codes?: string[]
-      backupCodes?: string[]
-      backup_codes?: string[]
+      codes?: Array<string>
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
     }>('GET', this.path.TWO_FA_RECOVERY_CODES)
     return { codes: response.codes ?? response.backupCodes ?? response.backup_codes ?? [] }
   }

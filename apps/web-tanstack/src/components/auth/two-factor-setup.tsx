@@ -6,18 +6,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { setup2faFn, enable2faFn } from '@/lib/server/two-factor'
+import { enable2faFn, setup2faFn } from '@/lib/server/two-factor'
 
 type Step = 'idle' | 'setup' | 'verify' | 'done'
 
 type SetupData = {
   secret: string
   qrCode: string
-  backupCodes: string[]
+  backupCodes: Array<string>
 }
 
 type Props = {
-  onComplete?: (backupCodes: string[]) => void
+  onComplete?: (backupCodes: Array<string>) => void
   onCancel?: () => void
 }
 
@@ -28,7 +28,7 @@ function isDataUri(value: string): boolean {
 export function TwoFactorSetup({ onComplete, onCancel }: Props) {
   const [step, setStep] = useState<Step>('idle')
   const [setupData, setSetupData] = useState<SetupData | null>(null)
-  const [backupCodes, setBackupCodes] = useState<string[]>([])
+  const [backupCodes, setBackupCodes] = useState<Array<string>>([])
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

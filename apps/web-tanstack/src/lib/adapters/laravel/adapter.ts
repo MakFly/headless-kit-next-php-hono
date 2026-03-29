@@ -160,9 +160,9 @@ export class LaravelAdapter extends BaseAdapter {
       secret?: string
       qrCode?: string
       qr_code?: string
-      backupCodes?: string[]
-      backup_codes?: string[]
-      data?: { secret: string; qrCode?: string; qr_code?: string; backupCodes?: string[]; backup_codes?: string[] }
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
+      data?: { secret: string; qrCode?: string; qr_code?: string; backupCodes?: Array<string>; backup_codes?: Array<string> }
     }>('POST', ENDPOINTS.TWO_FA_SETUP)
     const d = response.data ?? response
     return {
@@ -175,9 +175,9 @@ export class LaravelAdapter extends BaseAdapter {
   async enable2fa(code: string): Promise<TwoFaEnableResponse> {
     const response = await this.makeRequest<{
       enabled?: boolean
-      backupCodes?: string[]
-      backup_codes?: string[]
-      data?: { enabled: boolean; backupCodes?: string[]; backup_codes?: string[] }
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
+      data?: { enabled: boolean; backupCodes?: Array<string>; backup_codes?: Array<string> }
     }>('POST', ENDPOINTS.TWO_FA_ENABLE, { body: { code } })
     const d = response.data ?? response
     return {
@@ -214,10 +214,10 @@ export class LaravelAdapter extends BaseAdapter {
 
   async getRecoveryCodes(): Promise<RecoveryCodesResponse> {
     const response = await this.makeRequest<{
-      codes?: string[]
-      backupCodes?: string[]
-      backup_codes?: string[]
-      data?: { codes?: string[]; backupCodes?: string[]; backup_codes?: string[] }
+      codes?: Array<string>
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
+      data?: { codes?: Array<string>; backupCodes?: Array<string>; backup_codes?: Array<string> }
     }>('GET', ENDPOINTS.TWO_FA_RECOVERY_CODES)
     const d = response.data ?? response
     return { codes: d.codes ?? d.backupCodes ?? d.backup_codes ?? [] }
@@ -230,7 +230,7 @@ export class LaravelAdapter extends BaseAdapter {
     if (response && typeof response === 'object' && 'data' in response) {
       return (response as { data: NormalizedUser }).data
     }
-    return response as NormalizedUser
+    return response
   }
 
   async deleteAccount(): Promise<void> {

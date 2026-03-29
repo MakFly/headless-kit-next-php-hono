@@ -8,7 +8,7 @@ import { AppError } from '../../shared/lib/errors.ts';
 import { apiSuccess, apiError } from '../../shared/lib/response.ts';
 import { requireUser } from '../../shared/middleware/auth.ts';
 import type { AppVariables } from '../../shared/types/index.ts';
-import type { LoginInput, RegisterInput, RefreshInput } from './auth.schemas.ts';
+import type { LoginInput, RegisterInput, RefreshInput, ForgotPasswordInput, VerifyResetTokenInput, ResetPasswordInput } from './auth.schemas.ts';
 
 /**
  * Format auth response payload for API (camelCase + snake_case aliases)
@@ -122,6 +122,41 @@ export async function me(c: Context<{ Variables: AppVariables }>) {
     updated_at: userWithRoles.updatedAt,
     roles: userWithRoles.roles,
   });
+}
+
+/**
+ * Forgot password handler — always returns 200 to prevent email enumeration
+ */
+export async function forgotPassword(c: Context, data: ForgotPasswordInput) {
+  try {
+    await authService.forgotPassword(data.email);
+  } catch {
+    // Swallow errors to prevent email enumeration
+  }
+  return apiSuccess(c, { message: 'If an account exists with that email, a password reset link has been sent.' });
+}
+
+/**
+ * Verify reset token handler
+ */
+export async function verifyResetToken(c: Context, data: VerifyResetTokenInput) {
+  const valid = await authService.verifyResetToken(data.token);
+  return apiSuccess(c, { valid });
+}
+
+/**
+ * Reset password handler
+ */
+export async function resetPassword(c: Context, data: ResetPasswordInput) {
+  try {
+    await authService.resetPassword(data.token, data.newPassword);
+    return apiSuccess(c, { message: 'Password has been reset successfully.' });
+  } catch (error) {
+    if (error instanceof AppError) {
+      return apiError(c, error.code, error.message, error.statusCode);
+    }
+    throw error;
+  }
 }
 
 /**

@@ -94,6 +94,20 @@ export const refreshTokens = sqliteTable('refresh_tokens', {
 });
 
 /**
+ * Password reset tokens table
+ */
+export const passwordResetTokens = sqliteTable('password_reset_tokens', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  token: text('token').notNull().unique(),
+  expiresAt: text('expires_at').notNull(),
+  usedAt: text('used_at'),
+  createdAt: text('created_at').notNull().default(new Date().toISOString()),
+});
+
+/**
  * Relations
  */
 export const usersRelations = relations(users, ({ many }) => ({
@@ -135,6 +149,13 @@ export const rolePermissionsRelations = relations(rolePermissions, ({ one }) => 
 export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
   user: one(users, {
     fields: [refreshTokens.userId],
+    references: [users.id],
+  }),
+}));
+
+export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [passwordResetTokens.userId],
     references: [users.id],
   }),
 }));

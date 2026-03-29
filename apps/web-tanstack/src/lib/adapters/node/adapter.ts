@@ -131,8 +131,8 @@ export class NodeAdapter extends BaseAdapter {
       secret: string
       qrCode?: string
       qr_code?: string
-      backupCodes?: string[]
-      backup_codes?: string[]
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
     }>('POST', this.endpoints.TWO_FA_SETUP)
     return {
       secret: response.secret,
@@ -144,8 +144,8 @@ export class NodeAdapter extends BaseAdapter {
   async enable2fa(code: string): Promise<TwoFaEnableResponse> {
     const response = await this.makeRequest<{
       enabled: boolean
-      backupCodes?: string[]
-      backup_codes?: string[]
+      backupCodes?: Array<string>
+      backup_codes?: Array<string>
     }>('POST', this.endpoints.TWO_FA_ENABLE, { body: { code } })
     return {
       enabled: response.enabled ?? true,

@@ -161,3 +161,45 @@ export async function getCurrentUser(
 ): Promise<(SafeUser & { roles: Role[] }) | null> {
   return authRepository.findWithRoles(userId);
 }
+
+/**
+ * Forgot password — creates a reset token if user exists
+ */
+export async function forgotPassword(email: string): Promise<void> {
+  const user = await authRepository.findByEmail(email);
+  if (!user) return; // Silent — no email enumeration
+
+  const token = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+  await authRepository.createPasswordResetToken({
+    userId: user.id,
+    token,
+    expiresAt,
+  });
+  // In production, send email with token here
+}
+
+/**
+ * Verify a password reset token
+ */
+export async function verifyResetToken(token: string): Promise<boolean> {
+  const record = await authRepository.findPasswordResetToken(token);
+  if (!record) return false;
+  if (record.usedAt) return false;
+  return new Date(record.expiresAt) > new Date();
+}
+
+/**
+ * Reset password using a valid token
+ */
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  const record = await authRepository.findPasswordResetToken(token);
+  if (!record || record.usedAt || new Date(record.expiresAt) <= new Date()) {
+    throw new AppError('Invalid or expired reset token', 'INVALID_TOKEN', 400);
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  await authRepository.updateUserPassword(record.userId, passwordHash);
+  await authRepository.markPasswordResetTokenUsed(record.id);
+}

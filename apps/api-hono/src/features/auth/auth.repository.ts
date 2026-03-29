@@ -225,3 +225,56 @@ export async function isTokenValid(token: string): Promise<boolean> {
 
   return result.expiresAt > now;
 }
+
+// =========================================================================
+// Password reset token repository
+// =========================================================================
+
+/**
+ * Create a password reset token
+ */
+export async function createPasswordResetToken(data: {
+  userId: string;
+  token: string;
+  expiresAt: string;
+}): Promise<void> {
+  const id = nanoid();
+  const now = new Date().toISOString();
+
+  await db.insert(schema.passwordResetTokens).values({
+    id,
+    userId: data.userId,
+    token: data.token,
+    expiresAt: data.expiresAt,
+    createdAt: now,
+  });
+}
+
+/**
+ * Find password reset token by token value
+ */
+export async function findPasswordResetToken(token: string) {
+  return db.query.passwordResetTokens.findFirst({
+    where: eq(schema.passwordResetTokens.token, token),
+  }) ?? null;
+}
+
+/**
+ * Mark a password reset token as used
+ */
+export async function markPasswordResetTokenUsed(id: string): Promise<void> {
+  await db
+    .update(schema.passwordResetTokens)
+    .set({ usedAt: new Date().toISOString() })
+    .where(eq(schema.passwordResetTokens.id, id));
+}
+
+/**
+ * Update user password
+ */
+export async function updateUserPassword(userId: string, passwordHash: string): Promise<void> {
+  await db
+    .update(schema.users)
+    .set({ passwordHash, updatedAt: new Date().toISOString() })
+    .where(eq(schema.users.id, userId));
+}

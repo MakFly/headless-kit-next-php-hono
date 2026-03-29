@@ -48,6 +48,31 @@ export const refreshSchema = z.object({
   }
 );
 
+/**
+ * Forgot password request schema
+ */
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+/**
+ * Verify reset token schema
+ */
+export const verifyResetTokenSchema = z.object({
+  token: z.string().min(1, 'Token is required'),
+});
+
+/**
+ * Reset password schema
+ */
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Token is required'),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type RefreshInput = z.infer<typeof refreshSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type VerifyResetTokenInput = z.infer<typeof verifyResetTokenSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

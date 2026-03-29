@@ -1,6 +1,72 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Method App\\Features\\Admin\\Actions\\AdminCreateProduct\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/AdminCreateProduct.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\AdminDeleteProduct\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/AdminDeleteProduct.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\AdminListOrders\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/AdminListOrders.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\AdminListProducts\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/AdminListProducts.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\AdminUpdateOrderStatus\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/AdminUpdateOrderStatus.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\AdminUpdateProduct\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/AdminUpdateProduct.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\AssignRole\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/AssignRole.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\CreateCustomer\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/CreateCustomer.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\CreateRole\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/CreateRole.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\Dashboard\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/Dashboard.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\DeleteCustomer\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/DeleteCustomer.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -11,6 +77,66 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Features/Admin/Actions/Inventory.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\Inventory\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/Inventory.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Shared\\Models\\Product\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Admin/Actions/Inventory.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Shared\\Models\\Product\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Admin/Actions/Inventory.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ListCustomers\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ListCustomers.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ListPermissions\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ListPermissions.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ListReviews\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ListReviews.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ListRoles\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ListRoles.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ListSegments\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ListSegments.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ListUsers\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ListUsers.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\RemoveRole\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/RemoveRole.php
 
 		-
 			message: '#^Access to an undefined property App\\Shared\\Models\\Order\:\:\$month\.$#'
@@ -25,14 +151,146 @@ parameters:
 			path: app/Features/Admin/Actions/RevenueAnalytics.php
 
 		-
+			message: '#^Method App\\Features\\Admin\\Actions\\RevenueAnalytics\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/RevenueAnalytics.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Shared\\Models\\Order\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Admin/Actions/RevenueAnalytics.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Shared\\Models\\Order\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Admin/Actions/RevenueAnalytics.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ShowCustomer\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ShowCustomer.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ShowReview\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ShowReview.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\ShowUser\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/ShowUser.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\SyncPermissions\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/SyncPermissions.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\TopProducts\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/TopProducts.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\UpdateCustomer\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/UpdateCustomer.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\UpdateInventory\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/UpdateInventory.php
+
+		-
+			message: '#^Method App\\Features\\Admin\\Actions\\UpdateReview\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Admin/Actions/UpdateReview.php
+
+		-
+			message: '#^Method App\\Features\\Auth\\Actions\\DeleteAccountAction\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Auth/Actions/DeleteAccountAction.php
+
+		-
 			message: '#^Constant App\\Features\\Auth\\Actions\\ForgotPasswordAction\:\:TOKEN_EXPIRY_SECONDS is unused\.$#'
 			identifier: classConstant.unused
 			count: 1
 			path: app/Features/Auth/Actions/ForgotPasswordAction.php
 
 		-
+			message: '#^Method App\\Features\\Auth\\Actions\\ForgotPasswordAction\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Auth/Actions/ForgotPasswordAction.php
+
+		-
+			message: '#^Method App\\Features\\Auth\\Actions\\OAuthProviders\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Auth/Actions/OAuthProviders.php
+
+		-
+			message: '#^Property App\\Features\\Auth\\Actions\\OAuthProviders\:\:\$providers type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Auth/Actions/OAuthProviders.php
+
+		-
+			message: '#^Method App\\Features\\Auth\\Actions\\ResetPasswordAction\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Auth/Actions/ResetPasswordAction.php
+
+		-
 			message: '#^Cannot access property \$slug on string\.$#'
 			identifier: property.nonObject
+			count: 1
+			path: app/Features/Auth/Actions/TestAccounts.php
+
+		-
+			message: '#^Method App\\Features\\Auth\\Actions\\TestAccounts\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Auth/Actions/TestAccounts.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Shared\\Models\\User\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Auth/Actions/TestAccounts.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Features/Auth/Actions/TestAccounts.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Shared\\Models\\User\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Auth/Actions/TestAccounts.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Features/Auth/Actions/TestAccounts.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
 			count: 1
 			path: app/Features/Auth/Actions/TestAccounts.php
 
@@ -43,8 +301,26 @@ parameters:
 			path: app/Features/Auth/Actions/TestAccounts.php
 
 		-
+			message: '#^Method App\\Features\\Auth\\Actions\\UpdateProfileAction\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Auth/Actions/UpdateProfileAction.php
+
+		-
+			message: '#^Method App\\Features\\Auth\\Actions\\VerifyResetTokenAction\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Auth/Actions/VerifyResetTokenAction.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$quantity\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Features/Cart/Actions/AddItem.php
+
+		-
+			message: '#^Method App\\Features\\Cart\\Actions\\AddItem\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/Features/Cart/Actions/AddItem.php
 
@@ -55,8 +331,26 @@ parameters:
 			path: app/Features/Cart/Actions/AddItem.php
 
 		-
+			message: '#^Method App\\Features\\Cart\\Actions\\RemoveItem\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Cart/Actions/RemoveItem.php
+
+		-
+			message: '#^Method App\\Features\\Cart\\Actions\\ShowCart\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Cart/Actions/ShowCart.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$stock_quantity\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Features/Cart/Actions/UpdateItem.php
+
+		-
+			message: '#^Method App\\Features\\Cart\\Actions\\UpdateItem\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/Features/Cart/Actions/UpdateItem.php
 
@@ -85,6 +379,30 @@ parameters:
 			path: app/Features/Cart/Formatters/CartFormatter.php
 
 		-
+			message: '#^Method App\\Features\\Cart\\Formatters\\CartFormatter\:\:format\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Cart/Formatters/CartFormatter.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Cart/Formatters/CartFormatter.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Cart/Formatters/CartFormatter.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Support\\Collection\<int,array\<string, mixed\>\>\:\:values\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Cart/Formatters/CartFormatter.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$product\.$#'
 			identifier: property.notFound
 			count: 5
@@ -101,6 +419,24 @@ parameters:
 			identifier: property.notFound
 			count: 4
 			path: app/Features/Orders/Actions/CreateOrder.php
+
+		-
+			message: '#^Method App\\Features\\Orders\\Actions\\CreateOrder\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Orders/Actions/CreateOrder.php
+
+		-
+			message: '#^Method App\\Features\\Orders\\Actions\\ListOrders\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Orders/Actions/ListOrders.php
+
+		-
+			message: '#^Method App\\Features\\Orders\\Actions\\ShowOrder\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Orders/Actions/ShowOrder.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
@@ -133,6 +469,36 @@ parameters:
 			path: app/Features/Orders/Formatters/OrderFormatter.php
 
 		-
+			message: '#^Method App\\Features\\Orders\\Formatters\\OrderFormatter\:\:format\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Orders/Formatters/OrderFormatter.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Orders/Formatters/OrderFormatter.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Orders/Formatters/OrderFormatter.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Support\\Collection\<int,array\<string, mixed\>\>\:\:values\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Orders/Formatters/OrderFormatter.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\CancelSubscription\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/CancelSubscription.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -143,6 +509,18 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Features/Saas/Actions/ChangeTeamRole.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\ChangeTeamRole\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/ChangeTeamRole.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\CreateOrg\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/CreateOrg.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
@@ -163,6 +541,18 @@ parameters:
 			path: app/Features/Saas/Actions/Dashboard.php
 
 		-
+			message: '#^Method App\\Features\\Saas\\Actions\\Dashboard\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/Dashboard.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatCancelSubscription\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatCancelSubscription.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -171,6 +561,12 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Features/Saas/Actions/FlatChangeTeamRole.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatChangeTeamRole\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/Features/Saas/Actions/FlatChangeTeamRole.php
 
@@ -191,6 +587,24 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Features/Saas/Actions/FlatDashboard.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatDashboard\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatDashboard.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatGetSettings\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatGetSettings.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatGetSubscription\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatGetSubscription.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$limit_value\.$#'
@@ -215,6 +629,30 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Features/Saas/Actions/FlatGetUsage.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatGetUsage\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatGetUsage.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Saas/Actions/FlatGetUsage.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Saas/Actions/FlatGetUsage.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatInviteTeamMember\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatInviteTeamMember.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$amount\.$#'
@@ -249,6 +687,24 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Features/Saas/Actions/FlatListInvoices.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatListInvoices\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatListInvoices.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Saas/Actions/FlatListInvoices.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
 			count: 1
 			path: app/Features/Saas/Actions/FlatListInvoices.php
 
@@ -277,10 +733,58 @@ parameters:
 			path: app/Features/Saas/Actions/FlatListTeam.php
 
 		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatListTeam\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatListTeam.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Saas/Actions/FlatListTeam.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Saas/Actions/FlatListTeam.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Features/Saas/Actions/FlatRemoveTeamMember.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatRemoveTeamMember\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatRemoveTeamMember.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatSubscribe\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatSubscribe.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\FlatUpdateSettings\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/FlatUpdateSettings.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\GetSettings\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/GetSettings.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\GetSubscription\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/GetSubscription.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$limit_value\.$#'
@@ -305,6 +809,30 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Features/Saas/Actions/GetUsage.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\GetUsage\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/GetUsage.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Saas/Actions/GetUsage.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Saas/Actions/GetUsage.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\InviteTeamMember\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/InviteTeamMember.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$amount\.$#'
@@ -339,6 +867,24 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Features/Saas/Actions/ListInvoices.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\ListInvoices\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/ListInvoices.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Saas/Actions/ListInvoices.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
 			count: 1
 			path: app/Features/Saas/Actions/ListInvoices.php
 
@@ -355,6 +901,30 @@ parameters:
 			path: app/Features/Saas/Actions/ListOrgs.php
 
 		-
+			message: '#^Method App\\Features\\Saas\\Actions\\ListOrgs\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/ListOrgs.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Saas/Actions/ListOrgs.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Saas/Actions/ListOrgs.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\ListPlans\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/ListPlans.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -379,8 +949,32 @@ parameters:
 			path: app/Features/Saas/Actions/ListTeam.php
 
 		-
+			message: '#^Method App\\Features\\Saas\\Actions\\ListTeam\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/ListTeam.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Saas/Actions/ListTeam.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Saas/Actions/ListTeam.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Features/Saas/Actions/RemoveTeamMember.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\RemoveTeamMember\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/Features/Saas/Actions/RemoveTeamMember.php
 
@@ -395,6 +989,24 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Features/Saas/Actions/ShowOrg.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\ShowOrg\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/ShowOrg.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\Subscribe\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/Subscribe.php
+
+		-
+			message: '#^Method App\\Features\\Saas\\Actions\\UpdateSettings\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Actions/UpdateSettings.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
@@ -427,6 +1039,126 @@ parameters:
 			path: app/Features/Saas/Formatters/SubscriptionFormatter.php
 
 		-
+			message: '#^Method App\\Features\\Saas\\Formatters\\SubscriptionFormatter\:\:format\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Saas/Formatters/SubscriptionFormatter.php
+
+		-
+			message: '#^Method App\\Features\\Shop\\Actions\\ListCategories\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Shop/Actions/ListCategories.php
+
+		-
+			message: '#^Method App\\Features\\Shop\\Actions\\ListProducts\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Shop/Actions/ListProducts.php
+
+		-
+			message: '#^Method App\\Features\\Shop\\Actions\\ShowCategory\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Shop/Actions/ShowCategory.php
+
+		-
+			message: '#^Method App\\Features\\Shop\\Actions\\ShowProduct\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Shop/Actions/ShowProduct.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\AgentAssigned\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/AgentAssigned.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\AgentQueue\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/AgentQueue.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\AssignConversation\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/AssignConversation.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\CreateCannedResponse\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/CreateCannedResponse.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\CreateConversation\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/CreateConversation.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\DeleteCannedResponse\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/DeleteCannedResponse.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\ListCannedResponses\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/ListCannedResponses.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\ListConversations\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/ListConversations.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\RateConversation\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/RateConversation.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\RatingsStats\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/RatingsStats.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\SendMessage\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/SendMessage.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\ShowConversation\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/ShowConversation.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\UpdateCannedResponse\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/UpdateCannedResponse.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Actions\\UpdateConversationStatus\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Actions/UpdateConversationStatus.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Formatters\\CannedResponseFormatter\:\:format\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Formatters/CannedResponseFormatter.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$content\.$#'
 			identifier: property.notFound
 			count: 1
@@ -457,8 +1189,50 @@ parameters:
 			path: app/Features/Support/Formatters/ConversationFormatter.php
 
 		-
+			message: '#^Method App\\Features\\Support\\Formatters\\ConversationFormatter\:\:format\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Formatters/ConversationFormatter.php
+
+		-
+			message: '#^Method App\\Features\\Support\\Formatters\\ConversationFormatter\:\:formatWithMessages\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Support/Formatters/ConversationFormatter.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Features/Support/Formatters/ConversationFormatter.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Support/Formatters/ConversationFormatter.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Support\\Collection\<int,array\<string, mixed\>\>\:\:values\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Features/Support/Formatters/ConversationFormatter.php
+
+		-
+			message: '#^Method App\\Features\\Users\\Actions\\ListUsers\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Features/Users/Actions/ListUsers.php
+
+		-
 			message: '#^Cannot call method map\(\) on string\.$#'
 			identifier: method.nonObject
+			count: 1
+			path: app/Features/Users/Actions/Me.php
+
+		-
+			message: '#^Method App\\Features\\Users\\Actions\\Me\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/Features/Users/Actions/Me.php
 
@@ -469,10 +1243,190 @@ parameters:
 			path: app/Mail/PasswordResetMail.php
 
 		-
+			message: '#^Method App\\OpenApi\\BetterAuthOpenApiFactory\:\:operation\(\) has parameter \$parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/OpenApi/BetterAuthOpenApiFactory.php
+
+		-
+			message: '#^Method App\\OpenApi\\BetterAuthOpenApiFactory\:\:operation\(\) has parameter \$requestSchema with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/OpenApi/BetterAuthOpenApiFactory.php
+
+		-
+			message: '#^Method App\\OpenApi\\BetterAuthOpenApiFactory\:\:operation\(\) has parameter \$responseSchema with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/OpenApi/BetterAuthOpenApiFactory.php
+
+		-
+			message: '#^Method App\\Shared\\Helpers\\ApiResponse\:\:success\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Shared/Helpers/ApiResponse.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Shared/Middleware/OrgRbacMiddleware.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Cart uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Cart.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Cart\:\:items\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Cart.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Cart\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Cart.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\CartItem uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/CartItem.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\CartItem\:\:cart\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/CartItem.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\CartItem\:\:product\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/CartItem.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Category uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Category.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Category\:\:children\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Category.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Category\:\:parent\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Category.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Category\:\:products\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Category.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Conversation\:\:agent\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Conversation.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Conversation\:\:messages\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Conversation.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Conversation\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Conversation.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Customer uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Customer.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Customer\:\:reviews\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Customer.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Customer\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Customer.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Invoice\:\:organization\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Invoice.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Message\:\:conversation\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Message.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\OAuthProvider uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/OAuthProvider.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\OAuthProvider\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/OAuthProvider.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Order uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Order.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Order\:\:items\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Order.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Order\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Order.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\OrderItem uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/OrderItem.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\OrderItem\:\:order\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/OrderItem.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\OrderItem\:\:product\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/OrderItem.php
 
 		-
 			message: '#^Method App\\Shared\\Models\\Organization\:\:activeSubscription\(\) should return App\\Shared\\Models\\Subscription\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
@@ -481,8 +1435,194 @@ parameters:
 			path: app/Shared/Models/Organization.php
 
 		-
+			message: '#^Method App\\Shared\\Models\\Organization\:\:invoices\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Organization.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Organization\:\:owner\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Organization.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Organization\:\:plan\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Organization.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Organization\:\:subscriptions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Organization.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Organization\:\:teamMembers\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Organization.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Organization\:\:usageRecords\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Organization.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Permission uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Permission.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Permission\:\:createForResource\(\) has parameter \$actions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Shared/Models/Permission.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Permission\:\:roles\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Permission.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Plan\:\:subscriptions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Plan.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Product uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Product.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Product\:\:category\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Product.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Review uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Review.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Review\:\:customer\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Review.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Review\:\:product\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Review.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Role uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Role.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Role\:\:permissions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Role.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Role\:\:users\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Role.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\Segment uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Segment.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Subscription\:\:organization\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Subscription.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\Subscription\:\:plan\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/Subscription.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\TeamMember\:\:organization\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/TeamMember.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\TeamMember\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/TeamMember.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\UsageRecord\:\:organization\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/UsageRecord.php
+
+		-
+			message: '#^Class App\\Shared\\Models\\User uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/User.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\User\:\:getAllPermissions\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/User.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\User\:\:hasAnyRole\(\) has parameter \$roleSlugs with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Shared/Models/User.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\User\:\:oauthProviders\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/User.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\User\:\:permissions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/User.php
+
+		-
 			message: '#^Method App\\Shared\\Models\\User\:\:permissions\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany but returns Illuminate\\Support\\Collection\<int, mixed\>\.$#'
 			identifier: return.type
+			count: 1
+			path: app/Shared/Models/User.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\User\:\:roles\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Shared/Models/User.php
+
+		-
+			message: '#^Method App\\Shared\\Models\\User\:\:teamMemberships\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Shared/Models/User.php
 

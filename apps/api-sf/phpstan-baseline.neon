@@ -1,0 +1,277 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method App\\Feature\\Shop\\Repository\\CategoryRepository\:\:findBySlugWithProducts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Feature/Shop/Repository/CategoryRepository.php
+
+		-
+			message: '#^Method App\\Feature\\Shop\\Repository\\ProductRepository\:\:countFiltered\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Feature/Shop/Repository/ProductRepository.php
+
+		-
+			message: '#^Method App\\Feature\\Shop\\Repository\\ProductRepository\:\:createFilteredQueryBuilder\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Feature/Shop/Repository/ProductRepository.php
+
+		-
+			message: '#^Method App\\Feature\\Shop\\Repository\\ProductRepository\:\:findAllFiltered\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Feature/Shop/Repository/ProductRepository.php
+
+		-
+			message: '#^Method App\\Shared\\ApiPlatform\\Serializer\\ApiPlatformEnvelopeSubscriber\:\:extractPaginationMeta\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/ApiPlatform/Serializer/ApiPlatformEnvelopeSubscriber.php
+
+		-
+			message: '#^Method App\\Shared\\ApiPlatform\\Serializer\\ApiPlatformEnvelopeSubscriber\:\:isCollection\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/ApiPlatform/Serializer/ApiPlatformEnvelopeSubscriber.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\CannedResponse\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/CannedResponse.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Cart\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Cart.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\CartItem\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/CartItem.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Category\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Category.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\ChatMessage\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/ChatMessage.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Conversation\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Conversation.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Invoice\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Invoice.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Order\:\:getShippingAddress\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Order.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Order\:\:setShippingAddress\(\) has parameter \$shippingAddress with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Order.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Order\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Order.php
+
+		-
+			message: '#^Property App\\Shared\\Entity\\Order\:\:\$shippingAddress type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Order.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\OrderItem\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/OrderItem.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Organization\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Organization.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Permission\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Permission.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Plan\:\:getFeatures\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Plan.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Plan\:\:getLimits\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Plan.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Plan\:\:setFeatures\(\) has parameter \$features with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Plan.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Plan\:\:setLimits\(\) has parameter \$limits with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Plan.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Plan\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Plan.php
+
+		-
+			message: '#^Property App\\Shared\\Entity\\Plan\:\:\$features type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Plan.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Product\:\:getImages\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Product.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Product\:\:setImages\(\) has parameter \$images with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Product.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Product\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Product.php
+
+		-
+			message: '#^Property App\\Shared\\Entity\\Product\:\:\$images type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Product.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Review\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Review.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Role\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Role.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Role\:\:toArrayWithPermissions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Role.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Segment\:\:getCriteria\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Segment.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Segment\:\:setCriteria\(\) has parameter \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Segment.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Segment\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Segment.php
+
+		-
+			message: '#^Property App\\Shared\\Entity\\Segment\:\:\$criteria type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Segment.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\Subscription\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/Subscription.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\TeamMember\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/TeamMember.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\UsageRecord\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/UsageRecord.php
+
+		-
+			message: '#^Method App\\Shared\\Entity\\User\:\:hasAnyRole\(\) has parameter \$slugs with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Entity/User.php
+
+		-
+			message: '#^Method App\\Shared\\Repository\\ReviewRepository\:\:countFiltered\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Repository/ReviewRepository.php
+
+		-
+			message: '#^Method App\\Shared\\Repository\\ReviewRepository\:\:findAllFiltered\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Repository/ReviewRepository.php
+
+		-
+			message: '#^Class App\\Shared\\Security\\OrgVoter extends generic class Symfony\\Component\\Security\\Core\\Authorization\\Voter\\Voter but does not specify its types\: TAttribute, TSubject$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Shared/Security/OrgVoter.php
+
+		-
+			message: '#^Class App\\Shared\\Security\\Voter\\PermissionVoter extends generic class Symfony\\Component\\Security\\Core\\Authorization\\Voter\\Voter but does not specify its types\: TAttribute, TSubject$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Shared/Security/Voter/PermissionVoter.php
+
+		-
+			message: '#^Class App\\Shared\\Security\\Voter\\RoleVoter extends generic class Symfony\\Component\\Security\\Core\\Authorization\\Voter\\Voter but does not specify its types\: TAttribute, TSubject$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Shared/Security/Voter/RoleVoter.php

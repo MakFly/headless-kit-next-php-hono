@@ -123,6 +123,12 @@ jobs:
       - name: Install Composer dependencies
         run: cd apps/api-laravel && composer install --no-interaction --prefer-dist
 
+      - name: Lint (Pint)
+        run: cd apps/api-laravel && composer lint
+
+      - name: Static analysis (Larastan)
+        run: cd apps/api-laravel && composer analyse
+
       - name: Copy .env
         run: cd apps/api-laravel && cp .env.example .env
 
@@ -173,6 +179,15 @@ jobs:
 
       - name: Install Composer dependencies
         run: cd apps/api-sf && composer install --no-interaction --prefer-dist
+
+      - name: Cache warmup (for PHPStan)
+        run: cd apps/api-sf && php bin/console cache:warmup --env=dev
+
+      - name: Lint (PHP-CS-Fixer)
+        run: cd apps/api-sf && composer lint
+
+      - name: Static analysis (PHPStan)
+        run: cd apps/api-sf && composer analyse
 
       - name: Create database schema
         run: cd apps/api-sf && php bin/console doctrine:schema:create --env=test

@@ -1,5 +1,6 @@
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type PageHeaderProps = {
   title?: string;
@@ -20,6 +21,9 @@ export function PageHeader({ title, subtitle }: PageHeaderProps) {
           {subtitle && (
             <p className="text-xs text-muted-foreground">{subtitle}</p>
           )}
+        </div>
+        <div className="ml-auto">
+          <ThemeToggle />
         </div>
       </div>
     </header>

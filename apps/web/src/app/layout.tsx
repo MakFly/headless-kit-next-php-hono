@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthInitializer } from "@/components/auth-initializer";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
@@ -14,10 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
-        <AuthInitializer>{children}</AuthInitializer>
-        <Toaster />
+        <ThemeProvider>
+          <AuthInitializer>{children}</AuthInitializer>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

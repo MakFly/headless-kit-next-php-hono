@@ -2,7 +2,7 @@
  * Support repository
  */
 
-import { eq, and, desc, asc, sql, isNull } from 'drizzle-orm';
+import { eq, and, desc, asc, sql, isNull, count } from 'drizzle-orm';
 import { db, schema } from '../../shared/db/index.ts';
 
 // =========================================================================
@@ -40,31 +40,88 @@ export async function findConversationById(id: string) {
   return result[0] ?? null;
 }
 
-export async function findConversationsByUserId(userId: string) {
-  return db
+export async function findConversationsByUserId(userId: string, page = 1, perPage = 50) {
+  const cappedPerPage = Math.min(perPage, 100);
+  const offset = (page - 1) * cappedPerPage;
+
+  const condition = eq(schema.conversations.userId, userId);
+
+  const data = await db
     .select()
     .from(schema.conversations)
-    .where(eq(schema.conversations.userId, userId))
-    .orderBy(desc(schema.conversations.updatedAt));
+    .where(condition)
+    .orderBy(desc(schema.conversations.updatedAt))
+    .limit(cappedPerPage)
+    .offset(offset);
+
+  const [countResult] = await db
+    .select({ count: count() })
+    .from(schema.conversations)
+    .where(condition);
+
+  const total = countResult.count;
+
+  return {
+    data,
+    pagination: { page, perPage: cappedPerPage, total, totalPages: Math.ceil(total / cappedPerPage) },
+  };
 }
 
-export async function findConversationsByAgentId(agentId: string) {
-  return db
+export async function findConversationsByAgentId(agentId: string, page = 1, perPage = 50) {
+  const cappedPerPage = Math.min(perPage, 100);
+  const offset = (page - 1) * cappedPerPage;
+
+  const condition = eq(schema.conversations.agentId, agentId);
+
+  const data = await db
     .select()
     .from(schema.conversations)
-    .where(eq(schema.conversations.agentId, agentId))
-    .orderBy(desc(schema.conversations.updatedAt));
+    .where(condition)
+    .orderBy(desc(schema.conversations.updatedAt))
+    .limit(cappedPerPage)
+    .offset(offset);
+
+  const [countResult] = await db
+    .select({ count: count() })
+    .from(schema.conversations)
+    .where(condition);
+
+  const total = countResult.count;
+
+  return {
+    data,
+    pagination: { page, perPage: cappedPerPage, total, totalPages: Math.ceil(total / cappedPerPage) },
+  };
 }
 
-export async function findUnassignedConversations() {
-  return db
+export async function findUnassignedConversations(page = 1, perPage = 50) {
+  const cappedPerPage = Math.min(perPage, 100);
+  const offset = (page - 1) * cappedPerPage;
+
+  const condition = and(
+    eq(schema.conversations.status, 'open'),
+    isNull(schema.conversations.agentId)
+  );
+
+  const data = await db
     .select()
     .from(schema.conversations)
-    .where(and(
-      eq(schema.conversations.status, 'open'),
-      isNull(schema.conversations.agentId)
-    ))
-    .orderBy(asc(schema.conversations.createdAt));
+    .where(condition)
+    .orderBy(asc(schema.conversations.createdAt))
+    .limit(cappedPerPage)
+    .offset(offset);
+
+  const [countResult] = await db
+    .select({ count: count() })
+    .from(schema.conversations)
+    .where(condition);
+
+  const total = countResult.count;
+
+  return {
+    data,
+    pagination: { page, perPage: cappedPerPage, total, totalPages: Math.ceil(total / cappedPerPage) },
+  };
 }
 
 export async function updateConversation(id: string, data: Partial<{
@@ -118,12 +175,31 @@ export async function createMessage(data: {
   return db.query.messages.findFirst({ where: eq(schema.messages.id, id) });
 }
 
-export async function findMessagesByConversationId(conversationId: string) {
-  return db
+export async function findMessagesByConversationId(conversationId: string, page = 1, perPage = 100) {
+  const cappedPerPage = Math.min(perPage, 200);
+  const offset = (page - 1) * cappedPerPage;
+
+  const condition = eq(schema.messages.conversationId, conversationId);
+
+  const data = await db
     .select()
     .from(schema.messages)
-    .where(eq(schema.messages.conversationId, conversationId))
-    .orderBy(asc(schema.messages.createdAt));
+    .where(condition)
+    .orderBy(asc(schema.messages.createdAt))
+    .limit(cappedPerPage)
+    .offset(offset);
+
+  const [countResult] = await db
+    .select({ count: count() })
+    .from(schema.messages)
+    .where(condition);
+
+  const total = countResult.count;
+
+  return {
+    data,
+    pagination: { page, perPage: cappedPerPage, total, totalPages: Math.ceil(total / cappedPerPage) },
+  };
 }
 
 // =========================================================================

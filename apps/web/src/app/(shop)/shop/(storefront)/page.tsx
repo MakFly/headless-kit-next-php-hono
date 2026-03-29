@@ -90,7 +90,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         <div className="mt-10">
           <ProductPagination
             currentPage={productsResponse.pagination.page}
-            totalPages={productsResponse.pagination.totalPages}
+            totalPages={productsResponse.pagination.last_page}
           />
         </div>
       </section>

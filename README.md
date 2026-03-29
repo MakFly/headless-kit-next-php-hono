@@ -14,7 +14,7 @@ Browser ──→ TanStack Start (port 3003) ──→ (same backends)
 
 The frontend **never contacts backends directly**. All requests go through BFF Route Handlers (`/api/v1/*`) that handle:
 
-- **HMAC signing** — requests are signed with a shared secret to prevent forgery
+- **Bearer token forwarding** — requests are authenticated via the user's token
 - **Cookie management** — auth tokens stored in HttpOnly cookies (XSS-safe)
 - **Token refresh** — proactive (Edge middleware) and reactive (on 401) refresh
 - **Path transformation** — BFF paths mapped to backend-specific routes
@@ -119,7 +119,6 @@ LARAVEL_API_URL=http://localhost:8000
 SYMFONY_API_URL=http://localhost:8002
 NODE_API_URL=http://localhost:8003
 AUTH_BACKEND=laravel          # laravel | symfony | node
-BFF_SECRET=your-secret-key
 ```
 
 ### Laravel (`apps/api-laravel/.env`)

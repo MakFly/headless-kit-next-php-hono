@@ -52,11 +52,11 @@ class ApiResponse
         $payload = [
             'success' => true,
             'data' => $data,
-            'pagination' => [
+            'meta' => [
                 'page' => $page,
-                'perPage' => $perPage,
+                'per_page' => $perPage,
                 'total' => $total,
-                'totalPages' => (int) ceil($total / max(1, $perPage)),
+                'last_page' => (int) ceil($total / max(1, $perPage)),
             ],
             'status' => $status,
             'request_id' => bin2hex(random_bytes(8)),

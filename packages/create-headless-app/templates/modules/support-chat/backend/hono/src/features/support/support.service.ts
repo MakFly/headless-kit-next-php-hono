@@ -38,8 +38,8 @@ export async function createConversation(userId: string, subject: string, firstM
   return supportRepository.findConversationById(conv.id);
 }
 
-export async function listUserConversations(userId: string) {
-  return supportRepository.findConversationsByUserId(userId);
+export async function listUserConversations(userId: string, page?: number, perPage?: number) {
+  return supportRepository.findConversationsByUserId(userId, page, perPage);
 }
 
 export async function getConversationWithMessages(conversationId: string, userId: string) {
@@ -52,8 +52,8 @@ export async function getConversationWithMessages(conversationId: string, userId
     throw new AppError('Forbidden', 'FORBIDDEN', 403);
   }
 
-  const messages = await supportRepository.findMessagesByConversationId(conversationId);
-  return { ...conv, messages };
+  const messagesResult = await supportRepository.findMessagesByConversationId(conversationId);
+  return { ...conv, messages: messagesResult.data, messagesPagination: messagesResult.pagination };
 }
 
 export async function sendMessage(conversationId: string, senderId: string, senderType: string, content: string) {
@@ -109,12 +109,12 @@ export async function rateConversation(conversationId: string, userId: string, r
 // Agent
 // =========================================================================
 
-export async function getAgentQueue() {
-  return supportRepository.findUnassignedConversations();
+export async function getAgentQueue(page?: number, perPage?: number) {
+  return supportRepository.findUnassignedConversations(page, perPage);
 }
 
-export async function getAgentAssigned(agentId: string) {
-  return supportRepository.findConversationsByAgentId(agentId);
+export async function getAgentAssigned(agentId: string, page?: number, perPage?: number) {
+  return supportRepository.findConversationsByAgentId(agentId, page, perPage);
 }
 
 export async function assignAgent(conversationId: string, agentId: string) {

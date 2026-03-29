@@ -29,7 +29,7 @@ export async function listProducts(c: Context<{ Variables: AppVariables }>) {
     page: pagination.page,
     per_page: pagination.perPage,
     total: pagination.total,
-    total_pages: pagination.totalPages,
+    last_page: pagination.totalPages,
   });
 }
 
@@ -71,9 +71,9 @@ export async function listOrders(c: Context<{ Variables: AppVariables }>) {
   const { data, pagination } = result;
   return apiSuccess(c, data, {
     page: pagination.page,
-    perPage: pagination.perPage,
+    per_page: pagination.perPage,
     total: pagination.total,
-    totalPages: pagination.totalPages,
+    last_page: pagination.totalPages,
   });
 }
 
@@ -113,8 +113,16 @@ export async function getTopProducts(c: Context<{ Variables: AppVariables }>) {
 // =========================================================================
 
 export async function getInventory(c: Context<{ Variables: AppVariables }>) {
-  const inventory = await adminService.getInventory();
-  return apiSuccess(c, inventory);
+  const page = Math.max(1, Number(c.req.query('page')) || 1);
+  const perPage = Math.max(1, Number(c.req.query('per_page')) || 20);
+  const result = await adminService.getInventory(page, perPage);
+  const { data, pagination } = result;
+  return apiSuccess(c, data, {
+    page: pagination.page,
+    per_page: pagination.perPage,
+    total: pagination.total,
+    last_page: pagination.totalPages,
+  });
 }
 
 export async function updateInventory(c: Context<{ Variables: AppVariables }>) {
@@ -144,9 +152,9 @@ export async function listCustomers(c: Context<{ Variables: AppVariables }>) {
   const { data, pagination } = result;
   return apiSuccess(c, data, {
     page: pagination.page,
-    perPage: pagination.perPage,
+    per_page: pagination.perPage,
     total: pagination.total,
-    totalPages: pagination.totalPages,
+    last_page: pagination.totalPages,
   });
 }
 
@@ -195,9 +203,9 @@ export async function listReviews(c: Context<{ Variables: AppVariables }>) {
   const { data, pagination } = result;
   return apiSuccess(c, data, {
     page: pagination.page,
-    perPage: pagination.perPage,
+    per_page: pagination.perPage,
     total: pagination.total,
-    totalPages: pagination.totalPages,
+    last_page: pagination.totalPages,
   });
 }
 
@@ -237,6 +245,14 @@ export async function bulkRejectReviews(c: Context<{ Variables: AppVariables }>)
 // =========================================================================
 
 export async function listSegments(c: Context<{ Variables: AppVariables }>) {
-  const segments = await adminService.getSegments();
-  return apiSuccess(c, segments);
+  const page = Math.max(1, Number(c.req.query('page')) || 1);
+  const perPage = Math.max(1, Number(c.req.query('per_page')) || 20);
+  const result = await adminService.getSegments(page, perPage);
+  const { data, pagination } = result;
+  return apiSuccess(c, data, {
+    page: pagination.page,
+    per_page: pagination.perPage,
+    total: pagination.total,
+    last_page: pagination.totalPages,
+  });
 }

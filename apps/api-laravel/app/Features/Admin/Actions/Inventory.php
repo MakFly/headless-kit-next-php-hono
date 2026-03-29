@@ -7,17 +7,23 @@ namespace App\Features\Admin\Actions;
 use App\Shared\Models\Product;
 use App\Shared\Traits\ApiResponder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class Inventory
 {
     use ApiResponder;
 
-    public function __invoke(): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
-        $products = Product::with('category')
+        $perPage = min(100, max(1, (int) $request->input('per_page', 20)));
+        $page = max(1, (int) $request->input('page', 1));
+
+        $query = Product::with('category')
             ->select('id', 'name', 'slug', 'sku', 'stock_quantity', 'status', 'category_id')
-            ->orderBy('stock_quantity', 'asc')
-            ->get()
+            ->orderBy('stock_quantity', 'asc');
+
+        $total = $query->count();
+        $products = $query->forPage($page, $perPage)->get()
             ->map(fn ($p) => [
                 'id' => $p->id,
                 'name' => $p->name,
@@ -28,6 +34,6 @@ class Inventory
                 'category' => $p->category ? ['id' => $p->category->id, 'name' => $p->category->name] : null,
             ]);
 
-        return $this->success($products);
+        return $this->paginated($products, $page, $perPage, $total);
     }
 }

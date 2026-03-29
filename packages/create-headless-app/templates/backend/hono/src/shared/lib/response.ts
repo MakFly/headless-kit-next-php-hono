@@ -24,7 +24,7 @@ export function apiSuccess(
   status: number = 200
 ): Response {
   const requestId = (c.get('requestId') as string | undefined) ?? generateRequestId();
-  c.header('Cache-Control', 'no-store');
+  c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
   c.header('X-Request-Id', requestId);
 
   const body: Record<string, unknown> = {
@@ -52,7 +52,7 @@ export function apiError(
   details?: unknown
 ): Response {
   const requestId = (c.get('requestId') as string | undefined) ?? generateRequestId();
-  c.header('Cache-Control', 'no-store');
+  c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
   c.header('X-Request-Id', requestId);
 
   const errorBody: Record<string, unknown> = { code, message };

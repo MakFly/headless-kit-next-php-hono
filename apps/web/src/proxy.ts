@@ -134,12 +134,33 @@ export function proxy(request: NextRequest) {
 
   const attachBackendCookie = (response: NextResponse): NextResponse => {
     if (backendFromPath) {
-      response.cookies.set(AUTH_BACKEND_COOKIE, backendFromPath, {
-        path: "/",
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-      });
+      // CSRF protection: only set the backend-switching cookie when the
+      // request originates from the same site. SameSite=Lax already blocks
+      // cross-origin sub-resource requests, but an attacker could still
+      // trigger a top-level navigation (e.g. <a href="/laravel">). Checking
+      // Origin or Referer ensures we only honour same-origin navigations.
+      const origin = request.headers.get("origin");
+      const referer = request.headers.get("referer");
+      const appUrl = request.nextUrl.origin;
+
+      const isSameOrigin =
+        (origin && origin === appUrl) ||
+        (referer && referer.startsWith(appUrl));
+
+      if (isSameOrigin) {
+        response.cookies.set(AUTH_BACKEND_COOKIE, backendFromPath, {
+          path: "/",
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          httpOnly: true,
+        });
+      } else {
+        log.warn("Backend switch blocked: cross-origin request", {
+          pathname,
+          origin: origin ?? "none",
+          referer: referer ?? "none",
+        });
+      }
     }
 
     return response;
@@ -147,7 +168,11 @@ export function proxy(request: NextRequest) {
 
   // For API routes, check if proactive refresh is needed
   if (apiRoutes.some((route) => pathname.startsWith(route))) {
+    const requestId = request.headers.get("x-request-id") || crypto.randomUUID();
     const response = NextResponse.next();
+
+    // Propagate request ID to downstream handlers and back to client
+    response.headers.set("x-request-id", requestId);
 
     if (token) {
       // Check if token needs proactive refresh

@@ -10,6 +10,7 @@ api_platform:
             vary: ['Content-Type', 'Authorization', 'Origin']
         pagination_items_per_page: 20
         pagination_client_items_per_page: true
+        pagination_client_max_items_per_page: 100
     formats:
         jsonld:
             mime_types: ['application/ld+json']

@@ -7,6 +7,10 @@
  * Features:
  * - 401 Interceptor: Automatic token refresh on 401 responses
  * - Proactive Refresh: Refresh tokens before they expire
+ * - Body size limit: Rejects requests over 1MB
+ * - Rate limiting: Auth endpoints limited to 20 req/15min per IP (in-memory)
+ * - Refresh deduplication: Concurrent 401s share a single refresh call
+ * - Configurable timeout via PROXY_TIMEOUT_MS env var
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
@@ -20,6 +24,11 @@ import {
 import type { BackendType } from '@/lib/adapters/types';
 import { createLogger } from '@/lib/logger';
 import { ApiException, apiRequest, readResponseBody } from '@/lib/http';
+import {
+  isAuthRoute,
+  checkRateLimit,
+  validatePathSegments,
+} from '../proxy-utils';
 import {
   TOKEN_CONFIG,
   calculateExpirationTimestamp,
@@ -35,19 +44,26 @@ import {
 const log = createLogger('bff-proxy');
 
 /**
+ * Configurable timeouts
+ */
+const PROXY_TIMEOUT_MS = Number(process.env.PROXY_TIMEOUT_MS) || 30_000;
+const REFRESH_TIMEOUT_MS = Math.min(PROXY_TIMEOUT_MS, 5_000);
+
+/**
  * Type for Next.js 14+ dynamic route params
  */
 type RouteParams = {
   params: Promise<{ path: string[] }>;
 };
 
-/**
- * Regex to validate path segments (alphanumerics, dashes, underscores only)
- */
-const SAFE_PATH_SEGMENT = /^[a-zA-Z0-9_-]+$/;
 const REQUEST_ID_HEADER = 'x-request-id';
 const INTERNAL_REQUEST_HEADER = 'x-bff-internal';
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+/**
+ * Incoming request body size limit (1 MB)
+ */
+const MAX_REQUEST_SIZE = 1_048_576;
 
 /**
  * Cookie configuration
@@ -58,6 +74,69 @@ const COOKIE_CONFIG = {
   sameSite: 'lax' as const,
   path: '/',
 };
+
+/**
+ * In-flight refresh deduplication.
+ * Prevents concurrent 401 responses from triggering multiple refresh calls
+ * with the same refresh token (which would fail on single-use token backends).
+ */
+const inflightRefreshes = new Map<string, Promise<{ accessToken: string; refreshToken: string; expiresIn: number } | null>>();
+
+async function deduplicatedRefresh(
+  config: ProxyConfig,
+  backend: string,
+  refreshToken: string,
+  requestId: string
+): Promise<{ accessToken: string; refreshToken: string; expiresIn: number } | null> {
+  const existing = inflightRefreshes.get(refreshToken);
+  if (existing) {
+    log.info('Reusing in-flight refresh', { requestId });
+    return existing;
+  }
+
+  const promise = attemptTokenRefresh(config, backend, refreshToken, requestId)
+    .finally(() => {
+      inflightRefreshes.delete(refreshToken);
+    });
+
+  inflightRefreshes.set(refreshToken, promise);
+  return promise;
+}
+
+/**
+ * Whitelist backend response headers for streaming pass-through.
+ * Security headers are added by the BFF, not inherited from backend.
+ */
+function sanitizeResponseHeaders(backendHeaders: Headers, requestId: string): Headers {
+  const headers = new Headers();
+  // Note: content-length is intentionally excluded — Node's fetch decompresses
+  // gzip/br transparently, making the backend's content-length incorrect.
+  // The HTTP layer between BFF and client handles its own framing.
+  const PASSTHROUGH_HEADERS = [
+    'content-type', 'cache-control',
+    'etag', 'last-modified', 'x-request-id', 'x-total-count', 'link',
+  ];
+  for (const key of PASSTHROUGH_HEADERS) {
+    const value = backendHeaders.get(key);
+    if (value) headers.set(key, value);
+  }
+  headers.set(REQUEST_ID_HEADER, requestId);
+  headers.set('x-content-type-options', 'nosniff');
+  headers.set('x-frame-options', 'DENY');
+  setNoStoreHeaders(headers);
+  return headers;
+}
+
+/**
+ * Drain an unconsumed response body to prevent memory leaks (CVE-2024-24750).
+ */
+async function drainBody(response: Response): Promise<void> {
+  try {
+    await response.body?.cancel();
+  } catch {
+    // Ignore — body may already be consumed or closed
+  }
+}
 
 function setNoStoreHeaders(headers: Headers): void {
   headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
@@ -106,46 +185,6 @@ function validateCsrf(request: NextRequest, method: string): void {
   });
 }
 
-/**
- * Validates path segments to prevent SSRF/Path Traversal attacks
- * @throws {ApiException} if path contains dangerous segments
- */
-function validatePathSegments(segments: string[]): void {
-  for (const segment of segments) {
-    // Reject empty segments
-    if (!segment) {
-      throw new ApiException('Invalid path: empty segment', {
-        statusCode: 400,
-        code: 'INVALID_PATH',
-      });
-    }
-
-    // Reject path traversal
-    if (segment === '..' || segment === '.') {
-      throw new ApiException('Invalid path: traversal not allowed', {
-        statusCode: 400,
-        code: 'INVALID_PATH',
-      });
-    }
-
-    // Reject absolute URLs
-    if (segment.includes('://') || segment.startsWith('//')) {
-      throw new ApiException('Invalid path: absolute URLs not allowed', {
-        statusCode: 400,
-        code: 'INVALID_PATH',
-      });
-    }
-
-    // Validate segment format (alphanumerics, dashes, underscores)
-    if (!SAFE_PATH_SEGMENT.test(segment)) {
-      throw new ApiException('Invalid path: forbidden characters', {
-        statusCode: 400,
-        code: 'INVALID_PATH',
-      });
-    }
-  }
-}
-
 function errorResponse(error: ApiException, requestId: string): NextResponse {
   const payload: Record<string, unknown> = {
     error: error.message,
@@ -171,24 +210,34 @@ function asRecord(value: unknown): Record<string, unknown> {
 }
 
 /**
- * Extract and parse request body
+ * Extract and parse request body.
+ * Throws 415 if content-type is present but not application/json.
  */
 async function extractBody(request: NextRequest): Promise<unknown> {
   if (request.method === 'GET' || request.method === 'HEAD') {
     return null;
   }
 
-  try {
-    const contentType = request.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      const clonedRequest = request.clone();
-      return await clonedRequest.json();
-    }
-  } catch {
-    // No body or non-JSON
+  const contentType = request.headers.get('content-type') || '';
+
+  // Allow requests with no body (e.g., DELETE with no content-type)
+  if (!contentType) {
+    return null;
   }
 
-  return null;
+  if (!contentType.includes('application/json')) {
+    throw new ApiException('Unsupported content type. Only application/json is accepted.', {
+      statusCode: 415,
+      code: 'UNSUPPORTED_MEDIA_TYPE',
+    });
+  }
+
+  try {
+    const clonedRequest = request.clone();
+    return await clonedRequest.json();
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -239,7 +288,7 @@ async function attemptTokenRefresh(
       method: 'POST',
       headers,
       body,
-      timeoutMs: config.timeout,
+      timeoutMs: REFRESH_TIMEOUT_MS,
     });
 
     if (!response.ok) {
@@ -333,8 +382,21 @@ async function proxyRequest(
   const backend = resolveBackend(cookieStore.get(AUTH_BACKEND_COOKIE)?.value);
   const config = getProxyConfig(backend);
   const requestId = getRequestId(request);
+  const startTime = performance.now();
+
+  // Declared outside try so catch can drain unconsumed body on error
+  let backendResponse: Response | undefined;
 
   try {
+    // Reject oversized incoming request bodies (1MB limit)
+    const incomingContentLength = Number(request.headers.get('content-length') || '0');
+    if (incomingContentLength > MAX_REQUEST_SIZE) {
+      return NextResponse.json(
+        { error: 'Request body too large', code: 'BODY_TOO_LARGE', status: 413, request_id: requestId },
+        { status: 413, headers: { [REQUEST_ID_HEADER]: requestId } }
+      );
+    }
+
     // Extract path from params
     const params = await paramsPromise;
     const pathSegments = params.path;
@@ -345,6 +407,15 @@ async function proxyRequest(
 
     // Build BFF path
     const bffPath = `/api/v1/${pathSegments.join('/')}`;
+
+    // BFF-level rate limiting for auth routes
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!checkRateLimit(clientIp, bffPath)) {
+      return NextResponse.json(
+        { error: 'Too many requests', code: 'RATE_LIMITED', status: 429, request_id: requestId },
+        { status: 429, headers: { [REQUEST_ID_HEADER]: requestId, 'Retry-After': '900' } }
+      );
+    }
 
     // Transform to backend path
     const backendPath = config.transformPath(bffPath);
@@ -361,7 +432,7 @@ async function proxyRequest(
       });
     }
 
-    // Extract body
+    // Extract body (throws 415 for non-JSON content-type)
     const body = await extractBody(request);
 
     // Get tokens from cookies
@@ -378,7 +449,7 @@ async function proxyRequest(
     // Proactive refresh if middleware signaled it (and this isn't the refresh endpoint itself)
     if (refreshNeeded && refreshToken && !backendPath.includes('/refresh')) {
       log.info('Attempting proactive token refresh', { refreshNeeded, bffPath });
-      const newTokens = await attemptTokenRefresh(config, backend, refreshToken, requestId);
+      const newTokens = await deduplicatedRefresh(config, backend, refreshToken, requestId);
       if (newTokens) {
         proactivelyRefreshedTokens = newTokens;
         authToken = newTokens.accessToken;
@@ -435,17 +506,22 @@ async function proxyRequest(
       backendUrl.searchParams.set(key, value);
     });
 
-    // Make request to backend
+    // Make request to backend — propagate client AbortSignal
     let response = await apiRequest(backendUrl.toString(), {
       ...options,
-      timeoutMs: config.timeout,
+      signal: request.signal,
+      timeoutMs: PROXY_TIMEOUT_MS,
     });
+    backendResponse = response;
 
     // 401 Interceptor: Attempt refresh and retry
     if (response.status === 401 && refreshToken && !backendPath.includes('/refresh')) {
       log.info('Received 401, attempting token refresh', { bffPath });
 
-      const newTokens = await attemptTokenRefresh(config, backend, refreshToken, requestId);
+      // Drain the 401 response body to prevent memory leak
+      await drainBody(response);
+
+      const newTokens = await deduplicatedRefresh(config, backend, refreshToken, requestId);
 
       if (newTokens) {
         log.info('Refresh successful, retrying request');
@@ -456,12 +532,60 @@ async function proxyRequest(
         response = await apiRequest(backendUrl.toString(), {
           ...options,
           headers,
-          timeoutMs: config.timeout,
+          signal: request.signal,
+          timeoutMs: PROXY_TIMEOUT_MS,
         });
+        backendResponse = response;
 
-        // Create response and store new tokens
-        const responseData = await response.text();
-        const nextResponse = await buildResponse(response, responseData, backend, requestId);
+        // Dual-path: auth routes buffer for token extraction, data routes stream
+        if (isAuthRoute(bffPath)) {
+          const responseData = await response.text();
+          const nextResponse = await buildResponse(response, responseData, backend, requestId);
+          storeTokensInResponse(
+            nextResponse,
+            backend,
+            newTokens.accessToken,
+            newTokens.refreshToken,
+            newTokens.expiresIn
+          );
+          log.info('Proxy request completed', {
+            requestId, backend, method, path: bffPath,
+            status: nextResponse.status,
+            durationMs: Math.round(performance.now() - startTime),
+          });
+          return nextResponse;
+        }
+
+        // Normalize non-JSON error responses from backend (e.g., HTML 500 pages)
+        const retryBackendContentType = response.headers.get('content-type') || '';
+        if (response.status >= 400 && !retryBackendContentType.includes('application/json')) {
+          await drainBody(response);
+          log.warn('Non-JSON error from backend after retry', {
+            requestId, backend, method, path: bffPath,
+            status: response.status,
+            contentType: retryBackendContentType,
+            durationMs: Math.round(performance.now() - startTime),
+          });
+          return NextResponse.json(
+            {
+              error: `Backend error (${response.status})`,
+              code: 'BACKEND_ERROR',
+              status: response.status,
+              request_id: requestId,
+            },
+            {
+              status: response.status,
+              headers: { [REQUEST_ID_HEADER]: requestId },
+            }
+          );
+        }
+
+        // Streaming pass-through + store refreshed tokens via cookies
+        const nextResponse = new NextResponse(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: sanitizeResponseHeaders(response.headers, requestId),
+        });
         storeTokensInResponse(
           nextResponse,
           backend,
@@ -469,6 +593,11 @@ async function proxyRequest(
           newTokens.refreshToken,
           newTokens.expiresIn
         );
+        log.info('Proxy request completed', {
+          requestId, backend, method, path: bffPath,
+          status: nextResponse.status,
+          durationMs: Math.round(performance.now() - startTime),
+        });
         return nextResponse;
       }
 
@@ -495,9 +624,59 @@ async function proxyRequest(
       return nextResponse;
     }
 
-    // Build and return response
-    const responseData = await response.text();
-    const nextResponse = await buildResponse(response, responseData, backend, requestId);
+    // Dual-path: auth routes buffer for token extraction, data routes stream
+    if (isAuthRoute(bffPath)) {
+      const responseData = await response.text();
+      const nextResponse = await buildResponse(response, responseData, backend, requestId);
+
+      if (proactivelyRefreshedTokens) {
+        storeTokensInResponse(
+          nextResponse,
+          backend,
+          proactivelyRefreshedTokens.accessToken,
+          proactivelyRefreshedTokens.refreshToken,
+          proactivelyRefreshedTokens.expiresIn
+        );
+      }
+
+      log.info('Proxy request completed', {
+        requestId, backend, method, path: bffPath,
+        status: nextResponse.status,
+        durationMs: Math.round(performance.now() - startTime),
+      });
+      return nextResponse;
+    }
+
+    // Normalize non-JSON error responses from backend (e.g., HTML 500 pages)
+    const backendContentType = response.headers.get('content-type') || '';
+    if (response.status >= 400 && !backendContentType.includes('application/json')) {
+      await drainBody(response);
+      log.warn('Non-JSON error from backend', {
+        requestId, backend, method, path: bffPath,
+        status: response.status,
+        contentType: backendContentType,
+        durationMs: Math.round(performance.now() - startTime),
+      });
+      return NextResponse.json(
+        {
+          error: `Backend error (${response.status})`,
+          code: 'BACKEND_ERROR',
+          status: response.status,
+          request_id: requestId,
+        },
+        {
+          status: response.status,
+          headers: { [REQUEST_ID_HEADER]: requestId },
+        }
+      );
+    }
+
+    // Streaming pass-through — zero buffering for non-auth routes
+    const nextResponse = new NextResponse(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: sanitizeResponseHeaders(response.headers, requestId),
+    });
 
     if (proactivelyRefreshedTokens) {
       storeTokensInResponse(
@@ -509,8 +688,18 @@ async function proxyRequest(
       );
     }
 
+    log.info('Proxy request completed', {
+      requestId, backend, method, path: bffPath,
+      status: nextResponse.status,
+      durationMs: Math.round(performance.now() - startTime),
+    });
     return nextResponse;
   } catch (error) {
+    // Drain any unconsumed backend response body to prevent memory leak
+    if (backendResponse) {
+      await drainBody(backendResponse);
+    }
+
     const apiError = ApiException.fromUnknown(error, 'Failed to proxy request');
 
     if (apiError.statusCode >= 500) {
@@ -519,6 +708,7 @@ async function proxyRequest(
         error: apiError.message,
         statusCode: apiError.statusCode,
         requestId,
+        durationMs: Math.round(performance.now() - startTime),
       });
     } else {
       log.warn('Proxy request rejected', {
@@ -526,6 +716,7 @@ async function proxyRequest(
         error: apiError.message,
         statusCode: apiError.statusCode,
         requestId,
+        durationMs: Math.round(performance.now() - startTime),
       });
     }
 

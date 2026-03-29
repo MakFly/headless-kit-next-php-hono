@@ -29,7 +29,7 @@ return [
 
     'allowed_headers' => ['Content-Type', 'Authorization', 'Accept', 'X-Request-Id', 'Accept-Language'],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['X-Request-Id', 'Content-Length'],
 
     'max_age' => 86400,
 

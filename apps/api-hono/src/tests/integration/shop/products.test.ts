@@ -28,7 +28,7 @@ describe('Shop Endpoints', () => {
       expect(body.meta.page).toBe(1);
       expect(body.meta.per_page).toBe(12);
       expect(body.meta.total).toBeGreaterThan(0);
-      expect(body.meta.total_pages).toBeGreaterThan(0);
+      expect(body.meta.last_page).toBeGreaterThan(0);
     });
 
     it('should filter by category', async () => {

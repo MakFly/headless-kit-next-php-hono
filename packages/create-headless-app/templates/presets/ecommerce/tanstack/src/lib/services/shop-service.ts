@@ -69,7 +69,7 @@ export const getProductsFn = createServerFn({ method: 'GET' })
       )
     } catch (error) {
       console.error('[Shop Service] Failed to fetch products:', error)
-      return { data: [], pagination: { page: 1, perPage: 12, total: 0, totalPages: 0 } }
+      return { data: [], pagination: { page: 1, per_page: 12, total: 0, last_page: 0 } }
     }
   })
 

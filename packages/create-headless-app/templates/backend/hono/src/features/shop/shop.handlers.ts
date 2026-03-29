@@ -30,7 +30,7 @@ export async function listProducts(c: Context) {
     page: pagination.page,
     per_page: pagination.perPage,
     total: pagination.total,
-    total_pages: pagination.totalPages,
+    last_page: pagination.totalPages,
   });
 }
 

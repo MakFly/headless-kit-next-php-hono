@@ -15,6 +15,9 @@ class ListReviews
 
     public function __invoke(Request $request): JsonResponse
     {
+        $perPage = min(100, max(1, (int) $request->input('per_page', 20)));
+        $page = max(1, (int) $request->input('page', 1));
+
         $query = Review::with('product', 'customer');
 
         if ($request->filled('status')) {
@@ -25,6 +28,11 @@ class ListReviews
             $query->where('rating', (int) $request->rating);
         }
 
-        return $this->success($query->orderBy('created_at', 'desc')->get());
+        $query->orderBy('created_at', 'desc');
+
+        $total = $query->count();
+        $reviews = $query->forPage($page, $perPage)->get();
+
+        return $this->paginated($reviews, $page, $perPage, $total);
     }
 }

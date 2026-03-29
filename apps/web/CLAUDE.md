@@ -117,7 +117,7 @@ src/
 │   ├── http/                        # Low-level fetch wrapper (ApiException)
 │   ├── logger/                      # Pino (server) / JSON (edge) / console (client)
 │   ├── query/                       # TanStack Query setup + hooks (opt-in)
-│   ├── security/                    # HMAC types
+│   ├── security/                    # Security types
 │   └── services/
 │       └── token-service.ts         # Token expiry calculation
 ├── stores/

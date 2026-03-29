@@ -1,5 +1,7 @@
 import { ApiException } from './api-exception';
 
+const MAX_RESPONSE_SIZE = 5_242_880 // 5 MB
+
 export type ApiRequestOptions = RequestInit & {
   timeoutMs?: number;
 };
@@ -61,11 +63,23 @@ export async function apiRequest(
   const { signal: requestSignal, cleanup } = withTimeoutSignal(timeoutMs, parentSignal);
 
   try {
-    return await fetch(input, {
+    const response = await fetch(input, {
       ...fetchOptions,
       signal: requestSignal,
+      cache: 'no-store' as const,
     });
+
+    // Response size guard — reject oversized backend responses before buffering
+    const contentLength = Number(response.headers.get('content-length') || '0')
+    if (contentLength > MAX_RESPONSE_SIZE) {
+      await response.body?.cancel()
+      throw new ApiException('Backend response too large', { statusCode: 502 })
+    }
+
+    return response;
   } catch (error) {
+    if (error instanceof ApiException) throw error;
+
     if (error instanceof Error && error.name === 'AbortError') {
       throw new ApiException('Request timeout', {
         statusCode: 408,

@@ -7,15 +7,22 @@ namespace App\Features\Admin\Actions;
 use App\Shared\Models\Product;
 use App\Shared\Traits\ApiResponder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AdminListProducts
 {
     use ApiResponder;
 
-    public function __invoke(): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
-        $products = Product::with('category')->orderBy('created_at', 'desc')->get();
+        $perPage = min(100, max(1, (int) $request->input('per_page', 20)));
+        $page = max(1, (int) $request->input('page', 1));
 
-        return $this->success($products);
+        $query = Product::with('category')->orderBy('created_at', 'desc');
+
+        $total = $query->count();
+        $products = $query->forPage($page, $perPage)->get();
+
+        return $this->paginated($products, $page, $perPage, $total);
     }
 }

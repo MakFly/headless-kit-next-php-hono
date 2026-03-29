@@ -6,11 +6,16 @@ import {
 } from '@tanstack/react-start/server'
 import type {AdapterConfig, BackendType} from '@/lib/adapters';
 import {
-  
-  
+
+
   getAdapterConfig
 } from '@/lib/adapters'
 import { ApiException, apiRequest, readResponseBody } from '@/lib/http'
+import {
+  isAuthRoute,
+  checkRateLimit,
+  validatePathSegments,
+} from './proxy-utils'
 import {
   COOKIE_NAMES,
   TOKEN_CONFIG,
@@ -19,7 +24,6 @@ import {
   shouldRefreshByTimestamp,
 } from '@/lib/services/token-service'
 
-const SAFE_PATH_SEGMENT = /^[a-zA-Z0-9_-]+$/
 const REQUEST_ID_HEADER = 'x-request-id'
 const INTERNAL_REQUEST_HEADER = 'x-bff-internal'
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
@@ -29,6 +33,55 @@ const COOKIE_CONFIG = {
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
   path: '/',
+}
+
+// Fix 7: Configurable timeout
+const PROXY_TIMEOUT_MS = Number(process.env.PROXY_TIMEOUT_MS) || 30_000
+const REFRESH_TIMEOUT_MS = Math.min(PROXY_TIMEOUT_MS, 5_000)
+
+// Fix 1: Incoming request body size limit (1MB)
+const MAX_REQUEST_SIZE = 1_048_576 // 1 MB
+
+// Fix 5: Structured logger
+function logProxy(level: 'info' | 'warn' | 'error', message: string, data?: Record<string, unknown>) {
+  const entry = { timestamp: new Date().toISOString(), level, module: 'bff-proxy', message, ...data }
+  if (level === 'error') console.error(JSON.stringify(entry))
+  else if (level === 'warn') console.warn(JSON.stringify(entry))
+  else console.info(JSON.stringify(entry))
+}
+
+/**
+ * Whitelist backend response headers for streaming pass-through.
+ */
+function sanitizeResponseHeaders(backendHeaders: Headers, requestId: string): Headers {
+  const headers = new Headers()
+  // Note: content-length is intentionally excluded — Node's fetch decompresses
+  // gzip/br transparently, making the backend's content-length incorrect.
+  // The HTTP layer between BFF and client handles its own framing.
+  const PASSTHROUGH_HEADERS = [
+    'content-type', 'cache-control',
+    'etag', 'last-modified', 'x-request-id', 'x-total-count', 'link',
+  ]
+  for (const key of PASSTHROUGH_HEADERS) {
+    const value = backendHeaders.get(key)
+    if (value) headers.set(key, value)
+  }
+  headers.set(REQUEST_ID_HEADER, requestId)
+  headers.set('x-content-type-options', 'nosniff')
+  headers.set('x-frame-options', 'DENY')
+  setNoStoreHeaders(headers)
+  return headers
+}
+
+/**
+ * Drain an unconsumed response body to prevent memory leaks (CVE-2024-24750).
+ */
+async function drainBody(response: Response): Promise<void> {
+  try {
+    await response.body?.cancel()
+  } catch {
+    // Ignore — body may already be consumed or closed
+  }
 }
 
 function setNoStoreHeaders(headers: Headers): void {
@@ -100,35 +153,6 @@ function asRecord(value: unknown): Record<string, unknown> {
   return typeof value === 'object' && value !== null
     ? (value as Record<string, unknown>)
     : {}
-}
-
-function validatePathSegments(segments: Array<string>): void {
-  for (const segment of segments) {
-    if (!segment) {
-      throw new ApiException('Invalid path: empty segment', {
-        statusCode: 400,
-        code: 'INVALID_PATH',
-      })
-    }
-    if (segment === '..' || segment === '.') {
-      throw new ApiException('Invalid path: traversal not allowed', {
-        statusCode: 400,
-        code: 'INVALID_PATH',
-      })
-    }
-    if (segment.includes('://') || segment.startsWith('//')) {
-      throw new ApiException('Invalid path: absolute URLs not allowed', {
-        statusCode: 400,
-        code: 'INVALID_PATH',
-      })
-    }
-    if (!SAFE_PATH_SEGMENT.test(segment)) {
-      throw new ApiException('Invalid path: forbidden characters', {
-        statusCode: 400,
-        code: 'INVALID_PATH',
-      })
-    }
-  }
 }
 
 function getBackendTypeServer(): BackendType {
@@ -203,7 +227,7 @@ async function attemptTokenRefresh(
         method: 'POST',
         headers,
         body: JSON.stringify(body),
-        timeoutMs: config.timeout || 30000,
+        timeoutMs: REFRESH_TIMEOUT_MS,
       })
 
       if (!response.ok) return null
@@ -234,7 +258,7 @@ async function attemptTokenRefresh(
       method: 'POST',
       headers,
       body,
-      timeoutMs: config.timeout || 30000,
+      timeoutMs: REFRESH_TIMEOUT_MS,
     })
 
     if (!response.ok) return null
@@ -253,12 +277,45 @@ async function attemptTokenRefresh(
     }
   } catch (error) {
     const apiError = ApiException.fromUnknown(error, 'Token refresh failed')
-    console.error('Token refresh error:', {
+    logProxy('error', 'Token refresh error', {
       message: apiError.message,
       statusCode: apiError.statusCode,
     })
     return null
   }
+}
+
+// Fix 4: Token refresh deduplication
+/**
+ * In-flight refresh deduplication.
+ * Prevents concurrent 401s from triggering multiple refresh calls
+ * with the same refresh token (fails on single-use token backends).
+ */
+const inflightRefreshes = new Map<string, Promise<{
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
+} | null>>()
+
+async function deduplicatedRefresh(
+  backend: BackendType,
+  config: Partial<AdapterConfig>,
+  refreshToken: string,
+  requestId: string,
+): Promise<{ accessToken: string; refreshToken: string; expiresIn: number } | null> {
+  const existing = inflightRefreshes.get(refreshToken)
+  if (existing) {
+    logProxy('info', 'Reusing in-flight refresh', { requestId })
+    return existing
+  }
+
+  const promise = attemptTokenRefresh(backend, config, refreshToken, requestId)
+    .finally(() => {
+      inflightRefreshes.delete(refreshToken)
+    })
+
+  inflightRefreshes.set(refreshToken, promise)
+  return promise
 }
 
 async function storeTokens(
@@ -325,7 +382,20 @@ function isPublicRoute(path: string): boolean {
 async function handleBffRequest(request: Request): Promise<Response> {
   const { backend, config } = getProxyConfig()
   const requestId = getRequestId(request)
+
+  // Fix 5: Per-request duration logging
+  const startTime = performance.now()
+
+  // Declared outside try so catch can drain unconsumed body on error
+  let backendResponse: Response | undefined
+
   try {
+    // Fix 1: Reject oversized incoming request bodies (1MB limit)
+    const incomingContentLength = Number(request.headers.get('content-length') || '0')
+    if (incomingContentLength > MAX_REQUEST_SIZE) {
+      return jsonErrorResponse('Request body too large', 413, 'BODY_TOO_LARGE', undefined, requestId)
+    }
+
     const url = new URL(request.url)
     const pathSegments = url.pathname
       .replace(/^\/api\/v1\//, '')
@@ -355,12 +425,32 @@ async function handleBffRequest(request: Request): Promise<Response> {
 
     const method = request.method
     validateCsrf(request, method)
+
+    // Fix 6: Rate limiting for auth routes (after CSRF validation)
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    if (!checkRateLimit(clientIp, bffPath)) {
+      return jsonErrorResponse('Too many requests', 429, 'RATE_LIMITED', undefined, requestId)
+    }
+
     let body: unknown = null
 
+    // Fix 2: 415 for non-JSON bodies
     if (method !== 'GET' && method !== 'HEAD') {
-      try {
-        body = await request.json()
-      } catch {}
+      const contentType = request.headers.get('content-type') || ''
+      if (contentType && !contentType.includes('application/json')) {
+        return jsonErrorResponse(
+          'Unsupported content type. Only application/json is accepted.',
+          415,
+          'UNSUPPORTED_MEDIA_TYPE',
+          undefined,
+          requestId,
+        )
+      }
+      if (contentType) {
+        try {
+          body = await request.json()
+        } catch {}
+      }
     }
 
     let authToken = getCookie(COOKIE_NAMES.ACCESS_TOKEN) ?? undefined
@@ -372,7 +462,8 @@ async function handleBffRequest(request: Request): Promise<Response> {
     if (authToken && tokenExpiresAt && refreshToken && !backendPath.includes('/refresh')) {
       const shouldRefresh = shouldRefreshByTimestamp(tokenExpiresAt)
       if (shouldRefresh) {
-        const newTokens = await attemptTokenRefresh(backend, config, refreshToken, requestId)
+        // Fix 4: Use deduplicated refresh
+        const newTokens = await deduplicatedRefresh(backend, config, refreshToken, requestId)
         if (newTokens) {
           authToken = newTokens.accessToken
           await storeTokens(newTokens.accessToken, newTokens.refreshToken, newTokens.expiresIn)
@@ -407,17 +498,25 @@ async function handleBffRequest(request: Request): Promise<Response> {
       backendUrl.searchParams.set(key, value)
     })
 
+    // Make request to backend — propagate client AbortSignal
     let response = await apiRequest(backendUrl.toString(), {
       ...options,
-      timeoutMs: config.timeout || 30000,
+      signal: request.signal,
+      timeoutMs: PROXY_TIMEOUT_MS,
     })
+    backendResponse = response
 
+    // 401 Interceptor: Attempt refresh and retry
     if (
       response.status === 401 &&
       refreshToken &&
       !backendPath.includes('/refresh')
     ) {
-      const newTokens = await attemptTokenRefresh(backend, config, refreshToken, requestId)
+      // Drain the 401 response body to prevent memory leak
+      await drainBody(response)
+
+      // Fix 4: Use deduplicated refresh
+      const newTokens = await deduplicatedRefresh(backend, config, refreshToken, requestId)
 
       if (newTokens) {
         requestHeaders['Authorization'] = `Bearer ${newTokens.accessToken}`
@@ -425,19 +524,10 @@ async function handleBffRequest(request: Request): Promise<Response> {
         response = await apiRequest(backendUrl.toString(), {
           ...options,
           headers: requestHeaders,
-          timeoutMs: config.timeout || 30000,
+          signal: request.signal,
+          timeoutMs: PROXY_TIMEOUT_MS,
         })
-
-        const responseData = await response.text()
-        const headers = new Headers()
-        response.headers.forEach((value, key) => {
-          if (key !== 'set-cookie') headers.set(key, value)
-        })
-        headers.set(REQUEST_ID_HEADER, requestId)
-        setNoStoreHeaders(headers)
-        response.headers
-          .getSetCookie()
-          .forEach((cookie) => headers.append('set-cookie', cookie))
+        backendResponse = response
 
         await storeTokens(
           newTokens.accessToken,
@@ -445,10 +535,77 @@ async function handleBffRequest(request: Request): Promise<Response> {
           newTokens.expiresIn,
         )
 
-        return new Response(responseData, {
+        // Dual-path: auth routes buffer for token extraction, data routes stream
+        if (isAuthRoute(bffPath)) {
+          const responseData = await response.text()
+          const headers = new Headers()
+          response.headers.forEach((value, key) => {
+            if (key !== 'set-cookie') headers.set(key, value)
+          })
+          headers.set(REQUEST_ID_HEADER, requestId)
+          setNoStoreHeaders(headers)
+          response.headers
+            .getSetCookie()
+            .forEach((cookie) => headers.append('set-cookie', cookie))
+
+          // Extract tokens from auth response
+          try {
+            const jsonData = JSON.parse(responseData)
+            let accessTokenFromBody: string | undefined
+            let refreshTokenFromBody: string | undefined
+            let expiresInFromBody: number | undefined
+
+            if (backend === 'laravel') {
+              accessTokenFromBody = jsonData.data?.access_token
+              refreshTokenFromBody = jsonData.data?.refresh_token
+              expiresInFromBody = jsonData.data?.expires_in
+            } else {
+              accessTokenFromBody = jsonData.access_token || jsonData.accessToken
+              refreshTokenFromBody = jsonData.refresh_token || jsonData.refreshToken
+              expiresInFromBody = jsonData.expires_in || jsonData.expiresIn
+            }
+
+            if (accessTokenFromBody) {
+              const tokenMaxAge = expiresInFromBody || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE
+              setCookie(COOKIE_NAMES.ACCESS_TOKEN, accessTokenFromBody, { ...COOKIE_CONFIG, maxAge: tokenMaxAge })
+              const expiresAt = calculateExpirationTimestamp(tokenMaxAge)
+              setCookie(COOKIE_NAMES.TOKEN_EXPIRES_AT, formatExpirationForCookie(expiresAt), { ...COOKIE_CONFIG, httpOnly: false, maxAge: tokenMaxAge })
+            }
+            if (refreshTokenFromBody) {
+              setCookie(COOKIE_NAMES.REFRESH_TOKEN, refreshTokenFromBody, { ...COOKIE_CONFIG, maxAge: TOKEN_CONFIG.REFRESH_TOKEN_MAX_AGE })
+            }
+          } catch {}
+
+          // Fix 5: Duration logging
+          logProxy('info', 'Proxy request completed', { requestId, backend, method, path: bffPath, status: response.status, durationMs: Math.round(performance.now() - startTime) })
+          return new Response(responseData, {
+            status: response.status,
+            statusText: response.statusText,
+            headers,
+          })
+        }
+
+        // Normalize non-JSON error responses from backend (e.g., HTML 500 pages)
+        const retryBackendContentType = response.headers.get('content-type') || ''
+        if (response.status >= 400 && !retryBackendContentType.includes('application/json')) {
+          await drainBody(response)
+          logProxy('warn', 'Non-JSON error from backend after retry', { requestId, backend, method, path: bffPath, status: response.status, contentType: retryBackendContentType, durationMs: Math.round(performance.now() - startTime) })
+          return jsonErrorResponse(
+            `Backend error (${response.status})`,
+            response.status,
+            'BACKEND_ERROR',
+            undefined,
+            requestId,
+          )
+        }
+
+        // Streaming pass-through for non-auth routes
+        // Fix 5: Duration logging
+        logProxy('info', 'Proxy request completed', { requestId, backend, method, path: bffPath, status: response.status, durationMs: Math.round(performance.now() - startTime) })
+        return new Response(response.body, {
           status: response.status,
           statusText: response.statusText,
-          headers,
+          headers: sanitizeResponseHeaders(response.headers, requestId),
         })
       }
 
@@ -456,74 +613,92 @@ async function handleBffRequest(request: Request): Promise<Response> {
       return jsonErrorResponse('Session expired', 401, 'SESSION_EXPIRED', undefined, requestId)
     }
 
-    const responseData = await response.text()
-    const responseHeaders = new Headers()
-    response.headers.forEach((value, key) => {
-      if (key !== 'set-cookie') responseHeaders.set(key, value)
-    })
-    responseHeaders.set(REQUEST_ID_HEADER, requestId)
-    setNoStoreHeaders(responseHeaders)
-    response.headers
-      .getSetCookie()
-      .forEach((cookie) => responseHeaders.append('set-cookie', cookie))
+    // Dual-path: auth routes buffer for token extraction, data routes stream
+    if (isAuthRoute(bffPath)) {
+      const responseData = await response.text()
+      const responseHeaders = new Headers()
+      response.headers.forEach((value, key) => {
+        if (key !== 'set-cookie') responseHeaders.set(key, value)
+      })
+      responseHeaders.set(REQUEST_ID_HEADER, requestId)
+      setNoStoreHeaders(responseHeaders)
+      response.headers
+        .getSetCookie()
+        .forEach((cookie) => responseHeaders.append('set-cookie', cookie))
 
-    try {
-      const jsonData = JSON.parse(responseData)
-      let accessToken: string | undefined
-      let refreshTokenFromResponse: string | undefined
-      let expiresIn: number | undefined
+      try {
+        const jsonData = JSON.parse(responseData)
+        let accessToken: string | undefined
+        let refreshTokenFromResponse: string | undefined
+        let expiresIn: number | undefined
 
-      if (backend === 'laravel') {
-        accessToken = jsonData.data?.access_token
-        refreshTokenFromResponse = jsonData.data?.refresh_token
-        expiresIn = jsonData.data?.expires_in
-      } else {
-        accessToken = jsonData.access_token || jsonData.accessToken
-        refreshTokenFromResponse =
-          jsonData.refresh_token || jsonData.refreshToken
-        expiresIn = jsonData.expires_in || jsonData.expiresIn
-      }
+        if (backend === 'laravel') {
+          accessToken = jsonData.data?.access_token
+          refreshTokenFromResponse = jsonData.data?.refresh_token
+          expiresIn = jsonData.data?.expires_in
+        } else {
+          accessToken = jsonData.access_token || jsonData.accessToken
+          refreshTokenFromResponse = jsonData.refresh_token || jsonData.refreshToken
+          expiresIn = jsonData.expires_in || jsonData.expiresIn
+        }
 
-      if (accessToken) {
-        const tokenMaxAge = expiresIn || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE
+        if (accessToken) {
+          const tokenMaxAge = expiresIn || TOKEN_CONFIG.ACCESS_TOKEN_MAX_AGE
+          setCookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, { ...COOKIE_CONFIG, maxAge: tokenMaxAge })
+          const expiresAt = calculateExpirationTimestamp(tokenMaxAge)
+          setCookie(COOKIE_NAMES.TOKEN_EXPIRES_AT, formatExpirationForCookie(expiresAt), { ...COOKIE_CONFIG, httpOnly: false, maxAge: tokenMaxAge })
+        }
 
-        setCookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, {
-          ...COOKIE_CONFIG,
-          maxAge: tokenMaxAge,
-        })
+        if (refreshTokenFromResponse) {
+          setCookie(COOKIE_NAMES.REFRESH_TOKEN, refreshTokenFromResponse, { ...COOKIE_CONFIG, maxAge: TOKEN_CONFIG.REFRESH_TOKEN_MAX_AGE })
+        }
+      } catch {}
 
-        const expiresAt = calculateExpirationTimestamp(tokenMaxAge)
-        setCookie(
-          COOKIE_NAMES.TOKEN_EXPIRES_AT,
-          formatExpirationForCookie(expiresAt),
-          {
-            ...COOKIE_CONFIG,
-            httpOnly: false,
-            maxAge: tokenMaxAge,
-          },
-        )
-      }
+      // Fix 5: Duration logging
+      logProxy('info', 'Proxy request completed', { requestId, backend, method, path: bffPath, status: response.status, durationMs: Math.round(performance.now() - startTime) })
+      return new Response(responseData, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: responseHeaders,
+      })
+    }
 
-      if (refreshTokenFromResponse) {
-        setCookie(COOKIE_NAMES.REFRESH_TOKEN, refreshTokenFromResponse, {
-          ...COOKIE_CONFIG,
-          maxAge: TOKEN_CONFIG.REFRESH_TOKEN_MAX_AGE,
-        })
-      }
-    } catch {}
+    // Normalize non-JSON error responses from backend (e.g., HTML 500 pages)
+    const backendContentType = response.headers.get('content-type') || ''
+    if (response.status >= 400 && !backendContentType.includes('application/json')) {
+      await drainBody(response)
+      logProxy('warn', 'Non-JSON error from backend', { requestId, backend, method, path: bffPath, status: response.status, contentType: backendContentType, durationMs: Math.round(performance.now() - startTime) })
+      return jsonErrorResponse(
+        `Backend error (${response.status})`,
+        response.status,
+        'BACKEND_ERROR',
+        undefined,
+        requestId,
+      )
+    }
 
-    return new Response(responseData, {
+    // Streaming pass-through — zero buffering for non-auth routes
+    // Fix 5: Duration logging
+    logProxy('info', 'Proxy request completed', { requestId, backend, method, path: bffPath, status: response.status, durationMs: Math.round(performance.now() - startTime) })
+    return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers: responseHeaders,
+      headers: sanitizeResponseHeaders(response.headers, requestId),
     })
   } catch (error) {
+    // Drain any unconsumed backend response body to prevent memory leak
+    if (backendResponse) {
+      await drainBody(backendResponse)
+    }
+
     const apiError = ApiException.fromUnknown(error, 'Failed to proxy request')
 
     if (apiError.statusCode >= 500) {
-      console.error('BFF proxy request failed', {
+      logProxy('error', 'BFF proxy request failed', {
         message: apiError.message,
         statusCode: apiError.statusCode,
+        requestId,
+        durationMs: Math.round(performance.now() - startTime),
       })
     }
 

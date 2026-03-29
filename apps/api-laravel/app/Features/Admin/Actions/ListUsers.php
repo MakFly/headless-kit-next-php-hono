@@ -7,20 +7,21 @@ namespace App\Features\Admin\Actions;
 use App\Shared\Models\User;
 use App\Shared\Traits\ApiResponder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ListUsers
 {
     use ApiResponder;
 
-    public function __invoke(): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
-        $paginator = User::with('roles')->paginate(15);
+        $perPage = min(100, max(1, (int) $request->input('per_page', 15)));
+        $page = max(1, (int) $request->input('page', 1));
 
-        return $this->paginated(
-            $paginator->items(),
-            $paginator->currentPage(),
-            $paginator->perPage(),
-            $paginator->total()
-        );
+        $query = User::with('roles');
+        $total = $query->count();
+        $users = $query->forPage($page, $perPage)->get();
+
+        return $this->paginated($users, $page, $perPage, $total);
     }
 }

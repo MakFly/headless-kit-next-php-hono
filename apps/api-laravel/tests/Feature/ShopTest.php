@@ -78,10 +78,10 @@ class ShopTest extends TestCase
                 'data' => [
                     '*' => ['id', 'name', 'slug', 'price'],
                 ],
-                'pagination' => ['page', 'perPage', 'total', 'totalPages'],
+                'meta' => ['page', 'per_page', 'total', 'last_page'],
             ]);
 
-        $this->assertEquals(3, $response->json('pagination.total'));
+        $this->assertEquals(3, $response->json('meta.total'));
     }
 
     public function test_get_products_filters_by_category_slug(): void
@@ -89,7 +89,7 @@ class ShopTest extends TestCase
         $response = $this->getJson('/api/v1/products?category=electronics');
 
         $response->assertStatus(200);
-        $this->assertEquals(2, $response->json('pagination.total'));
+        $this->assertEquals(2, $response->json('meta.total'));
 
         foreach ($response->json('data') as $product) {
             $this->assertEquals($this->electronics->id, $product['category_id']);
@@ -101,7 +101,7 @@ class ShopTest extends TestCase
         $response = $this->getJson('/api/v1/products?search=laptop');
 
         $response->assertStatus(200);
-        $this->assertEquals(1, $response->json('pagination.total'));
+        $this->assertEquals(1, $response->json('meta.total'));
         $this->assertEquals('laptop-pro', $response->json('data.0.slug'));
     }
 
@@ -128,7 +128,7 @@ class ShopTest extends TestCase
         $response = $this->getJson('/api/v1/products?min_price=1000&max_price=5000');
 
         $response->assertStatus(200);
-        $this->assertEquals(2, $response->json('pagination.total'));
+        $this->assertEquals(2, $response->json('meta.total'));
 
         foreach ($response->json('data') as $product) {
             $this->assertGreaterThanOrEqual(1000, $product['price']);

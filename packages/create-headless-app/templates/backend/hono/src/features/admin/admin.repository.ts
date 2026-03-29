@@ -2,7 +2,7 @@
  * Admin repository
  */
 
-import { eq, like, desc, asc, sql, and, inArray } from 'drizzle-orm';
+import { eq, like, desc, asc, sql, and, inArray, count } from 'drizzle-orm';
 import { db, schema } from '../../shared/db/index.ts';
 
 // =========================================================================
@@ -89,7 +89,7 @@ export async function deleteProduct(id: string) {
 
 export async function findAllOrders(filters: { status?: string; page?: number; per_page?: number } = {}) {
   const page = filters.page || 1;
-  const perPage = filters.per_page || 20;
+  const perPage = Math.min(filters.per_page || 20, 100);
   const offset = (page - 1) * perPage;
 
   const conditions = [];
@@ -256,8 +256,11 @@ export async function getTopProducts(limit = 10) {
 // Inventory
 // =========================================================================
 
-export async function getInventory() {
-  return db
+export async function getInventory(page = 1, perPage = 20) {
+  const cappedPerPage = Math.min(perPage, 100);
+  const offset = (page - 1) * cappedPerPage;
+
+  const items = await db
     .select({
       id: schema.products.id,
       name: schema.products.name,
@@ -268,7 +271,17 @@ export async function getInventory() {
       price: schema.products.price,
     })
     .from(schema.products)
-    .orderBy(asc(schema.products.name));
+    .orderBy(asc(schema.products.name))
+    .limit(cappedPerPage)
+    .offset(offset);
+
+  const [countResult] = await db.select({ count: count() }).from(schema.products);
+  const total = countResult.count;
+
+  return {
+    data: items,
+    pagination: { page, perPage: cappedPerPage, total, totalPages: Math.ceil(total / cappedPerPage) },
+  };
 }
 
 export async function updateStock(productId: string, stockQuantity: number) {
@@ -293,7 +306,7 @@ export async function updateStock(productId: string, stockQuantity: number) {
 
 export async function findAllCustomers(filters: { segment?: string; search?: string; page?: number; per_page?: number } = {}) {
   const page = filters.page || 1;
-  const perPage = filters.per_page || 20;
+  const perPage = Math.min(filters.per_page || 20, 100);
   const offset = (page - 1) * perPage;
 
   const conditions = [];
@@ -396,7 +409,7 @@ export async function deleteCustomer(id: string) {
 
 export async function findAllReviews(filters: { status?: string; rating?: number; page?: number; per_page?: number } = {}) {
   const page = filters.page || 1;
-  const perPage = filters.per_page || 20;
+  const perPage = Math.min(filters.per_page || 20, 100);
   const offset = (page - 1) * perPage;
 
   const conditions = [];
@@ -517,8 +530,18 @@ export async function bulkUpdateReviewStatus(ids: string[], status: string) {
 // Segments
 // =========================================================================
 
-export async function findAllSegments() {
-  const segmentsList = await db.select().from(schema.segments);
+export async function findAllSegments(page = 1, perPage = 20) {
+  const cappedPerPage = Math.min(perPage, 100);
+  const offset = (page - 1) * cappedPerPage;
+
+  const [totalResult] = await db.select({ count: count() }).from(schema.segments);
+  const total = totalResult.count;
+
+  const segmentsList = await db
+    .select()
+    .from(schema.segments)
+    .limit(cappedPerPage)
+    .offset(offset);
 
   const result = [];
   for (const seg of segmentsList) {
@@ -535,5 +558,8 @@ export async function findAllSegments() {
     });
   }
 
-  return result;
+  return {
+    data: result,
+    pagination: { page, perPage: cappedPerPage, total, totalPages: Math.ceil(total / cappedPerPage) },
+  };
 }

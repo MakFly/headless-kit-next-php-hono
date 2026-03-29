@@ -12,7 +12,7 @@ Navigateur → Next.js BFF (port 3300) ──→ Laravel API (port 8002)
                                        → Symfony API (port 8001)
 ```
 
-Pattern BFF : le frontend ne contacte jamais les backends directement. Les requêtes passent par des Route Handlers (`/api/v1/*`) qui ajoutent HMAC signing et transmettent les cookies d'auth.
+Pattern BFF : le frontend ne contacte jamais les backends directement. Les requêtes BFF → Backend sont authentifiées via le Bearer token de l'utilisateur. Le BFF ajoute les headers de sécurité (CSRF, X-Request-Id) et gère le cycle de vie des tokens (refresh proactif/réactif).
 
 ## Structure du monorepo
 
@@ -122,8 +122,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3300
 LARAVEL_API_URL=http://localhost:8002
 SYMFONY_API_URL=http://localhost:8001
 NODE_API_URL=http://localhost:3333
-BFF_SECRET=xxx
-
 # Laravel (.env)
 APP_URL=http://localhost:8002
 FRONTEND_URL=http://localhost:3300

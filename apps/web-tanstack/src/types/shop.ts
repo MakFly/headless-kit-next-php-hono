@@ -50,9 +50,9 @@ export type PaginatedResponse<T> = {
   data: Array<T>
   pagination: {
     page: number
-    perPage: number
+    per_page: number
     total: number
-    totalPages: number
+    last_page: number
   }
 }
 

@@ -12,7 +12,7 @@
         The <span class="gradient-text">BFF Pattern</span>
       </h2>
       <p class="mx-auto max-w-2xl text-lg text-text-muted">
-        Your frontend never talks to the backend directly. Every request flows through a secure BFF proxy layer with HMAC signing.
+        Your frontend never talks to the backend directly. Every request flows through a secure BFF proxy layer with token forwarding and CSRF protection.
       </p>
     </div>
 
@@ -34,7 +34,7 @@
 <span class="text-text-muted">  |</span>
 <span class="text-text-muted">  '--- </span><span class="text-pink-400">TanStack Start BFF</span>   <span class="text-text-muted">:3003  (Vite, TanStack Router)</span>
 <span class="text-text-muted">          |</span>
-<span class="text-text-muted">          |  HMAC signing  +  Cookie forwarding</span>
+<span class="text-text-muted">          |  Bearer token  +  Cookie forwarding</span>
 <span class="text-text-muted">          |</span>
 <span class="text-text-muted">          |--- </span><span class="text-amber-400">Laravel API</span>     <span class="text-text-muted">:8000  (BetterAuth, Bearer tokens)</span>
 <span class="text-text-muted">          |</span>
@@ -54,8 +54,8 @@
       </div>
       <div class="text-center">
         <div class="mb-2 text-2xl font-bold text-violet-400">2</div>
-        <h3 class="mb-1 font-semibold">HMAC Signed</h3>
-        <p class="text-sm text-text-muted">Every request from the BFF to the backend is cryptographically signed and verified.</p>
+        <h3 class="mb-1 font-semibold">Token Secured</h3>
+        <p class="text-sm text-text-muted">Every request from the BFF to the backend carries the user's Bearer token with CSRF validation.</p>
       </div>
       <div class="text-center">
         <div class="mb-2 text-2xl font-bold text-violet-400">3</div>

@@ -7,16 +7,21 @@ namespace App\Features\Admin\Actions;
 use App\Shared\Models\Order;
 use App\Shared\Traits\ApiResponder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AdminListOrders
 {
     use ApiResponder;
 
-    public function __invoke(): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
-        $orders = Order::with('items', 'user')
-            ->orderBy('created_at', 'desc')
-            ->get()
+        $perPage = min(100, max(1, (int) $request->input('per_page', 20)));
+        $page = max(1, (int) $request->input('page', 1));
+
+        $query = Order::with('items', 'user')->orderBy('created_at', 'desc');
+
+        $total = $query->count();
+        $orders = $query->forPage($page, $perPage)->get()
             ->map(fn ($order) => [
                 'id' => $order->id,
                 'status' => $order->status,
@@ -29,6 +34,6 @@ class AdminListOrders
                 'createdAt' => $order->created_at,
             ]);
 
-        return $this->success($orders);
+        return $this->paginated($orders, $page, $perPage, $total);
     }
 }

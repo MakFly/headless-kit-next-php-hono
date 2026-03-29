@@ -90,8 +90,8 @@ export async function getTopProducts(limit?: number) {
 // Inventory
 // =========================================================================
 
-export async function getInventory() {
-  return adminRepository.getInventory();
+export async function getInventory(page?: number, perPage?: number) {
+  return adminRepository.getInventory(page, perPage);
 }
 
 export async function updateStock(productId: string, stockQuantity: number) {
@@ -177,6 +177,6 @@ export async function bulkRejectReviews(ids: string[]) {
 // Segments
 // =========================================================================
 
-export async function getSegments() {
-  return adminRepository.findAllSegments();
+export async function getSegments(page?: number, perPage?: number) {
+  return adminRepository.findAllSegments(page, perPage);
 }

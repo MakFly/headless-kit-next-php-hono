@@ -15,8 +15,16 @@ import type { AppVariables } from '../../shared/types/index.ts';
 
 export async function listConversations(c: Context<{ Variables: AppVariables }>) {
   const user = requireUser(c);
-  const convs = await supportService.listUserConversations(user.id);
-  return apiSuccess(c, convs);
+  const page = Math.max(1, Number(c.req.query('page')) || 1);
+  const perPage = Math.max(1, Number(c.req.query('per_page')) || 50);
+  const result = await supportService.listUserConversations(user.id, page, perPage);
+  const { data, pagination } = result;
+  return apiSuccess(c, data, {
+    page: pagination.page,
+    per_page: pagination.perPage,
+    total: pagination.total,
+    last_page: pagination.totalPages,
+  });
 }
 
 export async function createConversation(c: Context<{ Variables: AppVariables }>) {
@@ -70,14 +78,30 @@ export async function rateConversation(c: Context<{ Variables: AppVariables }>) 
 // =========================================================================
 
 export async function getAgentQueue(c: Context<{ Variables: AppVariables }>) {
-  const queue = await supportService.getAgentQueue();
-  return apiSuccess(c, queue);
+  const page = Math.max(1, Number(c.req.query('page')) || 1);
+  const perPage = Math.max(1, Number(c.req.query('per_page')) || 50);
+  const result = await supportService.getAgentQueue(page, perPage);
+  const { data, pagination } = result;
+  return apiSuccess(c, data, {
+    page: pagination.page,
+    per_page: pagination.perPage,
+    total: pagination.total,
+    last_page: pagination.totalPages,
+  });
 }
 
 export async function getAgentAssigned(c: Context<{ Variables: AppVariables }>) {
   const user = requireUser(c);
-  const convs = await supportService.getAgentAssigned(user.id);
-  return apiSuccess(c, convs);
+  const page = Math.max(1, Number(c.req.query('page')) || 1);
+  const perPage = Math.max(1, Number(c.req.query('per_page')) || 50);
+  const result = await supportService.getAgentAssigned(user.id, page, perPage);
+  const { data, pagination } = result;
+  return apiSuccess(c, data, {
+    page: pagination.page,
+    per_page: pagination.perPage,
+    total: pagination.total,
+    last_page: pagination.totalPages,
+  });
 }
 
 export async function assignConversation(c: Context<{ Variables: AppVariables }>) {

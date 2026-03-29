@@ -298,10 +298,10 @@ export function AdminOrdersTable() {
         </Table>
       </div>
 
-      {data && data.pagination.totalPages > 1 && (
+      {data && data.pagination.last_page > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Page {data.pagination.page} of {data.pagination.totalPages} ({data.pagination.total} total)
+            Page {data.pagination.page} of {data.pagination.last_page} ({data.pagination.total} total)
           </p>
           <div className="flex gap-2">
             <Button
@@ -315,7 +315,7 @@ export function AdminOrdersTable() {
             <Button
               variant="outline"
               size="sm"
-              disabled={page >= data.pagination.totalPages}
+              disabled={page >= data.pagination.last_page}
               onClick={() => setPage((p) => p + 1)}
             >
               Next

@@ -17,6 +17,7 @@ export async function fetchFromApi<T>(
   const executeRequest = async (accessToken: string | null): Promise<Response> =>
     fetch(`${baseUrl}${path}`, {
       ...options,
+      signal: AbortSignal.timeout(30_000),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -30,6 +31,7 @@ export async function fetchFromApi<T>(
 
   if (response.status === 401) {
     try {
+      await response.body?.cancel().catch(() => {})
       const refreshed = await adapter.refresh()
       token = refreshed.tokens.access_token
       response = await executeRequest(token)

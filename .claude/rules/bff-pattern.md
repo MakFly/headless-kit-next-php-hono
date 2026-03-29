@@ -8,12 +8,9 @@ Le frontend ne contacte JAMAIS les backends directement. Tout passe par le BFF :
 Client → BFF Route Handler (/api/v1/*) → Backend API
 ```
 
-## HMAC Signing
+## Sécurité BFF → Backend
 
-Les requêtes BFF → Backend sont signées avec HMAC pour garantir l'authenticité :
-- Le `BFF_SECRET` est partagé entre le BFF et les backends
-- Chaque requête inclut une signature HMAC dans les headers
-- Les backends vérifient la signature avant de traiter la requête
+Les requêtes BFF → Backend sont authentifiées via le Bearer token de l'utilisateur. Le BFF ajoute les headers de sécurité (CSRF, X-Request-Id) et gère le cycle de vie des tokens (refresh proactif/réactif).
 
 ## Adapter Pattern
 

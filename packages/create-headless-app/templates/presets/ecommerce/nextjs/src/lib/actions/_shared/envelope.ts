@@ -64,9 +64,9 @@ export function unwrapEnvelope<T>(response: unknown): T {
  */
 export type PaginationMeta = {
   page: number;
-  perPage: number;
+  per_page: number;
   total: number;
-  totalPages: number;
+  last_page: number;
 };
 
 export type UnwrappedPaginated<T> = {
@@ -77,7 +77,7 @@ export type UnwrappedPaginated<T> = {
 export function unwrapPaginated<T>(response: unknown): UnwrappedPaginated<T> {
   const res = response as Record<string, unknown>;
 
-  // New envelope format: { success, data: [...], meta: { page, perPage, total, totalPages } }
+  // New envelope format: { success, data: [...], meta: { page, per_page, total, last_page } }
   if (Array.isArray(res.data) && res.meta) {
     return {
       data: res.data as T[],
@@ -94,7 +94,7 @@ export function unwrapPaginated<T>(response: unknown): UnwrappedPaginated<T> {
   if (Array.isArray(res)) {
     return {
       data: res as T[],
-      pagination: { page: 1, perPage: res.length, total: res.length, totalPages: 1 },
+      pagination: { page: 1, per_page: res.length, total: res.length, last_page: 1 },
     };
   }
 

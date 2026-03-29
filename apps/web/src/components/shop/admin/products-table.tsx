@@ -300,10 +300,10 @@ export function AdminProductsTable() {
         )}
 
         {/* Pagination */}
-        {data && (data.pagination?.totalPages ?? 0) > 1 && (
+        {data && (data.pagination?.last_page ?? 0) > 1 && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Page {data.pagination?.page ?? 1} of {data.pagination?.totalPages ?? 1} ({data.pagination?.total ?? 0} total)
+              Page {data.pagination?.page ?? 1} of {data.pagination?.last_page ?? 1} ({data.pagination?.total ?? 0} total)
             </p>
             <div className="flex gap-2">
               <Button
@@ -317,7 +317,7 @@ export function AdminProductsTable() {
               <Button
                 variant="outline"
                 size="sm"
-                disabled={page >= (data.pagination?.totalPages ?? 1)}
+                disabled={page >= (data.pagination?.last_page ?? 1)}
                 onClick={() => setPage((p) => p + 1)}
               >
                 Next

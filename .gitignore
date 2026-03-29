@@ -47,3 +47,7 @@ coverage/
 # Database
 database.sqlite
 *.sqlite
+data.db
+
+# instant-grep index
+.ig/

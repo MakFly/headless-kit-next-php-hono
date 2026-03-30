@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bun run --filter @headless/site build && cp -r apps/site/.vercel/output .vercel/output",
+  "outputDirectory": ".vercel/output",
+  "installCommand": "bun install",
+  "framework": null
+}

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "postbuild": "pagefind --site dist --glob '**/*.html'",
+    "postbuild": "pagefind --site dist/client --glob '**/*.html'",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint .",
@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.3",
-    "@astrojs/node": "9",
     "@astrojs/react": "^4.4.2",
     "@astrojs/sitemap": "^3.7.2",
     "@astrojs/vercel": "9",

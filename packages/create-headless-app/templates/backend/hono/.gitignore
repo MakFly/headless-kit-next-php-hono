@@ -4,7 +4,7 @@ node_modules/
 # Build
 dist/
 
-# Database
+# Database (local SQLite)
 *.db
 *.db-journal
 
@@ -27,8 +27,4 @@ Thumbs.db
 *.log
 logs/
 
-# Drizzle
-drizzle/
-
-# Bun
-bun.lockb
+# Drizzle Kit writes SQL under ./drizzle — commit migrations + meta

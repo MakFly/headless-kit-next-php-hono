@@ -1,53 +1,61 @@
-# Dependencies
+# ── Dependencies ─────────────────────────────────────────
 node_modules/
 vendor/
 
-# Build outputs
+# ── Builds & framework output ───────────────────────────
 .next/
-.output/
 .turbo/
 dist/
 build/
+out/
+.output/
+.astro/
+.vercel/
 
-# Environment
+# ── TypeScript ───────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Environment (keep *.example tracked) ─────────────────
 .env
 .env.local
 .env.*.local
+!.env.example
+!**/.env.example
 
-# IDE
+# ── IDE & editors ───────────────────────────────────────
 .idea/
 .vscode/
 *.swp
 *.swo
+*~
 
-# OS
+# ── OS ───────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-# Logs
+# ── Logs ─────────────────────────────────────────────────
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
 
-# Laravel
-apps/api/storage/*.key
-apps/api/bootstrap/cache/*
-
-# Symfony
-apps/api-sf/var/
-apps/api-sf/.phpunit/
-apps/api-sf/src/DataFixtures/
-
-# Testing
+# ── Tests & coverage ─────────────────────────────────────
 coverage/
 .phpunit.result.cache
+.phpunit.cache/
 
-# Cache
-*.cache
+# ── Linters / formatters (local caches) ──────────────────
+.eslintcache
+.prettiercache
+.php-cs-fixer.cache
 
-# Database
-database.sqlite
+# ── Local databases (dev / SQLite) ───────────────────────
 *.sqlite
-data.db
+*.sqlite3
+*.db
+*.db-journal
 
-# instant-grep index
+# ── Search index (local) ─────────────────────────────────
 .ig/

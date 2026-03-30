@@ -1,5 +1,5 @@
 import { b as createAstro, c as createComponent, r as renderComponent, a as renderTemplate, m as maybeRenderHead, d as renderScript } from '../../chunks/astro/server_C6wb1U6_.mjs';
-import { $ as $$Main } from '../../chunks/main_C64414HP.mjs';
+import { $ as $$Main } from '../../chunks/main_BctqMkjO.mjs';
 import { s as stripe } from '../../chunks/stripe_DbHctTlv.mjs';
 import { g as getLicenseByUser } from '../../chunks/license_CP9fThp_.mjs';
 export { renderers } from '../../renderers.mjs';

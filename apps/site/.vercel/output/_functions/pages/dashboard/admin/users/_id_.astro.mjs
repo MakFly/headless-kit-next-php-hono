@@ -1,5 +1,5 @@
 import { b as createAstro, c as createComponent, a as renderTemplate, f as defineScriptVars, r as renderComponent, m as maybeRenderHead, e as addAttribute } from '../../../../chunks/astro/server_C6wb1U6_.mjs';
-import { $ as $$Dashboard } from '../../../../chunks/dashboard_BH4PFK7W.mjs';
+import { $ as $$Dashboard } from '../../../../chunks/dashboard_CZ5mJo0o.mjs';
 import { c as getUserWithLicense, e as getUserSessions } from '../../../../chunks/admin_B8uWt3Aj.mjs';
 export { renderers } from '../../../../renderers.mjs';
 

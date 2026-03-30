@@ -9,8 +9,9 @@ import sitemap from "@astrojs/sitemap"
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://headlesskit.dev",
+  output: "server",
   adapter: vercel(),
+  site: "https://headlesskit.dev",
   i18n: {
     defaultLocale: "en",
     locales: ["en", "fr"],

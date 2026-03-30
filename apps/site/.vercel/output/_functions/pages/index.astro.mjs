@@ -1,8 +1,8 @@
 import { b as createAstro, c as createComponent, r as renderComponent, a as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_C6wb1U6_.mjs';
-import { g as getLocale, a as getMessages } from '../chunks/SEOHead_vuvfZxuQ.mjs';
-import { $ as $$Main } from '../chunks/main_C64414HP.mjs';
+import { g as getLocale, a as getMessages } from '../chunks/SEOHead_BDAgrQOd.mjs';
+import { $ as $$Main } from '../chunks/main_BctqMkjO.mjs';
 import { $ as $$JsonLd } from '../chunks/JsonLd_BomKjIGt.mjs';
-import { $ as $$Navbar, a as $$Hero, b as $$SocialProof, c as $$FeaturesGrid, d as $$ModulesShowcase, e as $$ArchitectureDiagram, f as $$QuickStart, g as $$Pricing, h as $$FAQ, i as $$CTABanner, j as $$Footer } from '../chunks/Footer_DSsRnjeZ.mjs';
+import { $ as $$Navbar, a as $$Hero, b as $$SocialProof, c as $$FeaturesGrid, d as $$ModulesShowcase, e as $$ArchitectureDiagram, f as $$QuickStart, g as $$Pricing, h as $$FAQ, i as $$CTABanner, j as $$Footer } from '../chunks/Footer_CvUF7Quq.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Astro = createAstro("https://headlesskit.dev");

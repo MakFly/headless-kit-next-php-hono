@@ -1,3 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 36 36">
-  <path fill="#000" d="M22.25 4h-8.5a1 1 0 0 0-.96.73l-5.54 19.4a.5.5 0 0 0 .62.62l5.05-1.44a1 1 0 0 0 .67-.55L18 14l4.41 8.76a1 1 0 0 0 .67.55l5.05 1.44a.5.5 0 0 0 .62-.62l-5.54-19.4a1 1 0 0 0-.96-.73Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C4B5FD"/>
+      <stop offset="100%" style="stop-color:#A78BFA"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="64" height="64" rx="14" ry="14" fill="url(#bg)"/>
+
+  <!-- Subtle inner highlight -->
+  <rect width="64" height="30" rx="14" ry="14" fill="white" opacity="0.06"/>
+
+  <!-- Left vertical bar of H -->
+  <rect x="12" y="22" width="9" height="28" rx="2.5" fill="white"/>
+
+  <!-- Right vertical bar of H -->
+  <rect x="43" y="22" width="9" height="28" rx="2.5" fill="white"/>
+
+  <!-- Crossbar of H (slightly lower for "headless" effect) -->
+  <rect x="12" y="33" width="40" height="8" rx="2.5" fill="white"/>
+
+  <!-- Floating "head" node — the headless concept -->
+  <!-- Three connected dots suggesting API/nodes, floating above -->
+  <circle cx="32" cy="10" r="4" fill="url(#accent)" filter="url(#glow)"/>
+  <circle cx="22" cy="10" r="2.5" fill="#C4B5FD" opacity="0.7"/>
+  <circle cx="42" cy="10" r="2.5" fill="#C4B5FD" opacity="0.7"/>
+
+  <!-- Connector lines between the nodes -->
+  <line x1="24.5" y1="10" x2="28" y2="10" stroke="#C4B5FD" stroke-width="1.5" opacity="0.7"/>
+  <line x1="36" y1="10" x2="39.5" y2="10" stroke="#C4B5FD" stroke-width="1.5" opacity="0.7"/>
 </svg>

@@ -1,5 +1,5 @@
 import { b as createAstro, c as createComponent, r as renderComponent, a as renderTemplate, m as maybeRenderHead, e as addAttribute } from '../../../chunks/astro/server_C6wb1U6_.mjs';
-import { $ as $$Dashboard } from '../../../chunks/dashboard_BH4PFK7W.mjs';
+import { $ as $$Dashboard } from '../../../chunks/dashboard_CZ5mJo0o.mjs';
 import { f as searchUsers } from '../../../chunks/admin_B8uWt3Aj.mjs';
 import { d as db, u as user } from '../../../chunks/db_CHRX6QwF.mjs';
 import { count, eq } from 'drizzle-orm';

@@ -1,0 +1,177 @@
+---
+title: "CLI Getting Started"
+description: "Interactive CLI to scaffold a new Headless Kit project with your choice of backend, frontend, and modules."
+section: "cli"
+order: 1
+---
+
+# CLI Getting Started
+
+The `create-headless-app` CLI scaffolds a complete Headless Kit project with your choice of backend, frontend, preset, and modules.
+
+## Usage
+
+```bash
+bunx create-headless-app
+```
+
+This launches an interactive prompt that walks you through project configuration.
+
+## Interactive Prompts
+
+### 1. Project Name
+
+```
+? Project name: my-app
+```
+
+Must be lowercase with hyphens only (`/^[a-z0-9-]+$/`). This becomes the directory name and is used in `package.json` and Docker config.
+
+### 2. Backend
+
+```
+? Backend:
+  > Laravel      PHP 8.3 + BetterAuth + RBAC
+    Symfony      PHP 8.3 + BetterAuth + RBAC
+    Hono         Bun + Drizzle (lightweight)
+```
+
+Choose one backend. The CLI copies the matching backend template and configures environment variables accordingly.
+
+### 3. Frontend
+
+```
+? Frontend:
+  > Next.js         App Router + shadcn/ui (recommended)
+    TanStack Start  Vite + TanStack Router + Zustand
+```
+
+Next.js is the recommended choice with full BFF proxy, Server Actions, and shadcn/ui components. TanStack Start offers a Vite-based alternative with Zustand for state management.
+
+### 4. UI Preset
+
+```
+? UI Preset:
+  > SaaS (Recommended)  Landing page + Admin dashboard
+    Admin               Dashboard + sidebar + RBAC tables
+    Landing             Marketing page + styled auth
+    Ecommerce           Store + cart + checkout + admin
+    Minimal             BFF infrastructure only, no UI kit
+```
+
+Presets determine which UI components and page templates are included. See the [Presets](/cli/presets) page for details on each option.
+
+### 5. Modules
+
+```
+? Modules (auth is always included):
+  [ ] Multi-tenant orgs    Organization management with user switching
+  [ ] Billing & plans      Subscription plans, invoices, and billing management
+  [ ] Team management      Team members, invitations, and role assignment
+  [ ] Org-level RBAC       Role-based access control per organization
+  [ ] Support chat         Customer support conversations and agent queue
+  [ ] AI Assistant         AI chat with assistant-ui + Vercel AI SDK
+  [ ] API Platform CRUD    Replace CRUD controllers with API Platform (Symfony only)
+```
+
+Modules are optional add-ons. Authentication is always included regardless of selection. The API Platform module only appears when Symfony is selected as the backend.
+
+Module dependencies are resolved automatically. For example, selecting "Billing & plans" also includes "Multi-tenant orgs" since billing requires organizations.
+
+### 6. Database
+
+```
+? Database:
+  > SQLite        Zero config, great for dev
+    PostgreSQL    Production-ready
+```
+
+SQLite requires no setup and works immediately. PostgreSQL generates Docker Compose configuration with a database service.
+
+## What Gets Scaffolded
+
+After answering all prompts, the CLI creates:
+
+```
+my-app/
+├── apps/
+│   ├── web/           # Frontend (Next.js or TanStack)
+│   └── api/           # Backend (Laravel, Symfony, or Hono)
+├── packages/          # Shared config and types
+├── docker-compose.yml # Docker setup (if PostgreSQL selected)
+├── package.json       # Root workspace config
+├── turbo.json         # Turborepo pipeline
+└── Makefile           # Dev and QA targets
+```
+
+The frontend includes:
+
+- BFF proxy route handler
+- Auth pages (login, register, forgot password)
+- Adapter for the selected backend
+- UI components matching the selected preset
+- Module-specific pages and components
+
+The backend includes:
+
+- Auth endpoints (login, register, refresh, logout, me)
+- 2FA support
+- Password reset flow
+- Feature directories for selected modules
+- Database migrations/schema
+
+## Auto-Generated Secrets
+
+The CLI generates unique random secrets for each project:
+
+| Secret | Used by |
+|--------|---------|
+| `APP_KEY` | Laravel (base64 encoded) |
+| `APP_SECRET` | Symfony |
+| `JWT_SECRET` | Hono |
+| `BETTER_AUTH_SECRET` | Laravel, Symfony |
+| `DB_PASSWORD` | PostgreSQL (Docker) |
+
+These are written to the appropriate `.env` files. You should rotate them before deploying to production.
+
+## Post-Scaffold Steps
+
+After the CLI finishes, follow the printed instructions:
+
+```bash
+cd my-app
+bun install
+```
+
+Then set up the backend:
+
+```bash
+# Laravel
+cd apps/api && composer install && php artisan migrate --seed
+
+# Symfony
+cd apps/api && composer install && php bin/console doctrine:database:create && php bin/console doctrine:schema:create
+
+# Hono
+cd apps/api && bun run db:migrate && bun run db:seed
+```
+
+Start the dev server:
+
+```bash
+make dev    # or: bun run dev
+```
+
+## Non-Interactive Usage
+
+You can also test presets non-interactively using Makefile targets from the monorepo root:
+
+```bash
+make cli-try-saas        # SaaS + Next.js + Laravel
+make cli-try-admin       # Admin + Next.js + Laravel
+make cli-try-landing     # Landing + Next.js + Laravel
+make cli-try-ecommerce   # Ecommerce + TanStack + Hono
+make cli-try-none        # Minimal + Next.js + Hono
+```
+
+These scaffold into `/tmp/headless-test/` for quick testing.

@@ -1,0 +1,9 @@
+---
+const currentPath = Astro.url.pathname
+const basePath = currentPath.replace(/^\/fr/, "") || "/"
+const site = Astro.site?.origin || "https://headlesskit.dev"
+---
+
+<link rel="alternate" hreflang="en" href={`${site}${basePath}`} />
+<link rel="alternate" hreflang="fr" href={`${site}/fr${basePath}`} />
+<link rel="alternate" hreflang="x-default" href={`${site}${basePath}`} />

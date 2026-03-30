@@ -1,0 +1,108 @@
+---
+import { getMessages, getLocale } from "@/i18n"
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+const year = new Date().getFullYear()
+---
+
+<footer class="border-t border-border">
+  <div class="mx-auto max-w-6xl px-6 py-12">
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- Brand -->
+      <div>
+        <div class="text-sm font-semibold tracking-tight text-foreground">
+          {t.footer.brand}
+        </div>
+        <p class="mt-3 text-sm text-muted-foreground">
+          {t.footer.tagline}
+        </p>
+      </div>
+
+      <!-- Product -->
+      <div>
+        <div class="text-xs font-medium uppercase tracking-widest text-muted-foreground">{t.footer.product}</div>
+        <ul class="mt-3 space-y-2">
+          <li>
+            <a href="#features" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {t.nav.features}
+            </a>
+          </li>
+          <li>
+            <a href="#modules" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {t.modules.eyebrow}
+            </a>
+          </li>
+          <li>
+            <a href="#pricing" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {t.nav.pricing}
+            </a>
+          </li>
+          <li>
+            <a href="#faq" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {t.faq.eyebrow}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div>
+        <div class="text-xs font-medium uppercase tracking-widest text-muted-foreground">{t.footer.resources}</div>
+        <ul class="mt-3 space-y-2">
+          <li>
+            <a href="/docs/getting-started/installation" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {t.footer.documentation}
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/headless-kit/headless-kit"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a href="#" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              Discord
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <div class="text-xs font-medium uppercase tracking-widest text-muted-foreground">{t.footer.contact}</div>
+        <ul class="mt-3 space-y-2">
+          <li>
+            <a href="mailto:hello@headlesskit.dev" class="text-sm text-primary transition-colors hover:text-primary/80">
+              hello@headlesskit.dev
+            </a>
+          </li>
+          <li class="text-xs text-muted-foreground">
+            {t.footer.supportNote}
+          </li>
+        </ul>
+        <div class="mt-4 flex flex-wrap gap-2">
+          {['Astro', 'React', 'Tailwind', 'shadcn/ui', 'Bun'].map((tech) => (
+            <span class="rounded-full border border-border px-2.5 py-0.5 text-[10px] text-muted-foreground">
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="mt-12 flex flex-col items-center gap-2 border-t border-border pt-6 sm:flex-row sm:justify-between">
+      <span class="text-xs text-muted-foreground">
+        &copy; {year} {t.footer.copyright}
+      </span>
+      <span class="text-xs text-muted-foreground">
+        {t.footer.builtBy}
+      </span>
+    </div>
+  </div>
+</footer>

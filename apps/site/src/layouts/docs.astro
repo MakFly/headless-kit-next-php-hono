@@ -1,0 +1,107 @@
+---
+import "@/styles/global.css"
+import DocsNavbar from "@/components/docs/DocsNavbar.astro"
+import DocsSidebar from "@/components/docs/DocsSidebar.astro"
+import SearchDialog from "@/components/docs/SearchDialog.astro"
+import DocsBreadcrumb from "@/components/docs/DocsBreadcrumb.astro"
+import { TableOfContents } from "@/components/docs/TableOfContents"
+import PrevNextNav from "@/components/docs/PrevNextNav.astro"
+import { getLocale } from "@/i18n"
+import SEOHead from "@/components/SEOHead.astro"
+import JsonLd from "@/components/JsonLd.astro"
+import { getSectionForSlug } from "@/lib/navigation"
+
+type Props = {
+  title: string
+  description: string
+  headings: { depth: number; slug: string; text: string }[]
+  currentSlug: string
+  prev: { slug: string; label: string } | null
+  next: { slug: string; label: string } | null
+}
+
+const { title, description, headings, currentSlug, prev, next } = Astro.props
+const section = getSectionForSlug(currentSlug)
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3)
+const locale = getLocale(Astro.currentLocale)
+---
+
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="color-scheme" content="light dark" />
+    <SEOHead title={`${title} — Headless Kit Docs`} description={description} type="article" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} — Headless Kit Docs</title>
+    <JsonLd data={{
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Docs", "item": "https://headlesskit.dev/docs" },
+        ...(section ? [{ "@type": "ListItem", "position": 2, "name": section.label, "item": `https://headlesskit.dev/docs/${section.slug}` }] : []),
+        { "@type": "ListItem", "position": section ? 3 : 2, "name": title }
+      ]
+    }} />
+    <script is:inline>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script>
+  </head>
+  <body class="min-h-svh antialiased bg-background text-foreground">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+      Skip to content
+    </a>
+    <DocsNavbar />
+
+    <div class="flex pt-14">
+      <!-- Sidebar -->
+      <aside
+        id="docs-sidebar"
+        class="fixed top-14 left-0 z-40 hidden h-[calc(100svh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm md:block"
+      >
+        <div class="border-b border-border p-3">
+          <SearchDialog />
+        </div>
+        <DocsSidebar currentSlug={currentSlug} />
+      </aside>
+
+      <!-- Main content -->
+      <main id="main-content" class="min-w-0 flex-1 md:ml-64 lg:mr-56">
+        <div class="mx-auto max-w-3xl px-6 py-10 md:px-8">
+          {section && <DocsBreadcrumb section={section.slug} title={title} />}
+          <article class="docs-prose">
+            <h1>{title}</h1>
+            <p class="text-lg text-muted-foreground mb-8 !mt-0">{description}</p>
+            <slot />
+          </article>
+          <PrevNextNav prev={prev} next={next} />
+        </div>
+      </main>
+
+      <!-- Table of Contents -->
+      {tocHeadings.length > 0 && (
+        <aside class="fixed top-14 right-0 hidden h-[calc(100svh-3.5rem)] w-56 overflow-y-auto border-l border-border bg-background/95 p-4 lg:block">
+          <TableOfContents headings={tocHeadings} locale={locale} client:load />
+        </aside>
+      )}
+    </div>
+
+    <!-- Mobile sidebar overlay -->
+    <script is:inline>
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-sidebar]');
+        if (btn) {
+          const sidebar = document.getElementById('docs-sidebar');
+          sidebar.classList.toggle('hidden');
+          sidebar.classList.toggle('block');
+        }
+        // Close on backdrop click
+        if (e.target.id === 'sidebar-backdrop') {
+          document.getElementById('docs-sidebar').classList.add('hidden');
+          document.getElementById('docs-sidebar').classList.remove('block');
+        }
+      });
+    </script>
+  </body>
+</html>

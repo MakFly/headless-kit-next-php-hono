@@ -1,0 +1,48 @@
+---
+import { getMessages, getLocale } from "@/i18n"
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+
+const stats = [
+  { value: "3", label: t.socialProof.backendFrameworks, detail: t.socialProof.backendDetail },
+  { value: "2", label: t.socialProof.frontendOptions, detail: t.socialProof.frontendDetail },
+  { value: "4", label: t.socialProof.productionModules, detail: t.socialProof.modulesDetail },
+  { value: "180+", label: t.socialProof.apiEndpoints, detail: t.socialProof.endpointsDetail },
+]
+
+const techStack = [
+  "TypeScript", "PHP 8.3", "Bun", "Tailwind v4",
+  "Drizzle ORM", "Doctrine", "Eloquent", "Zod",
+]
+---
+
+<section class="relative border-y border-border/50 py-16">
+  <div class="mx-auto max-w-6xl px-6">
+    <!-- Stats grid -->
+    <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+      {stats.map((stat) => (
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary md:text-4xl">
+            {stat.value}
+          </div>
+          <div class="mt-1 text-xs font-semibold uppercase tracking-widest text-foreground">
+            {stat.label}
+          </div>
+          <div class="mt-1 text-xs text-muted-foreground">
+            {stat.detail}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Tech pills -->
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-3">
+      <span class="text-xs uppercase tracking-widest text-muted-foreground/60">{t.socialProof.builtWith}</span>
+      {techStack.map((tech) => (
+        <span class="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground">
+          {tech}
+        </span>
+      ))}
+    </div>
+  </div>
+</section>

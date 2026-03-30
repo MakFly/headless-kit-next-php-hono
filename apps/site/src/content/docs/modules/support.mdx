@@ -1,0 +1,186 @@
+---
+title: "Support Module"
+description: "Helpdesk and support ticket system with conversations, agent queue, canned responses, and ratings."
+section: "modules"
+order: 4
+---
+
+# Support Module
+
+The Support module provides a helpdesk system with conversation-based tickets, agent assignment, canned responses, and customer satisfaction ratings.
+
+## User Endpoints
+
+All user endpoints require authentication.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/support/conversations` | List user's conversations |
+| POST | `/api/v1/support/conversations` | Create a new support ticket |
+| GET | `/api/v1/support/conversations/{id}` | Get conversation with messages |
+| POST | `/api/v1/support/conversations/{id}/messages` | Send a message in conversation |
+| POST | `/api/v1/support/conversations/{id}/rate` | Rate a resolved conversation |
+
+### Creating a Ticket
+
+```json
+POST /api/v1/support/conversations
+{
+  "subject": "Order issue",
+  "message": "I have a problem with my order #123"
+}
+```
+
+### Sending a Message
+
+```json
+POST /api/v1/support/conversations/{id}/messages
+{
+  "content": "Here are the details..."
+}
+```
+
+### Rating a Conversation
+
+```json
+POST /api/v1/support/conversations/{id}/rate
+{
+  "rating": 5,
+  "comment": "Great support, thanks!"
+}
+```
+
+## Agent Endpoints
+
+Agent endpoints require `auth + role:admin`. These are used by support agents to manage the ticket queue.
+
+### Queue Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/support/agent/queue` | Get unassigned conversations |
+| GET | `/api/v1/support/agent/assigned` | Get conversations assigned to current agent |
+| PATCH | `/api/v1/support/agent/conversations/{id}/assign` | Assign/claim a conversation |
+| PATCH | `/api/v1/support/agent/conversations/{id}/status` | Update conversation status (open, in_progress, resolved, closed) |
+
+### Canned Responses
+
+Canned responses are pre-written templates that agents can use to quickly reply to common questions.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/support/agent/canned` | List all canned responses |
+| POST | `/api/v1/support/agent/canned` | Create canned response |
+| PUT | `/api/v1/support/agent/canned/{id}` | Update canned response |
+| DELETE | `/api/v1/support/agent/canned/{id}` | Delete canned response |
+
+Note: Hono uses `PATCH` instead of `PUT` for updating canned responses.
+
+### Analytics
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/support/agent/ratings` | Get rating statistics (average, distribution) |
+
+## Conversation Lifecycle
+
+```
+1. User creates conversation    → status: "open"
+2. Agent claims from queue      → status: "in_progress", assigned_to: agent_id
+3. Messages exchanged           → (status unchanged)
+4. Agent resolves               → status: "resolved"
+5. User rates conversation      → rating saved
+6. Agent or system closes       → status: "closed"
+```
+
+## Implementation per Backend
+
+### Laravel (`apps/api-laravel/`)
+
+Key files:
+- Routes: `app/Features/Support/routes.php`
+- User actions: `app/Features/Support/Actions/` -- ListConversations, CreateConversation, ShowConversation, SendMessage, RateConversation
+- Agent actions: `app/Features/Support/Actions/` -- AgentQueue, AgentAssigned, AssignConversation, UpdateConversationStatus, ListCannedResponses, CreateCannedResponse, UpdateCannedResponse, DeleteCannedResponse, RatingsStats
+
+User routes use `auth:betterauth` middleware. Agent routes add `role:admin`:
+
+```php
+Route::middleware(['auth:betterauth', 'role:admin'])
+    ->prefix('support/agent')
+    ->group(function () { ... });
+```
+
+### Symfony (`apps/api-sf/`)
+
+Key files:
+- Controllers: `src/Feature/Support/Controller/` (8 controllers: CreateConversationController, SendMessageController, RateConversationController, AgentQueueController, AgentAssignedController, AssignConversationController, UpdateStatusController, RatingStatsController)
+- API Platform resources: Conversation (GetCollection, Get, Patch), ChatMessage (GetCollection, Post), CannedResponse (GetCollection, Get, Post, Patch, Delete)
+
+Conversation listing and detail for users go through API Platform with security scoping. Business operations (create, send message, assign, rate) use invokable controllers.
+
+### Hono (`apps/api-hono/`)
+
+Key files:
+- Feature: `src/features/support/` (5 files: support.routes.ts, support.handlers.ts, support.service.ts, support.repository.ts, support.schemas.ts)
+
+User endpoints use `authMiddleware` (applied to all support routes). Agent endpoints add `adminMiddleware` inline:
+
+```typescript
+support.get('/agent/queue', adminMiddleware, (c) => supportHandlers.getAgentQueue(c));
+```
+
+## Frontend (Next.js BFF)
+
+### Pages
+
+Located in `apps/web/src/app/(support)/support/`:
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/support` | `(app)/page.tsx` | Conversation list |
+| `/support/{ticketId}` | `(app)/[ticketId]/page.tsx` | Conversation detail |
+| `/support/c/{id}` | `(app)/c/[id]/page.tsx` | Conversation view (alternate) |
+| `/support/agent` | `(app)/agent/page.tsx` | Agent queue dashboard |
+| `/support/agent/canned` | `(app)/agent/canned/page.tsx` | Canned response management |
+| `/support/agent/ratings` | `(app)/agent/ratings/page.tsx` | Rating analytics |
+
+The support section has its own auth pages at `/support/auth/` (login, register, forgot-password, reset-password).
+
+### Server Actions
+
+Located in `apps/web/src/lib/actions/support/`:
+
+| File | Actions |
+|------|---------|
+| `agent.ts` | Agent queue, assigned conversations, assign/claim, update status |
+| `canned.ts` | CRUD operations for canned responses |
+| `ai.ts` | AI-assisted response suggestions |
+
+Conversation creation, message sending, and listing are handled through the general support actions. All actions use the BFF client for backend communication.
+
+## Response Format
+
+Conversations include nested messages and metadata:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "conv-123",
+    "subject": "Order issue",
+    "status": "in_progress",
+    "assignedTo": "agent-456",
+    "messages": [
+      {
+        "id": "msg-1",
+        "content": "I have a problem...",
+        "sender": "user",
+        "createdAt": "2025-01-15T10:30:00Z"
+      }
+    ],
+    "rating": null,
+    "createdAt": "2025-01-15T10:30:00Z",
+    "updatedAt": "2025-01-15T11:00:00Z"
+  }
+}
+```

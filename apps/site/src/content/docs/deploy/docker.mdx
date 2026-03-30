@@ -1,0 +1,258 @@
+---
+title: "Docker"
+description: "Docker Compose setup, Dockerfiles per app, and container configuration."
+section: "deploy"
+order: 1
+---
+
+# Docker
+
+Headless Kit includes Docker templates for every app. The CLI generates a `docker-compose.yml` tailored to your backend choice.
+
+## Docker Compose Overview
+
+Each backend has its own Compose template with the following services:
+
+| Service | Image/Build | Purpose |
+|---------|-------------|---------|
+| `web` | Dockerfile.nextjs or Dockerfile.tanstack | Frontend BFF |
+| `api` | Dockerfile.laravel, Dockerfile.symfony, or Dockerfile.hono | Backend API |
+| `db` | postgres:16-alpine | PostgreSQL database |
+| `redis` | redis:7-alpine | Cache and sessions (Laravel) |
+| `mailpit` | axllent/mailpit | Email testing (dev) |
+
+### Example: Laravel Compose
+
+```yaml
+services:
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "3300:3300"
+    environment:
+      - NODE_ENV=production
+      - AUTH_BACKEND=laravel
+      - LARAVEL_API_URL=http://api:8002
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - APP_ENV=production
+      - APP_KEY=${APP_KEY}
+      - APP_URL=http://localhost:8002
+      - FRONTEND_URL=http://localhost:3300
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=${PROJECT_NAME}
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - api-storage:/var/www/html/storage
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${PROJECT_NAME}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+```
+
+The `web` service connects to `api` using Docker's internal DNS (`http://api:8002`), not `localhost`.
+
+## Dockerfiles
+
+### Next.js (`Dockerfile.nextjs`)
+
+Multi-stage build using `oven/bun:1-alpine`:
+
+1. **deps**: Install dependencies with `bun install --frozen-lockfile`
+2. **builder**: Copy deps, build with `bun run build` (Next.js standalone output)
+3. **runner**: Copy standalone output, static files, and public assets
+
+```dockerfile
+FROM oven/bun:1-alpine AS base
+WORKDIR /app
+
+FROM base AS deps
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile
+
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN bun run build
+
+FROM base AS runner
+ENV NODE_ENV=production
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+USER nextjs
+EXPOSE 3001
+CMD ["bun", "server.js"]
+```
+
+Next.js must be configured with `output: 'standalone'` in `next.config.ts` for the standalone build to work.
+
+### Laravel (`Dockerfile.laravel`)
+
+Multi-stage build using `php:8.3-fpm-alpine`:
+
+1. **deps**: Install Composer dependencies (production only, no dev)
+2. **app**: Copy application code, optimize autoloader, set permissions
+
+```dockerfile
+FROM php:8.3-fpm-alpine AS base
+RUN apk add --no-cache postgresql-dev libzip-dev zip unzip \
+    && docker-php-ext-install pdo_pgsql pgsql zip opcache
+
+FROM base AS deps
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --prefer-dist
+
+FROM base AS app
+COPY --from=deps /var/www/html/vendor ./vendor
+COPY . .
+RUN composer dump-autoload --optimize \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+EXPOSE 8000
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+```
+
+The `docker-entrypoint.sh` script runs migrations at container startup.
+
+### Symfony (`Dockerfile.symfony`)
+
+Similar to Laravel but with Symfony-specific permissions handling:
+
+```dockerfile
+FROM php:8.3-fpm-alpine AS base
+RUN apk add --no-cache postgresql-dev libzip-dev zip unzip acl \
+    && docker-php-ext-install pdo_pgsql pgsql zip opcache
+
+FROM base AS app
+COPY --from=deps /var/www/html/vendor ./vendor
+COPY . .
+RUN composer dump-autoload --optimize \
+    && setfacl -R -m u:www-data:rwX var
+
+EXPOSE 8002
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php", "-S", "0.0.0.0:8002", "-t", "public"]
+```
+
+### Hono (`Dockerfile.hono`)
+
+Lightweight build using `oven/bun:1-alpine`:
+
+```dockerfile
+FROM oven/bun:1-alpine AS base
+WORKDIR /app
+
+FROM base AS deps
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile --production
+
+FROM base AS runner
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
+COPY src ./src
+COPY package.json ./
+
+USER hono
+EXPOSE 8003
+CMD ["bun", "run", "start"]
+```
+
+## Docker Commands
+
+```bash
+# Build and start all services
+docker compose up --build
+
+# Start in detached mode
+docker compose up -d
+
+# View logs
+docker compose logs -f web
+docker compose logs -f api
+
+# Run migrations inside the container
+docker compose exec api php artisan migrate          # Laravel
+docker compose exec api php bin/console doctrine:schema:update --force  # Symfony
+docker compose exec api bun run db:migrate           # Hono
+
+# Open a shell in the API container
+docker compose exec api sh
+
+# Stop all services
+docker compose down
+
+# Stop and remove volumes (fresh start)
+docker compose down -v
+```
+
+## Environment Variables in Docker
+
+Secrets should be passed via environment variables, not baked into images. Use a `.env` file at the project root:
+
+```ini
+APP_KEY=base64:...
+DB_PASSWORD=secure-random-password
+JWT_SECRET=minimum-32-characters-long-secret
+BETTER_AUTH_SECRET=yet-another-secure-secret
+```
+
+Docker Compose reads `.env` automatically and substitutes `${VARIABLE}` placeholders.
+
+## Volume Mounts
+
+| Volume | Service | Purpose |
+|--------|---------|---------|
+| `db-data` | db | PostgreSQL data persistence |
+| `redis-data` | redis | Redis persistence |
+| `api-storage` | api (Laravel) | Laravel storage (logs, cache, uploads) |
+
+Volumes persist data between container restarts. Use `docker compose down -v` to remove them for a completely fresh start.
+
+## Health Checks
+
+The PostgreSQL service includes a health check. The API service waits for the database to be healthy before starting:
+
+```yaml
+db:
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U postgres"]
+    interval: 5s
+    timeout: 5s
+    retries: 5
+
+api:
+  depends_on:
+    db:
+      condition: service_healthy
+```
+
+This prevents the API from crashing on startup because the database is not ready yet.

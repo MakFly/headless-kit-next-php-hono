@@ -1,0 +1,21 @@
+---
+type Props = {
+  filename?: string
+}
+
+const { filename } = Astro.props
+---
+
+<div class="my-6 overflow-hidden rounded-lg border border-border">
+  {filename && (
+    <div class="flex items-center gap-2 border-b border-border bg-cyber-surface-elevated px-4 py-2">
+      <span class="size-3 rounded-full bg-red-500/60"></span>
+      <span class="size-3 rounded-full bg-yellow-500/60"></span>
+      <span class="size-3 rounded-full bg-green-500/60"></span>
+      <span class="ml-2 font-mono text-xs text-muted-foreground">{filename}</span>
+    </div>
+  )}
+  <div class="[&>pre]:!rounded-none [&>pre]:!border-0 [&>pre]:!my-0">
+    <slot />
+  </div>
+</div>

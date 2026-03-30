@@ -1,0 +1,8 @@
+---
+import { getLocale } from "@/i18n"
+import { FeaturesSection } from "./FeaturesSection"
+
+const locale = getLocale(Astro.currentLocale)
+---
+
+<FeaturesSection client:visible locale={locale} />

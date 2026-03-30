@@ -1,0 +1,55 @@
+---
+import { getMessages, getLocale } from "@/i18n"
+import { ThemeToggle } from "./ThemeToggle"
+import { AuthNavButtons } from "./AuthNavButtons"
+import { LanguageSwitcher } from "./LanguageSwitcher"
+
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+const currentPath = Astro.url.pathname
+
+const siteMode = import.meta.env.PUBLIC_SITE_MODE || "development"
+const isProductionMode = siteMode === "production"
+---
+
+<nav class="glass fixed top-0 z-50 w-full" aria-label="Main navigation">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+    <a href="/" class="text-lg font-semibold tracking-tight text-foreground">
+      Headless Kit
+    </a>
+
+    <div class="hidden items-center gap-8 md:flex">
+      <a href="#features" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+        {t.nav.features}
+      </a>
+      <a href="#architecture" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+        {t.nav.architecture}
+      </a>
+      <a href="#modules" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+        {t.nav.modules}
+      </a>
+      {!isProductionMode && (
+        <a href="#pricing" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+          {t.nav.pricing}
+        </a>
+      )}
+      <a href="/docs/getting-started/installation" class="text-sm text-muted-foreground transition-colors hover:text-foreground">
+        {t.nav.docs}
+      </a>
+      <a
+        href="https://github.com/headless-kit/headless-kit"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        {t.nav.github}
+      </a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <LanguageSwitcher locale={locale} currentPath={currentPath} />
+      <ThemeToggle client:load />
+      <AuthNavButtons client:load locale={locale} productionMode={isProductionMode} />
+    </div>
+  </div>
+</nav>

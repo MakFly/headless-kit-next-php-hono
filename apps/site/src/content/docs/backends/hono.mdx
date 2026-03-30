@@ -1,0 +1,232 @@
+---
+title: "Hono Backend"
+description: "Hono 4 API backend running on Bun with Drizzle ORM, JWT auth, and Zod validation."
+section: "backends"
+order: 3
+---
+
+# Hono Backend
+
+The Hono backend (`apps/api-hono/`) runs on **port 3333** using Bun as the runtime. It provides a lightweight, type-safe REST API with Hono 4, Drizzle ORM (SQLite), JWT authentication via `jose`, and Zod validation.
+
+## Setup
+
+```bash
+cd apps/api-hono
+bun install
+bun run db:migrate
+bun run db:seed
+bun run dev
+```
+
+The API is now available at `http://localhost:3333/api/v1/`.
+
+## 5-File Feature Convention
+
+Every feature in `src/features/{name}/` follows a strict 5-file convention:
+
+| File | Responsibility |
+|------|---------------|
+| `{name}.routes.ts` | Hono route definitions, middleware chain, `zValidator` calls |
+| `{name}.handlers.ts` | Parse request, call service, return `apiSuccess` / `apiError` |
+| `{name}.service.ts` | Business logic; throws `AppError` on domain errors |
+| `{name}.repository.ts` | Drizzle ORM queries only -- no business logic |
+| `{name}.schemas.ts` | Zod validation schemas + inferred TypeScript types |
+
+### Layer Rules
+
+- Handlers never call repositories directly -- always go through the service
+- Services never access `c` (Hono Context) -- they receive and return plain data
+- Repositories never throw `AppError` -- they return `null`/`undefined`, services interpret
+- Schemas are pure Zod -- no runtime imports, no side effects
+
+```
+src/
+├── index.ts                    # App bootstrap, global middleware, route mounts
+├── features/
+│   ├── auth/                   # JWT register/login/refresh/logout/me + 2FA
+│   ├── shop/                   # Products + categories (public)
+│   ├── cart/                   # Cart management (auth)
+│   ├── orders/                 # Order management (auth)
+│   ├── admin/                  # Admin CRUD (auth + admin)
+│   ├── saas/                   # Multi-tenant SaaS (auth + orgRbac)
+│   └── support/                # Support chat (auth)
+├── shared/
+│   ├── db/
+│   │   ├── schema.ts           # All Drizzle table definitions
+│   │   ├── seed.ts             # Seed entrypoint
+│   │   └── index.ts            # DB + schema exports
+│   ├── middleware/
+│   │   ├── auth.ts             # authMiddleware, optionalAuthMiddleware, requireUser()
+│   │   ├── admin.ts            # adminMiddleware (requires admin role)
+│   │   ├── org-rbac.ts         # orgRbac middleware (org membership check)
+│   │   ├── i18n.ts             # Accept-Language parsing
+│   │   └── index.ts            # Re-exports + requestContextMiddleware
+│   ├── lib/
+│   │   ├── response.ts         # apiSuccess(), apiError()
+│   │   ├── errors.ts           # AppError class
+│   │   ├── jwt.ts              # signToken(), verifyToken()
+│   │   └── hash.ts             # hashPassword(), verifyPassword()
+│   └── types/
+│       └── index.ts            # AppVariables, SafeUser, JwtPayload
+└── tests/
+```
+
+## JWT Authentication
+
+Hono uses **JWT HS256** via the `jose` library. The same secret signs and verifies tokens.
+
+| Token | TTL | Storage |
+|-------|-----|---------|
+| Access token | 1 hour | Client-side (cookie via BFF) |
+| Refresh token | 7 days | Database (`sessions` table) |
+| 2FA temp token | 10 minutes | In-memory |
+| Password reset | 1 hour | Database (`password_reset_tokens`) |
+
+The `JWT_SECRET` is validated at startup -- the server crashes if missing or under 32 characters in production.
+
+### Auth Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/v1/auth/register` | Public | Register new user |
+| POST | `/api/v1/auth/login` | Public (rate-limited) | Login (returns tokens) |
+| POST | `/api/v1/auth/refresh` | Public (rate-limited) | Refresh access token |
+| POST | `/api/v1/auth/logout` | JWT | Logout |
+| GET | `/api/v1/auth/me` | JWT | Get current user |
+| GET | `/api/v1/auth/oauth/providers` | Public | List OAuth providers |
+| GET | `/api/v1/auth/test-accounts` | Public (dev only) | Get test accounts |
+
+### Two-Factor Authentication
+
+Mounted at `/api/v1/auth/2fa/`:
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/v1/auth/2fa/status` | JWT | Check 2FA enabled status |
+| POST | `/api/v1/auth/2fa/setup` | JWT | Generate TOTP secret + QR URI |
+| POST | `/api/v1/auth/2fa/enable` | JWT | Confirm TOTP code, activate 2FA |
+| POST | `/api/v1/auth/2fa/disable` | JWT | Disable 2FA (requires valid code) |
+| GET | `/api/v1/auth/2fa/recovery-codes` | JWT | List remaining backup codes |
+| POST | `/api/v1/auth/2fa/verify` | Temp token (rate-limited) | Verify TOTP during login |
+| POST | `/api/v1/auth/2fa/recovery` | Temp token (rate-limited) | Use recovery code during login |
+
+### Response Format (camelCase)
+
+Hono uses **camelCase** for auth response fields (unlike the PHP backends which use snake_case):
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": { "id": "...", "email": "...", "name": "..." },
+    "accessToken": "...",
+    "refreshToken": "...",
+    "expiresIn": 3600,
+    "tokenType": "Bearer"
+  },
+  "status": 200,
+  "request_id": "abc123"
+}
+```
+
+## Drizzle ORM + SQLite
+
+All table definitions live in `src/shared/db/schema.ts`. The database is SQLite (`data.db` at project root).
+
+```bash
+bun run db:generate    # Generate Drizzle migration from schema changes
+bun run db:migrate     # Apply pending migrations
+bun run db:push        # Push schema without migration (dev only)
+bun run db:seed        # Seed data
+bun run db:studio      # Drizzle Studio UI
+```
+
+ID convention: `text('id').primaryKey().$defaultFn(() => crypto.randomUUID())`
+
+Timestamps are stored as ISO 8601 text strings (SQLite has no native date type).
+
+## Zod Validation
+
+Every feature has a `{name}.schemas.ts` file with Zod schemas. Validation is applied at the route level using `@hono/zod-validator`:
+
+```typescript
+auth.post(
+  '/register',
+  zValidator('json', registerSchema, (result, c) => {
+    if (!result.success) {
+      return apiError(c, 'VALIDATION_ERROR', 'Validation failed', 400,
+        result.error.flatten().fieldErrors);
+    }
+  }),
+  async (c) => { /* handler */ }
+);
+```
+
+## Middleware
+
+### Global Middleware (applied to all routes)
+
+Applied in order in `src/index.ts`: `logger()`, `prettyJSON()`, `secureHeaders()`, `requestContextMiddleware`, `i18nMiddleware`, `cors()`.
+
+### Route Middleware
+
+| Middleware | Purpose |
+|-----------|---------|
+| `authMiddleware` | Validates JWT, sets `user` in context |
+| `adminMiddleware` | Requires `admin` role (after authMiddleware) |
+| `orgRbac(level)` | Requires org membership at given level |
+| `rateLimitMiddleware({scope, maxAttempts, windowSeconds})` | Configurable rate limiting |
+| `noStoreMiddleware` | Sets `Cache-Control: no-store` |
+
+### Rate Limiting
+
+| Scope | Max Attempts | Window |
+|-------|-------------|--------|
+| `auth-login` | 5 | 15 min |
+| `auth-refresh` | 30 | 1 min |
+| `auth-2fa-verify` | 10 | 15 min |
+| `auth-2fa-recovery` | 5 | 15 min |
+
+## Route Mounts
+
+All routes are mounted in `src/index.ts`:
+
+| Feature | Mount Path | Middleware |
+|---------|-----------|-----------|
+| auth | `/api/v1/auth` | Public (rate-limited) |
+| shop | `/api/v1` | Public |
+| cart | `/api/v1/cart` | `authMiddleware` |
+| orders | `/api/v1/orders` | `authMiddleware` |
+| admin | `/api/v1/admin` | `authMiddleware` + `adminMiddleware` |
+| saas | `/api/v1/saas` | `authMiddleware` + `orgRbac` |
+| support | `/api/v1/support` | `authMiddleware` |
+
+## Testing
+
+```bash
+bun test                        # All tests
+bun test src/tests/unit/        # Unit tests only
+bun test src/tests/integration/ # Integration tests only
+bun test --grep "Auth"          # Filter by name
+```
+
+Test files cover: `auth.test.ts`, `health.test.ts`, `products.test.ts`, `cart.test.ts`, `orders.test.ts`, `saas.test.ts`, `admin.test.ts`, `support.test.ts`.
+
+## QA
+
+```bash
+make qa-hono    # Runs typecheck + tests
+```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3333` | Server port |
+| `API_VERSION` | `v1` | API version prefix |
+| `JWT_SECRET` | -- | JWT signing secret (required in prod, min 32 chars) |
+| `FRONTEND_URL` | `http://localhost:3301` | Primary CORS origin |
+| `BFF_ORIGIN` | -- | Optional additional CORS origin |
+| `DATABASE_URL` | `file:./data.db` | SQLite file path |
+| `NODE_ENV` | `development` | Controls error verbosity |

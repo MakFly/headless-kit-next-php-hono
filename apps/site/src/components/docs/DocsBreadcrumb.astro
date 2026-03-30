@@ -1,0 +1,29 @@
+---
+type Props = {
+  section: string
+  title: string
+}
+const { section, title } = Astro.props
+
+const sectionLabels: Record<string, string> = {
+  'getting-started': 'Getting Started',
+  'architecture': 'Architecture',
+  'backends': 'Backends',
+  'guides': 'Guides',
+  'modules': 'Modules',
+  'cli': 'CLI',
+  'deploy': 'Deploy',
+}
+
+const sectionLabel = sectionLabels[section] || section
+---
+
+<nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted-foreground">
+  <ol class="flex items-center gap-1.5">
+    <li><a href="/docs" class="hover:text-foreground transition-colors">Docs</a></li>
+    <li class="text-muted-foreground/50">/</li>
+    <li><a href={`/docs/${section}`} class="hover:text-foreground transition-colors">{sectionLabel}</a></li>
+    <li class="text-muted-foreground/50">/</li>
+    <li class="text-foreground font-medium">{title}</li>
+  </ol>
+</nav>

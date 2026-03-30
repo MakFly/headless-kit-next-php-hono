@@ -1,0 +1,306 @@
+---
+title: "Production Deployment"
+description: "Pre-deploy checklist, build commands, security hardening, and monitoring setup."
+section: "deploy"
+order: 2
+---
+
+# Production Deployment
+
+This guide covers everything needed to deploy Headless Kit to production: secret management, build optimization, security hardening, and monitoring.
+
+## Pre-Deploy Checklist
+
+Before deploying, verify every item:
+
+- [ ] **Rotate all secrets** (JWT_SECRET, BETTER_AUTH_SECRET, APP_KEY)
+- [ ] **Set cookies to Secure** (automatic when `NODE_ENV=production`)
+- [ ] **Configure CORS** to allow only your production domain
+- [ ] **Enable SSL/TLS** on all public endpoints
+- [ ] **Set `APP_DEBUG=false`** on Laravel and Symfony
+- [ ] **Remove test accounts** endpoint or disable it in production
+- [ ] **Review rate limiting** configuration per backend
+- [ ] **Set up database backups** for PostgreSQL
+- [ ] **Configure log aggregation** (see Logging section below)
+
+## Build Commands
+
+### Next.js BFF
+
+```bash
+cd apps/web
+bun run build
+```
+
+Next.js produces a standalone output (when configured with `output: 'standalone'` in `next.config.ts`). The build output in `.next/standalone` contains everything needed to run the app without `node_modules`.
+
+Start the production server:
+
+```bash
+cd apps/web/.next/standalone
+bun server.js
+```
+
+### TanStack Start
+
+```bash
+cd apps/web-tanstack
+bun run build
+```
+
+### Laravel
+
+```bash
+cd apps/api-laravel
+composer install --no-dev --optimize-autoloader
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan migrate --force
+```
+
+### Symfony
+
+```bash
+cd apps/api-sf
+APP_ENV=prod composer install --no-dev --optimize-autoloader
+php bin/console cache:clear --env=prod
+php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+### Hono
+
+```bash
+cd apps/api-hono
+bun install --production
+bun run db:migrate
+```
+
+Hono runs directly on Bun without a separate build step.
+
+## Recommended Architecture
+
+```
+Internet
+  |
+  +-- Reverse Proxy (nginx / Caddy / CloudFlare)
+       |
+       +-- Next.js BFF (:3300)
+       |     |
+       |     +-- Laravel API (:8002)   [internal network]
+       |     +-- Symfony API (:8001)   [internal network]
+       |     +-- Hono API (:3333)      [internal network]
+       |
+       +-- PostgreSQL (:5432)          [internal network]
+       +-- Redis (:6379)               [internal network]
+```
+
+Key principles:
+
+- Only the **reverse proxy** and **BFF** are publicly accessible
+- Backend APIs are on an **internal network** with no public access
+- The database and cache are **never** exposed to the internet
+- All public traffic goes through **SSL/TLS**
+
+## Cookie Security
+
+In production, cookies are configured automatically when `NODE_ENV=production`:
+
+```typescript
+{
+  httpOnly: true,        // Tokens invisible to JavaScript (XSS protection)
+  secure: true,          // HTTPS only
+  sameSite: 'lax',       // CSRF protection
+  path: '/',
+}
+```
+
+The `SameSite=Lax` setting prevents cookies from being sent on cross-origin requests while still allowing top-level navigations (links from other sites).
+
+## CORS Configuration
+
+Each backend should restrict CORS to the BFF origin only:
+
+```ini
+# Laravel
+FRONTEND_URL=https://your-domain.com
+
+# Symfony
+FRONTEND_URL=https://your-domain.com
+
+# Hono
+FRONTEND_URL=https://your-domain.com
+```
+
+Since backends are not publicly accessible, CORS is primarily a defense-in-depth measure.
+
+## Rate Limiting
+
+All backends implement rate limiting on sensitive endpoints:
+
+| Endpoint | Limit | Window |
+|----------|-------|--------|
+| Login / Register | 5 requests | 15 minutes |
+| Password reset | 3 requests | 15 minutes |
+| 2FA verify | 10 requests | 15 minutes |
+| Token refresh | 30 requests | 1 minute |
+| API mutations (POST/PUT/DELETE) | 60 requests | 1 minute |
+| API reads (GET) | 120 requests | 1 minute |
+
+Implementation per backend:
+
+| Backend | Mechanism |
+|---------|-----------|
+| Laravel | `throttle` middleware on routes |
+| Symfony | `RateLimiterService` with cache backend |
+| Hono | `rateLimitMiddleware()` on routes |
+
+## Security Headers
+
+The BFF proxy itself sets `x-content-type-options: nosniff` and `x-frame-options: DENY` on all API responses. In addition, the reverse proxy or backend should set these headers on every response:
+
+```
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-XSS-Protection: 0
+Referrer-Policy: strict-origin-when-cross-origin
+Content-Security-Policy: default-src 'self'
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+```
+
+All three backends include an `X-Request-Id` header on every response for tracing.
+
+### BFF Rate Limiting
+
+The BFF proxy includes an in-memory rate limiter for auth endpoints (20 requests / 15 minutes per IP). For multi-instance deployments, replace with a distributed store:
+
+- [Upstash Rate Limit](https://github.com/upstash/ratelimit) — serverless Redis
+- [ioredis](https://github.com/redis/ioredis) — self-hosted Redis
+
+#### Redis adapter example
+
+```typescript
+// Replace the in-memory rateLimitMap in route.ts with:
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(20, '15 m'),
+  prefix: 'bff:auth',
+})
+
+async function checkRateLimit(ip: string): Promise<boolean> {
+  const { success } = await ratelimit.limit(ip)
+  return success
+}
+```
+
+## Health Check Endpoints
+
+Set up health checks for your load balancer or orchestrator:
+
+| Backend | Endpoint | Checks |
+|---------|----------|--------|
+| Next.js | `GET /api/health` | App is running |
+| Laravel | `GET /api/health` | App + database connection |
+| Symfony | `GET /api/health` | App + database connection |
+| Hono | `GET /api/health` | App + database connection |
+
+## Logging
+
+### PHP Backends (Laravel + Symfony)
+
+Both use Monolog for structured logging:
+
+**Laravel** (`config/logging.php`):
+```php
+'channels' => [
+    'stack' => [
+        'driver' => 'stack',
+        'channels' => ['daily', 'stderr'],
+    ],
+],
+```
+
+**Symfony** (`config/packages/monolog.yaml`):
+```yaml
+monolog:
+    handlers:
+        main:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.log"
+            level: info
+```
+
+### Hono
+
+Uses the built-in `logger()` middleware for request logging and `console.error` for errors:
+
+```typescript
+import { logger } from 'hono/logger';
+app.use('*', logger());
+```
+
+### Next.js BFF
+
+Uses Pino for server-side logging with structured JSON output in production:
+
+- Server runtime: Pino with JSON formatting
+- Edge runtime: JSON logger (Pino is not available in Edge)
+- Client: Console logger (development only)
+
+### Log Format
+
+All backends follow the same structured format:
+
+```json
+{
+  "timestamp": "2025-01-15T10:30:00.000Z",
+  "level": "INFO",
+  "message": "User registered",
+  "request_id": "abc-123-def",
+  "user_id": "usr_456"
+}
+```
+
+### What to Never Log
+
+- Passwords (plaintext or hashed)
+- Auth tokens (access, refresh, Paseto)
+- Credit card numbers
+- Full request bodies containing sensitive fields
+
+## Environment Variable Validation
+
+All backends validate critical environment variables at startup in production:
+
+- **Hono**: Throws if `JWT_SECRET` is the default value or under 32 characters
+- **Laravel**: Crashes if `APP_KEY` is missing; validates `BETTER_AUTH_SECRET` in service provider
+- **Symfony**: Crashes at container compilation if required `%env()%` variables are missing
+
+A misconfigured deployment fails immediately at startup rather than serving requests with missing security configuration.
+
+## Reverse Proxy Configuration
+
+### Nginx Example
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+
+    ssl_certificate /etc/ssl/certs/your-domain.crt;
+    ssl_certificate_key /etc/ssl/private/your-domain.key;
+
+    location / {
+        proxy_pass http://127.0.0.1:3300;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Only proxy traffic to the BFF (port 3300). Backend APIs should not have public-facing proxy rules.

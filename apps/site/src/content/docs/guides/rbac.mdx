@@ -1,0 +1,262 @@
+---
+title: "Role-Based Access Control"
+description: "RBAC model with roles, permissions, and authorization across all three backends and both frontends"
+section: "guides"
+order: 3
+---
+
+# Role-Based Access Control
+
+Headless Kit implements RBAC with three default roles and granular permissions modeled as `resource:action` pairs.
+
+## Model
+
+### Roles
+
+Three default roles are seeded:
+
+| Role | Slug | Description |
+|------|------|-------------|
+| Admin | `admin` | Full access to everything |
+| Manager | `manager` | Can manage users and content |
+| User | `user` | Standard authenticated access |
+
+### Permissions
+
+Permissions follow the `resource:action` pattern:
+
+| Permission | Resource | Action |
+|------------|----------|--------|
+| `users:manage` | users | manage |
+| `users:create` | users | create |
+| `users:read` | users | read |
+| `users:update` | users | update |
+| `users:delete` | users | delete |
+| `products:create` | products | create |
+| `products:update` | products | update |
+| `orders:read` | orders | read |
+| `orders:update` | orders | update |
+| `roles:manage` | roles | manage |
+
+The `manage` action is a wildcard that grants all actions on a resource.
+
+### User Data Structure
+
+The normalized user object includes roles and permissions:
+
+```typescript
+type NormalizedUser = {
+  id: string | number;
+  email: string;
+  name: string;
+  roles?: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+  permissions?: Array<{
+    id: number;
+    name: string;
+    slug: string;
+    resource: string;
+    action: string;
+  }>;
+};
+```
+
+## Backend Authorization
+
+### Laravel
+
+Laravel uses middleware on routes for authorization:
+
+```php
+// Role-based middleware
+Route::middleware(['auth:betterauth', 'role:admin'])->group(function () {
+    Route::get('/admin/users', [UserController::class, 'index']);
+});
+
+// Permission-based middleware
+Route::middleware(['auth:betterauth', 'permission:users:manage'])->group(function () {
+    Route::post('/admin/users/{id}/roles', [UserController::class, 'assignRole']);
+});
+```
+
+Model-level protection uses `$fillable` for mass assignment and query scoping:
+
+```php
+$order = Order::where('user_id', auth()->id())->findOrFail($id);
+```
+
+### Symfony
+
+Symfony uses Voters for fine-grained authorization:
+
+```php
+// Controller with attribute
+#[IsGranted('ROLE_ADMIN')]
+public function index(): Response { ... }
+
+// Voter for object-level checks
+class PermissionVoter extends Voter
+{
+    protected function voteOnAttribute(
+        string $attribute,
+        mixed $subject,
+        TokenInterface $token
+    ): bool {
+        $user = $token->getUser();
+        // Check user->permissions for resource:action match
+    }
+}
+```
+
+Security levels:
+
+| Level | Symfony Config |
+|-------|---------------|
+| Public | `security: false` in firewall |
+| Authenticated | `IS_AUTHENTICATED_FULLY` |
+| Admin | `ROLE_ADMIN` via voter |
+| Custom | Custom voter with permission check |
+
+### Hono
+
+Hono uses middleware functions:
+
+```typescript
+// Auth middleware (validates JWT)
+app.use('/api/v1/*', authMiddleware)
+
+// Admin middleware (checks admin role)
+app.use('/api/v1/admin/*', adminMiddleware)
+
+// Org RBAC middleware (checks org membership + role)
+app.use('/api/v1/orgs/:orgId/*', orgRbacMiddleware)
+```
+
+Object-level authorization happens in the repository layer:
+
+```typescript
+const order = await repo.findByIdAndUser(orderId, user.id);
+if (!order) throw new AppError('NOT_FOUND', 'order.not_found', 404);
+```
+
+## Admin RBAC Endpoints
+
+All backends expose admin endpoints for managing users and roles:
+
+### User Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/users` | List users with roles |
+| GET | `/api/v1/admin/users/:id` | Get user with roles and permissions |
+| POST | `/api/v1/admin/users/:id/roles` | Assign a role to a user |
+| DELETE | `/api/v1/admin/users/:id/roles/:roleId` | Remove a role from a user |
+
+### Role Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/roles` | List all roles |
+| POST | `/api/v1/roles` | Create a new role |
+| POST | `/api/v1/roles/:id/permissions` | Assign permissions to a role |
+
+## Frontend: Server Actions
+
+RBAC operations are handled through Server Actions in `apps/web/src/lib/actions/rbac/`:
+
+```typescript
+'use server';
+
+import { bffGet, bffPost, bffDelete } from '../_shared/bff-client';
+
+export async function getUsersAction(): Promise<UserWithRoles[]> {
+  const response = await bffGet<unknown>('/api/v1/users');
+  return unwrapEnvelope<UserWithRoles[]>(response);
+}
+
+export async function assignRoleAction(
+  userId: number,
+  roleSlug: string
+): Promise<{ message: string; data: UserWithRoles }> {
+  return bffPost(`/api/v1/admin/users/${userId}/roles`, { role: roleSlug });
+}
+
+export async function removeRoleAction(
+  userId: number,
+  roleId: number
+): Promise<{ message: string }> {
+  return bffDelete(`/api/v1/admin/users/${userId}/roles/${roleId}`);
+}
+```
+
+## Frontend: Permission Helpers
+
+The Zustand auth store exposes computed helpers for checking permissions:
+
+```typescript
+// In auth-store.ts
+hasPermission: (resource, action) => {
+  const { user } = get();
+  if (!user) return false;
+  return checkHasPermission(user, resource, action);
+},
+
+hasRole: (roleSlug) => {
+  const { user } = get();
+  if (!user) return false;
+  return checkHasRole(user, roleSlug);
+},
+
+isAdmin: () => {
+  const { user } = get();
+  if (!user) return false;
+  return checkIsAdmin(user);
+},
+```
+
+Usage in components:
+
+```tsx
+function AdminSection() {
+  const isAdmin = useAuthStore((s) => s.isAdmin());
+  const canManageUsers = useAuthStore((s) => s.hasPermission('users', 'manage'));
+
+  if (!isAdmin) return null;
+
+  return (
+    <div>
+      {canManageUsers && <UserManagement />}
+    </div>
+  );
+}
+```
+
+## Dashboard Sidebar Visibility
+
+The dashboard sidebar conditionally renders navigation items based on the user's roles:
+
+```tsx
+// Only admins see the admin section
+{isAdmin() && (
+  <>
+    <SidebarItem href="/dashboard/users" icon={Users} label="Users" />
+    <SidebarItem href="/dashboard/roles" icon={Shield} label="Roles" />
+    <SidebarItem href="/dashboard/permissions" icon={Key} label="Permissions" />
+  </>
+)}
+```
+
+The `isAdmin()` check uses the role data from the server, avoiding any client-side guessing. The actual authorization enforcement always happens server-side in the backend middleware/voters.
+
+## Important: Server-Side Enforcement
+
+Frontend permission checks are for **UI convenience only**. The real authorization happens on the backend:
+
+- Laravel: middleware + policy classes
+- Symfony: voters + security attributes
+- Hono: middleware + repository-level checks
+
+Never rely solely on frontend checks for security.

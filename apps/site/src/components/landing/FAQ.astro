@@ -1,0 +1,35 @@
+---
+import { getMessages, getLocale } from "@/i18n"
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+
+const faqs = t.faq.items
+---
+
+<section id="faq" class="section-padding">
+  <div class="mx-auto max-w-3xl px-6">
+    <!-- Section header -->
+    <div class="mb-16 text-center">
+      <p class="text-sm font-medium uppercase tracking-widest text-primary">{t.faq.eyebrow}</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+        {t.faq.title}
+        <span class="gradient-text">{t.faq.titleAccent}</span>
+      </h2>
+    </div>
+
+    <!-- FAQ list -->
+    <div class="space-y-4">
+      {faqs.map((faq) => (
+        <details class="group glass-card transition-colors hover:bg-muted/50">
+          <summary class="flex cursor-pointer items-center justify-between px-6 py-4 text-sm font-medium text-foreground select-none list-none">
+            {faq.q}
+            <span class="ml-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-6 pb-4 text-sm leading-relaxed text-muted-foreground">
+            {faq.a}
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

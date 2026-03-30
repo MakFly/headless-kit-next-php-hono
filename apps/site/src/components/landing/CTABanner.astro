@@ -1,0 +1,40 @@
+---
+import { getMessages, getLocale } from "@/i18n"
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+---
+
+<section class="section-padding gradient-bg">
+  <div class="mx-auto max-w-3xl px-6 text-center">
+    <p class="text-sm font-medium uppercase tracking-widest text-primary">{t.cta.eyebrow}</p>
+
+    <h2 class="mt-6 text-3xl font-bold tracking-tight md:text-5xl">
+      {t.cta.title}
+      <br />
+      <span class="gradient-text">{t.cta.titleAccent}</span>
+    </h2>
+
+    <p class="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
+      {t.cta.subtitle}
+    </p>
+
+    <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <a
+        href="/auth/register"
+        class="inline-flex items-center rounded-full bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+      >
+        {t.cta.ctaPrimary}
+      </a>
+      <a
+        href="#pricing"
+        class="inline-flex items-center rounded-full border border-border px-8 py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/20"
+      >
+        {t.cta.ctaSecondary}
+      </a>
+    </div>
+
+    <p class="mt-6 text-sm text-muted-foreground">
+      {t.cta.freeNote}
+    </p>
+  </div>
+</section>

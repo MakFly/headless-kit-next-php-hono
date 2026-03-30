@@ -1,0 +1,201 @@
+---
+title: "Symfony Backend"
+description: "Symfony 8 API backend with BetterAuth bundle, Paseto V4 tokens, and API Platform hybrid architecture."
+section: "backends"
+order: 2
+---
+
+# Symfony Backend
+
+The Symfony backend (`apps/api-sf/`) runs on **port 8001** and provides a REST API using Symfony 8, BetterAuth with Paseto V4 tokens, Doctrine ORM, and API Platform 4 for CRUD resources.
+
+## Setup
+
+```bash
+cd apps/api-sf
+composer install
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+symfony server:start --port=8001 --no-tls
+```
+
+The API is now available at `http://localhost:8001/api/v1/`.
+
+## Project Structure
+
+The codebase uses a **Vertical Slice Architecture + API Platform hybrid** approach:
+
+```
+src/
+├── Feature/
+│   ├── Auth/
+│   │   ├── Controller/         # 11 invokable controllers + TwoFactor/ (6 controllers)
+│   │   └── Service/            # RateLimiterService
+│   ├── Cart/
+│   │   ├── Controller/         # ShowCart, AddItem, UpdateItem, RemoveItem
+│   │   └── Repository/         # CartRepository
+│   ├── Orders/
+│   │   └── Controller/         # CreateOrder (List/Show via API Platform)
+│   ├── Admin/
+│   │   ├── Controller/Rbac/    # 6 controllers (roles, permissions)
+│   │   ├── Controller/Shop/    # 8 controllers (dashboard, analytics, inventory)
+│   │   └── Service/            # SegmentQueryService
+│   ├── Saas/
+│   │   ├── Controller/         # 10 controllers
+│   │   └── Service/            # OrgLoader
+│   └── Support/
+│       └── Controller/         # 8 controllers
+├── Shared/
+│   ├── Entity/                 # ALL Doctrine entities (#[ApiResource] on CRUD entities)
+│   ├── Repository/             # Shared repositories
+│   ├── Security/               # Voters, traits
+│   ├── Service/                # ApiResponseService
+│   ├── ApiPlatform/            # Normalizers, EnvelopeSubscriber, state providers
+│   └── EventSubscriber/        # ApiExceptionSubscriber
+```
+
+## Hybrid Architecture
+
+Symfony uses a hybrid approach where standard CRUD operations go through API Platform, while business logic uses invokable controllers:
+
+| Use API Platform | Use invokable controller |
+|-----------------|--------------------------|
+| CRUD (list, show, create, update, delete) | Business logic (subscribe, invite, assign) |
+| Standard filtering + pagination | Multi-step operations with side-effects |
+| Resource serialization with Groups | Aggregations, analytics, dashboards |
+
+API Platform provides 34 operations across 13 resources (Product, Category, Review, Order, Plan, Organization, Subscription, Invoice, TeamMember, UsageRecord, Conversation, ChatMessage, CannedResponse).
+
+## Paseto V4 Tokens
+
+Unlike JWT, Symfony uses **Paseto V4** tokens via the BetterAuth bundle. Paseto provides:
+
+- **No algorithm confusion attacks** -- the algorithm is part of the protocol, not the token header
+- **Mandatory encryption** for local tokens, mandatory signing for public tokens
+- **Built-in expiration** handling without custom claims
+- **Smaller attack surface** than JWT (no `none` algorithm, no RSA/HMAC confusion)
+
+Token lifetimes follow the same pattern as other backends: 1-hour access tokens, 7-day refresh tokens. Password hashing uses Argon2id (Symfony's default hasher).
+
+## Authentication Endpoints
+
+All auth routes use invokable controllers with `#[Route]` attributes.
+
+### Core Auth
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/v1/auth/register` | Public | Register new user |
+| POST | `/api/v1/auth/login` | Public | Login (returns Paseto tokens) |
+| POST | `/api/v1/auth/login/2fa` | Public | Login with 2FA pending token |
+| GET | `/api/v1/auth/me` | Paseto | Get current user |
+| PATCH | `/api/v1/auth/me` | Paseto | Update profile |
+| DELETE | `/api/v1/auth/me` | Paseto | Delete account |
+| POST | `/api/v1/auth/refresh` | Public | Refresh access token |
+| POST | `/api/v1/auth/logout` | Paseto | Logout |
+| POST | `/api/v1/auth/revoke-all` | Paseto | Revoke all sessions |
+
+### Password Reset
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/v1/auth/password/forgot` | Public | Send reset email |
+| POST | `/api/v1/auth/password/reset` | Public | Reset password with token |
+| POST | `/api/v1/auth/password/verify-token` | Public | Verify reset token |
+
+### Two-Factor Authentication
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/v1/auth/2fa/status` | Paseto | Check 2FA enabled status |
+| POST | `/api/v1/auth/2fa/setup` | Paseto | Generate TOTP secret + QR URI |
+| POST | `/api/v1/auth/2fa/enable` | Paseto | Confirm and activate 2FA |
+| POST | `/api/v1/auth/2fa/disable` | Paseto | Disable 2FA |
+| POST | `/api/v1/auth/2fa/verify` | Temp token | Verify TOTP during login |
+| POST | `/api/v1/auth/2fa/recovery` | Temp token | Use recovery code during login |
+| GET | `/api/v1/auth/2fa/recovery-codes` | Paseto | List remaining recovery codes |
+
+## Invokable Controllers
+
+Each endpoint is a single invokable controller class with `#[Route]`:
+
+```php
+#[Route('/api/v1/cart', name: 'api_v1_cart_show', methods: ['GET'])]
+class ShowCartController extends AbstractController
+{
+    public function __construct(
+        private readonly ApiResponseService $apiResponse,
+    ) {}
+
+    public function __invoke(): JsonResponse
+    {
+        // ...
+        return $this->apiResponse->success($data);
+    }
+}
+```
+
+## Security
+
+### Firewalls
+
+Defined in `config/packages/security.yaml`:
+- **Public routes**: auth endpoints (register, login, refresh, forgot-password)
+- **Protected routes**: require `IS_AUTHENTICATED_FULLY`
+- **Admin routes**: require `ROLE_ADMIN` via Voters
+
+### Voters for RBAC
+
+Symfony uses Voters for authorization instead of middleware:
+
+- `ROLE_ADMIN` for admin endpoints
+- Custom Voters for organization-level permissions (viewer, member, admin, owner)
+- Object-level authorization checks in individual controllers
+
+### Rate Limiting
+
+The `RateLimiterService` (`src/Feature/Auth/Service/RateLimiterService.php`) provides cache-backed rate limiting for auth endpoints. Configuration follows the project-wide rate limiting policy (5 login attempts per 15 minutes, etc.).
+
+## CORS
+
+Handled by NelmioBundle (`config/packages/nelmio_cors.yaml`). Uses `FRONTEND_URL` environment variable. Never add manual `Access-Control-*` headers in controllers.
+
+## Response Format
+
+All responses (both invokable controllers and API Platform) use the same envelope, wrapped by `EnvelopeSubscriber` for API Platform responses:
+
+```json
+{
+  "success": true,
+  "data": { "..." },
+  "status": 200,
+  "request_id": "abc123"
+}
+```
+
+Paginated responses include: `"meta": { "page": 1, "per_page": 20, "total": 100, "last_page": 5 }`
+
+## Testing
+
+```bash
+php bin/phpunit                             # Run all tests (129 tests)
+php bin/phpunit tests/Functional/Auth/      # Auth tests only
+php bin/phpunit --filter=testListProducts   # Specific test
+```
+
+## QA
+
+```bash
+make qa-sf    # Runs PHP-CS-Fixer + PHPStan + PHPUnit
+```
+
+## Key Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `config/packages/security.yaml` | Firewalls, user provider |
+| `config/packages/doctrine.yaml` | Entity mapping (`src/Shared/Entity/`) |
+| `config/packages/better_auth.yaml` | BetterAuth (Paseto V4, 2FA, magic link) |
+| `config/packages/api_platform.yaml` | API Platform (formats, pagination) |
+| `config/routes/api_platform.yaml` | Mounts API Platform under `/api/v1` |
+| `config/packages/nelmio_cors.yaml` | CORS configuration |

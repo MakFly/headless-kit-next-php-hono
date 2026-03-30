@@ -1,0 +1,174 @@
+---
+title: "Auth Flow"
+description: "Login lifecycle, token management, cookie storage, and refresh strategies."
+section: "architecture"
+order: 2
+---
+
+# Auth Flow
+
+Authentication in Headless Kit follows a strict server-side flow. Tokens never touch client JavaScript. This page covers the full lifecycle from login to token refresh.
+
+## Login Flow
+
+```
+1. User submits login form
+2. Client calls useAuthStore.login() (Zustand)
+3. Zustand calls loginAction() (Server Action)
+4. Server Action calls bffPost('/api/v1/auth/login', credentials, { skipAuth: true })
+5. bff-client POSTs to http://localhost:3300/api/v1/auth/login
+6. Route handler transforms path per backend config
+7. Backend validates credentials, returns tokens
+8. Route handler stores tokens in HttpOnly cookies
+9. Server Action returns user object to Zustand
+10. Zustand stores user in memory for client components
+```
+
+The `skipAuth: true` option tells the BFF client not to inject an existing token, since this is a public endpoint.
+
+## Token Lifecycle
+
+| Token | Lifetime | Storage |
+|-------|----------|---------|
+| Access token | 1 hour | `auth_token` HttpOnly cookie |
+| Refresh token | 30 days | `refresh_token` HttpOnly cookie |
+| Expiry timestamp | Matches access token | `token_expires_at` cookie (not HttpOnly) |
+
+The `token_expires_at` cookie is readable by the Edge middleware to detect tokens approaching expiry without decoding the JWT on every request.
+
+## Backend Auth Strategies
+
+Each backend implements the same auth contract with different token formats:
+
+| Backend | Token type | Library |
+|---------|-----------|---------|
+| Symfony | Paseto V4 | BetterAuth Symfony bundle |
+| Laravel | Bearer (JWT) | BetterAuth Laravel |
+| Hono | JWT (HS256) | jose |
+
+All backends expose the same endpoints under `/api/v1/auth/`:
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/register` | POST | Create account |
+| `/login` | POST | Authenticate |
+| `/me` | GET | Current user |
+| `/refresh` | POST | Refresh token pair |
+| `/logout` | POST | Invalidate session |
+
+## Cookie Management
+
+When the proxy receives a successful auth response from the backend, it sets three cookies:
+
+```typescript
+// Access token -- HttpOnly, not readable by JavaScript
+cookieStore.set('auth_token', accessToken, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/',
+  maxAge: expiresIn,
+});
+
+// Refresh token -- HttpOnly
+cookieStore.set('refresh_token', refreshToken, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/',
+  maxAge: 30 * 24 * 60 * 60, // 30 days
+});
+
+// Expiry timestamp -- readable by Edge middleware
+cookieStore.set('token_expires_at', expiryTimestamp, {
+  httpOnly: false,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/',
+});
+```
+
+## Edge Middleware
+
+The Edge middleware at `src/proxy.ts` runs on every request before it reaches the route handler. It handles three concerns:
+
+### Protected Route Redirection
+
+Routes under `/dashboard`, `/saas`, and `/support` require authentication. If no valid token exists, the middleware redirects to the section-specific login page:
+
+```
+/dashboard/* --> /dashboard/auth/login?redirect=/dashboard/*
+/saas/*      --> /saas/auth/login?redirect=/saas/*
+/support/*   --> /support/auth/login?redirect=/support/*
+```
+
+The `/shop` section is public and not protected by middleware.
+
+### Auth Page Redirection
+
+If an authenticated user visits a login or register page, they are redirected to the section root to avoid showing the auth form unnecessarily:
+
+```
+/dashboard/auth/login --> /dashboard (if authenticated)
+/saas/auth/login      --> /saas (if authenticated)
+```
+
+### Proactive Refresh Detection
+
+For API routes (`/api/v1/*`, `/api/auth/*`), the middleware checks whether the access token is expiring within the next 5 minutes. It does this by:
+
+1. Reading the `token_expires_at` cookie
+2. Comparing it to the current time
+3. If within the threshold, setting the `x-bff-refresh-needed` header
+
+The route handler reads this header and triggers a token refresh before processing the actual request.
+
+## Refresh Strategies
+
+Headless Kit uses two complementary refresh strategies to minimize authentication interruptions.
+
+### Proactive Refresh
+
+Triggered by the Edge middleware when a token is within 5 minutes of expiry. The `x-bff-refresh-needed` header signals the route handler to refresh tokens as part of the current request cycle. The user never sees a 401.
+
+#### Refresh Deduplication
+
+When multiple concurrent requests receive 401 simultaneously, the BFF deduplicates refresh calls. Only one refresh request is sent to the backend; other requests wait for the same Promise. This prevents token revocation on backends with single-use refresh tokens (e.g., Symfony Paseto).
+
+### Reactive Refresh (401 Interceptor)
+
+If a backend returns 401 (token expired or invalid), the proxy:
+
+1. Reads the `refresh_token` cookie
+2. Sends `POST /api/v1/auth/refresh` to the backend with the refresh token
+3. On success: stores new tokens in cookies, retries the original request
+4. On failure: clears all auth cookies, returns 401 to the client
+
+This handles edge cases where the proactive refresh missed (clock skew, long-running requests, etc.).
+
+### JWT Decode in Edge Runtime
+
+The Edge middleware decodes JWT payloads without signature verification to read the `exp` claim. This is safe because:
+
+- The middleware only reads the expiration time, not auth claims
+- Actual authentication happens on the backend
+- The Edge runtime does not have access to signing keys
+
+```typescript
+function decodeJwtPayloadEdge(token: string): { exp?: number } | null {
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  const payload = parts[1];
+  // Base64 decode and parse...
+}
+```
+
+## Logout
+
+Logout clears all auth cookies and calls the backend to invalidate the session:
+
+1. Server Action calls `POST /api/v1/auth/logout` via BFF client
+2. Backend invalidates the refresh token
+3. Route handler clears `auth_token`, `refresh_token`, and `token_expires_at` cookies
+4. Zustand clears the user from client state
+5. User is redirected to the login page

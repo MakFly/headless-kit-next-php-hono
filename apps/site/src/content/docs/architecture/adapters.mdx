@@ -1,0 +1,172 @@
+---
+title: "Adapters"
+description: "Backend adapter pattern, factory resolution, and per-backend response transformations."
+section: "architecture"
+order: 3
+---
+
+# Adapters
+
+Headless Kit uses an adapter pattern to abstract differences between backends. The BFF communicates with Laravel, Symfony, and Hono through a unified interface while each adapter handles backend-specific details.
+
+## Architecture
+
+```
+apps/web/src/lib/adapters/
+├── base-adapter.ts     # Abstract base class
+├── laravel/            # Laravel adapter
+├── symfony/            # Symfony adapter
+├── node/               # Hono (Node) adapter
+├── proxy-config.ts     # Per-backend path transformations
+├── types.ts            # Shared adapter types
+├── errors.ts           # AdapterError class
+└── index.ts            # Factory (getAuthAdapter)
+```
+
+## The BaseAdapter Class
+
+All adapters extend `BaseAdapter`, which provides:
+
+- **Cookie management**: Reading and writing HttpOnly auth cookies
+- **HTTP requests**: Sending requests to the backend with proper headers
+- **Token storage**: Storing access and refresh tokens in cookies after auth responses
+- **Error handling**: Wrapping backend errors in `AdapterError`
+
+```typescript
+export abstract class BaseAdapter implements AuthAdapter {
+  protected config: AdapterConfig;
+
+  // Implemented by each adapter
+  abstract login(data: LoginRequest): Promise<AuthResponse>;
+  abstract register(data: RegisterRequest): Promise<AuthResponse>;
+  abstract refreshToken(data: RefreshTokenRequest): Promise<AuthResponse>;
+  abstract getUser(): Promise<NormalizedUser>;
+  abstract logout(): Promise<void>;
+}
+```
+
+## Adapter Types
+
+The `AuthAdapter` interface defines the contract every backend adapter must fulfill:
+
+```typescript
+type AuthAdapter = {
+  login(data: LoginRequest): Promise<AuthResponse>;
+  register(data: RegisterRequest): Promise<AuthResponse>;
+  refreshToken(data: RefreshTokenRequest): Promise<AuthResponse>;
+  getUser(): Promise<NormalizedUser>;
+  logout(): Promise<void>;
+};
+
+type AuthResponse = {
+  user: NormalizedUser;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+};
+
+type NormalizedUser = {
+  id: string;
+  email: string;
+  name: string;
+};
+```
+
+## Factory
+
+The `getAuthAdapter()` function returns a singleton adapter instance based on the active backend:
+
+```typescript
+import { getAuthAdapter } from '@/lib/adapters';
+
+const adapter = getAuthAdapter();
+const response = await adapter.login({ email, password });
+```
+
+Backend resolution follows this priority:
+
+1. `auth_backend` cookie (runtime override)
+2. `AUTH_BACKEND` environment variable
+3. Default: `laravel`
+
+Valid values are `laravel`, `symfony`, and `node` (for Hono).
+
+## Per-Backend Differences
+
+### Response Normalization
+
+Each backend returns auth data in a slightly different shape. Adapters normalize responses to the common `AuthResponse` type.
+
+| Field | Laravel | Symfony | Hono |
+|-------|---------|---------|------|
+| Access token | `data.access_token` | `access_token` | `accessToken` |
+| Refresh token | `data.refresh_token` | `refresh_token` | `refreshToken` |
+| Expiry | `data.expires_in` | `expires_in` | `expiresIn` |
+| User | `data.user` | `user` | `user` |
+
+Laravel wraps responses in a `data` envelope. Symfony uses flat snake_case. Hono uses camelCase. Each adapter extracts and normalizes these differences.
+
+### Path Transformations
+
+The `proxy-config.ts` module defines how BFF paths map to backend paths:
+
+**Laravel**:
+- `/api/v1/me` maps to `/api/v1/auth/me`
+- All other paths pass through 1:1
+
+**Symfony**:
+- `/api/v1/me` maps to `/api/v1/auth/me`
+- Auth routes pass through 1:1
+- Other routes pass through
+
+**Hono**:
+- `/api/v1/auth/*` maps to `/api/v1/auth/*`
+- `/api/v1/me` maps to `/api/v1/auth/me`
+- Other `/api/v1/*` routes map to `/api/*`
+
+### Auth Prefixes
+
+Each backend allows configuring the auth route prefix via environment variables:
+
+| Backend | Env var | Default |
+|---------|---------|---------|
+| Laravel | `LARAVEL_AUTH_PREFIX` | `/api/v1/auth` |
+| Symfony | `SYMFONY_AUTH_PREFIX` | `/api/v1/auth` |
+| Hono | `NODE_AUTH_PREFIX` | `/api/v1/auth` |
+
+## Proxy Config
+
+The `getProxyConfig()` function returns the full proxy configuration for the active backend:
+
+```typescript
+type ProxyConfig = {
+  baseUrl: string;              // Backend URL (e.g. http://localhost:8002)
+  timeout: number;              // Request timeout (30s)
+  transformPath: (path: string) => string;  // BFF path to backend path
+  publicRoutes: string[];       // Routes that skip auth
+  transformResponse?: (data: unknown) => unknown;  // Optional response transform
+};
+```
+
+### Public Routes
+
+Each backend defines public routes that do not require authentication:
+
+- Auth endpoints: login, register, refresh, OAuth providers, test accounts
+- Shop endpoints: products, categories
+- SaaS endpoints: plans
+
+The proxy checks incoming paths against this list to decide whether to inject the auth token.
+
+## Adding a New Backend
+
+To add a new backend adapter:
+
+1. Create a new directory under `src/lib/adapters/` (e.g. `fastapi/`)
+2. Implement a class extending `BaseAdapter`
+3. Add the backend config to `proxy-config.ts`
+4. Register it in the factory switch in `index.ts`
+5. Add the backend type to `BackendType` in `types.ts`
+6. Add environment variables to `src/lib/config/env.ts`
+
+The adapter only needs to handle response normalization. The proxy config handles path transformation and public route definitions separately.

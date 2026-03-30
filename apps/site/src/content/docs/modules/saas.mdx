@@ -1,0 +1,151 @@
+---
+title: "SaaS Module"
+description: "Multi-tenant SaaS module with organizations, billing, team management, and usage tracking."
+section: "modules"
+order: 3
+---
+
+# SaaS Module
+
+The SaaS module provides multi-tenant functionality: organizations, subscription billing, team management, usage tracking, and per-organization settings. It supports both org-scoped routes (with `orgId` in the URL) and flat routes (auto-resolve the user's current organization).
+
+## Organization Model
+
+Each user can belong to multiple organizations with different roles:
+
+| Role | Permissions |
+|------|-------------|
+| `owner` | Full control: manage subscription, delete org |
+| `admin` | Manage team, settings, view invoices |
+| `member` | View subscription, team, usage |
+| `viewer` | View org dashboard and basic info |
+
+## Public Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/saas/plans` | List available subscription plans |
+
+## Org Management (Authenticated)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/saas/orgs` | List user's organizations |
+| POST | `/api/v1/saas/orgs` | Create a new organization |
+
+## Flat Routes (Auto-Resolve Org)
+
+These routes automatically resolve the current user's organization without an `orgId` in the URL. Available in Laravel and intended for simplified single-org flows.
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/v1/saas/subscription` | Auth | Get current subscription |
+| POST | `/api/v1/saas/subscription` | Auth | Subscribe to a plan |
+| DELETE | `/api/v1/saas/subscription` | Auth | Cancel subscription |
+| GET | `/api/v1/saas/invoices` | Auth | List invoices |
+| GET | `/api/v1/saas/team` | Auth | List team members |
+| POST | `/api/v1/saas/team/invite` | Auth | Invite team member |
+| PATCH | `/api/v1/saas/team/{id}/role` | Auth | Change member role |
+| DELETE | `/api/v1/saas/team/{id}` | Auth | Remove team member |
+| GET | `/api/v1/saas/dashboard` | Auth | Org dashboard |
+| GET | `/api/v1/saas/usage` | Auth | Usage statistics |
+| GET | `/api/v1/saas/settings` | Auth | Org settings |
+| PATCH | `/api/v1/saas/settings` | Auth | Update org settings |
+
+## Org-Scoped Routes
+
+These routes include `{orgId}` and enforce role-based access per org.
+
+### Viewer Level
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/saas/orgs/{orgId}` | Get organization detail |
+| GET | `/api/v1/saas/orgs/{orgId}/dashboard` | Org dashboard data |
+
+### Member Level
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/saas/orgs/{orgId}/subscription` | Current subscription |
+| GET | `/api/v1/saas/orgs/{orgId}/team` | List team members |
+| GET | `/api/v1/saas/orgs/{orgId}/usage` | Usage statistics |
+
+### Admin Level
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/saas/orgs/{orgId}/team/invite` | Invite team member |
+| PATCH | `/api/v1/saas/orgs/{orgId}/team/{id}/role` | Change member's role |
+| DELETE | `/api/v1/saas/orgs/{orgId}/team/{id}` | Remove team member |
+| GET | `/api/v1/saas/orgs/{orgId}/invoices` | List invoices |
+| GET | `/api/v1/saas/orgs/{orgId}/settings` | Organization settings |
+| PATCH | `/api/v1/saas/orgs/{orgId}/settings` | Update settings |
+
+### Owner Level
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/saas/orgs/{orgId}/subscription` | Subscribe to a plan |
+| DELETE | `/api/v1/saas/orgs/{orgId}/subscription` | Cancel subscription |
+
+## Implementation per Backend
+
+### Laravel (`apps/api-laravel/`)
+
+The SaaS feature uses two route groups: flat routes (auto-resolve org) and org-scoped routes with `org.rbac` middleware at different levels (viewer, member, admin, owner).
+
+Key files:
+- Routes: `app/Features/Saas/routes.php`
+- Actions: `app/Features/Saas/Actions/` -- includes both flat variants (`FlatSubscribe`, `FlatGetSubscription`, etc.) and org-scoped variants (`Subscribe`, `GetSubscription`, etc.)
+- Flat actions: `FlatDashboard`, `FlatGetSettings`, `FlatGetSubscription`, `FlatGetUsage`, `FlatInviteTeamMember`, `FlatListTeam`, `FlatRemoveTeamMember`, `FlatSubscribe`, `FlatCancelSubscription`, `FlatChangeTeamRole`, `FlatListInvoices`, `FlatUpdateSettings`
+- Org management: `ListOrgs`, `CreateOrg`, `ShowOrg`
+- Middleware: `App\Shared\Middleware\OrgRbacMiddleware` (alias `org.rbac`)
+- Models: `app/Shared/Models/` (Organization, Subscription, Plan, Invoice, TeamMember, UsageRecord)
+
+### Symfony (`apps/api-sf/`)
+
+Key files:
+- Controllers: `src/Feature/Saas/Controller/` (10 controllers: Dashboard, GetSubscription, Subscribe, CancelSubscription, InviteTeamMember, ChangeTeamRole, RemoveTeamMember, GetUsage, GetSettings, UpdateSettings)
+- Service: `src/Feature/Saas/Service/OrgLoader.php` (resolves organization for the current user)
+- API Platform resources: Organization (GetCollection, Get, Patch), Subscription (Get), Invoice (GetCollection), TeamMember (GetCollection, Get, Patch, Delete), UsageRecord (GetCollection), Plan (GetCollection, Get)
+
+### Hono (`apps/api-hono/`)
+
+Key files:
+- Feature: `src/features/saas/` (5 files following the standard convention)
+- Middleware: `orgRbac(level)` from `src/shared/middleware/org-rbac.ts` -- inline middleware applied per route with the required role level
+- Routes use org-scoped patterns: `saas.get('/orgs/:orgId', orgRbac('viewer'), handler)`
+
+## Frontend (Next.js BFF)
+
+### Pages
+
+Located in `apps/web/src/app/(saas)/saas/`:
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/saas` | `(app)/page.tsx` | SaaS dashboard |
+| `/saas/billing` | `(app)/billing/page.tsx` | Subscription & billing |
+| `/saas/team` | `(app)/team/page.tsx` | Team management |
+| `/saas/usage` | `(app)/usage/page.tsx` | Usage statistics |
+| `/saas/settings` | `(app)/settings/page.tsx` | Organization settings |
+| `/saas/onboarding` | `onboarding/page.tsx` | New org onboarding flow |
+
+The SaaS app section has its own auth pages at `/saas/auth/` (login, register, forgot-password, reset-password).
+
+### State Management
+
+The SaaS frontend uses a Zustand org store for client-side organization state. The store is hydrated from SSR data via `org-store-hydrator.tsx` in the SaaS app layout.
+
+### Server Actions
+
+Located in `apps/web/src/lib/actions/saas/`:
+
+| File | Actions |
+|------|---------|
+| `orgs.ts` | List orgs, create org, get org detail |
+| `billing.ts` | Get subscription, subscribe, cancel, list invoices, list plans |
+| `team.ts` | List team, invite member, change role, remove member |
+| `usage.ts` | Get usage statistics |
+| `dashboard.ts` | Get org dashboard data |

@@ -1,0 +1,53 @@
+---
+import "@/styles/global.css"
+import { getLocale } from "@/i18n"
+import { Toaster } from "@/components/ui/sonner"
+import SEOHead from "@/components/SEOHead.astro"
+import JsonLd from "@/components/JsonLd.astro"
+
+type Props = {
+  title?: string
+  description?: string
+}
+
+const { title, description } = Astro.props
+const locale = getLocale(Astro.currentLocale)
+const pageTitle = title ? `${title} — Headless Kit` : 'Headless Kit — Build Full-Stack Apps with Domain-Driven Modules'
+const pageDescription = description || 'Production-grade headless starter kit with Next.js BFF, multi-backend auth, and domain-driven modules.'
+---
+
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="color-scheme" content="light dark" />
+    <SEOHead title={pageTitle} description={pageDescription} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+    <JsonLd data={{
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Headless Kit",
+      "url": "https://headlesskit.dev",
+      "description": "Production-grade headless starter kit with multi-backend BFF architecture",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://headlesskit.dev/docs?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }} />
+    <script is:inline>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script>
+  </head>
+  <body class="min-h-svh antialiased">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+      Skip to content
+    </a>
+    <div id="main-content">
+      <slot />
+    </div>
+    <Toaster client:load position="bottom-right" richColors />
+  </body>
+</html>

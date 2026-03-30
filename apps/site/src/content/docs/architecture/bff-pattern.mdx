@@ -1,0 +1,172 @@
+---
+title: "BFF Pattern"
+description: "How the Backend-for-Frontend proxy works and why the browser never contacts backends directly."
+section: "architecture"
+order: 1
+---
+
+# BFF Pattern
+
+Headless Kit uses a Backend-for-Frontend (BFF) architecture. The browser never contacts Laravel, Symfony, or Hono directly. Every request flows through the BFF proxy.
+
+## Why a BFF
+
+Without a BFF, the browser would need to:
+
+- Store tokens in localStorage (vulnerable to XSS)
+- Handle CORS with multiple backends
+- Manage token refresh logic in client JavaScript
+- Expose backend URLs to the public
+
+The BFF solves all of these:
+
+- Tokens live in **HttpOnly cookies** (invisible to JavaScript)
+- The browser only talks to **one origin** (the BFF)
+- Token refresh happens **server-side** automatically
+- Backend URLs are **never exposed** to the client
+
+## Request Flow
+
+```
+Browser
+  |
+  |-- Page load ---------> Next.js App Router (SSR / RSC)
+  |                              |
+  |                              +-- Server Action --> bff-client --> /api/v1/* --> Backend
+  |
+  +-- Client fetch ------> /api/v1/* (catch-all route handler)
+                                 |
+                                 +-- Laravel  (port 8002)
+                                 +-- Symfony  (port 8001)
+                                 +-- Hono     (port 3333)
+```
+
+All paths go through the BFF. Server Actions call the BFF client which hits the local `/api/v1/*` route handler, which then proxies to the configured backend.
+
+## The Catch-All Proxy
+
+The proxy lives at `apps/web/src/app/api/v1/[...path]/route.ts`. It handles all HTTP methods (GET, POST, PUT, PATCH, DELETE) through a single handler.
+
+### What the proxy does on every request
+
+1. **Reads the `auth_backend` cookie** to determine which backend to contact
+2. **Validates path segments** against a safe regex (`/^[a-zA-Z0-9_-]+$/`) to prevent path traversal and SSRF
+3. **Enforces content-type** — only `application/json` is accepted on mutating requests; others receive 415
+4. **Enforces body size limit** — requests larger than 1 MB are rejected with 413
+5. **Rate limits auth endpoints** — 20 requests per 15 minutes per IP (in-memory store, swap for Redis in multi-instance deployments)
+6. **Validates CSRF** for mutating methods (POST, PUT, PATCH, DELETE) by checking Origin and Referer headers. Internal BFF requests bypass this via the `x-bff-internal` header
+7. **Transforms the path** from the BFF URL scheme to the backend URL scheme using the proxy config
+8. **Checks for proactive refresh** by reading the `x-bff-refresh-needed` header set by Edge middleware
+9. **Forwards the request** with the `Authorization: Bearer <token>` header and an `AbortSignal` tied to the client connection — if the client disconnects, the backend fetch is cancelled
+10. **Handles 401 responses** by attempting a token refresh and retrying the original request once
+11. **Stores refreshed tokens** in HttpOnly cookies on success
+
+### Path Transformation
+
+Each backend has different URL conventions. The proxy config in `proxy-config.ts` handles the translation:
+
+| Backend  | BFF path            | Backend path         |
+|----------|---------------------|----------------------|
+| Laravel  | `/api/v1/auth/*`    | `/api/v1/auth/*`     |
+| Symfony  | `/api/v1/auth/*`    | `/api/v1/auth/*`     |
+| Hono     | `/api/v1/auth/*`    | `/api/v1/auth/*`     |
+| Hono     | `/api/v1/*` (other) | `/api/*`             |
+| All      | `/api/v1/me`        | `/api/v1/auth/me`    |
+
+The `/api/v1/me` shorthand is normalized to `/api/v1/auth/me` for all backends.
+
+### Streaming vs Buffered Routes
+
+The BFF uses two response paths:
+
+- **Streaming (default)**: Non-auth responses are passed through as a `ReadableStream` — zero buffering in memory. This is ~95% of traffic.
+- **Buffered**: Auth routes (`/auth/login`, `/auth/register`, `/auth/refresh`, etc.) are buffered to extract tokens and store them in HttpOnly cookies.
+
+The `AUTH_ROUTES` set in `route.ts` / `$.tsx` defines which routes are buffered. When adding a new auth endpoint that returns tokens, you MUST add it to this set.
+
+```typescript
+const AUTH_ROUTES = new Set([
+  'auth/login', 'auth/register', 'auth/refresh', 'auth/logout',
+  'auth/forgot-password', 'auth/reset-password',
+  'auth/two-factor/enable', 'auth/two-factor/verify',
+  'auth/two-factor/disable', 'auth/two-factor/recover',
+  'auth/two-factor/recovery',
+  'auth/magic-link/check', 'auth/magic-link/verify',
+])
+```
+
+## Security Layers
+
+| Layer | Protection | Response |
+|-------|-----------|----------|
+| Body size limit | Requests > 1 MB | 413 `BODY_TOO_LARGE` |
+| Content-type | Non-JSON bodies | 415 `UNSUPPORTED_MEDIA_TYPE` |
+| CSRF | Origin/Referer mismatch on mutations | 403 `CSRF_ORIGIN_MISMATCH` |
+| Path validation | Traversal, SSRF, forbidden chars | 400 `INVALID_PATH` |
+| Rate limiting | Auth endpoints > 20 req/15min/IP | 429 `RATE_LIMITED` |
+| Response size | Backend response > 5 MB | 502 `RESPONSE_TOO_LARGE` |
+| Non-JSON errors | Backend returns HTML/text on 4xx/5xx | Normalized to JSON `BACKEND_ERROR` |
+| AbortSignal | Client disconnect | Backend fetch cancelled |
+
+### Non-JSON Error Normalization
+
+Backends sometimes return HTML error pages (e.g., Symfony/Laravel debug pages, nginx 502 pages) instead of JSON. The BFF detects non-JSON responses with status >= 400 and normalizes them into a consistent JSON envelope:
+
+```json
+{
+  "error": "Backend error (500)",
+  "code": "BACKEND_ERROR",
+  "status": 500,
+  "request_id": "abc-123"
+}
+```
+
+This ensures the frontend always receives JSON, even when the backend is misconfigured or crashes.
+
+### CSRF Validation
+
+Mutating requests (POST, PUT, PATCH, DELETE) are validated by checking that the `Origin` or `Referer` header matches the app URL. This prevents cross-site request forgery.
+
+Server Actions set the `x-bff-internal: 1` header to bypass CSRF checks since they already run on the server.
+
+### Path Validation
+
+Every path segment is validated against `/^[a-zA-Z0-9_-]+$/`. This prevents:
+
+- Path traversal (`../../etc/passwd`)
+- Server-side request forgery (SSRF)
+- Injection of unexpected characters
+
+### Token Management
+
+The proxy reads the access token from the `auth_token` HttpOnly cookie and forwards it as a Bearer token in the Authorization header. The backend never sees the cookie directly.
+
+If the backend returns 401, the proxy:
+
+1. Reads the `refresh_token` cookie
+2. Sends a refresh request to the backend
+3. If successful, stores new tokens in cookies and retries the original request
+4. If refresh fails, clears all auth cookies and returns 401
+
+### Request ID Tracing
+
+Every request gets an `x-request-id` header (either from the incoming request or generated as a UUID). This ID is forwarded to the backend and included in the response for cross-service tracing.
+
+## Public Routes
+
+Certain routes do not require authentication. These are defined per backend in `proxy-config.ts`:
+
+- `/api/v1/auth/login`
+- `/api/v1/auth/register`
+- `/api/v1/auth/refresh`
+- `/api/v1/auth/oauth/providers`
+- `/api/v1/auth/test-accounts`
+- `/api/v1/products` (shop)
+- `/api/v1/categories` (shop)
+- `/api/v1/saas/plans` (pricing)
+
+For public routes, the proxy skips token injection and 401 retry logic.
+
+## TanStack Start BFF
+
+The TanStack Start frontend uses the same pattern with a catch-all at `src/routes/api/v1/$.tsx`. It reads `AUTH_BACKEND` from the environment and applies the same path transformation and token management logic.

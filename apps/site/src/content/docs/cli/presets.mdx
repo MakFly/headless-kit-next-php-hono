@@ -1,0 +1,156 @@
+---
+title: "Presets"
+description: "Four UI presets that determine which modules, pages, and components are scaffolded."
+section: "cli"
+order: 2
+---
+
+# Presets
+
+Presets are pre-configured combinations of modules and UI templates. They determine what pages, components, and backend features are included when you scaffold a new project.
+
+## Available Presets
+
+### SaaS (Recommended)
+
+The most complete preset, designed for multi-tenant SaaS applications.
+
+**Includes:**
+- Landing page with marketing sections
+- Admin dashboard with sidebar navigation
+- SaaS module (organizations, billing, team management)
+- Admin module (users, roles, permissions)
+- Support module (tickets, agent queue)
+- Auth pages for each section (dashboard, saas, support)
+
+**Best for:** B2B SaaS products, multi-tenant platforms, subscription-based services.
+
+### Ecommerce
+
+Full e-commerce storefront with admin panel.
+
+**Includes:**
+- Shop storefront (product listing, product detail, categories)
+- Shopping cart and checkout flow
+- Order management
+- Shop admin panel (product management, order management)
+- Admin module (users, roles, permissions)
+- Auth pages for shop and dashboard sections
+
+**Best for:** Online stores, marketplaces, product catalogs with checkout.
+
+### Admin
+
+Focused admin dashboard without public-facing pages.
+
+**Includes:**
+- Admin dashboard with sidebar navigation
+- User management with RBAC (roles and permissions)
+- Data tables with sorting, filtering, and pagination
+- Auth pages (login, register, forgot password)
+- Settings page
+
+**Best for:** Internal tools, back-office applications, admin panels for existing products.
+
+### Landing
+
+Marketing-focused starter with styled authentication.
+
+**Includes:**
+- Landing page with hero, features, and CTA sections
+- Styled auth pages (login, register)
+- Minimal dashboard (post-login redirect target)
+
+**Best for:** Marketing sites, waitlist pages, products where the landing page is the priority.
+
+### Minimal
+
+Bare infrastructure with no UI kit.
+
+**Includes:**
+- BFF proxy route handler
+- Backend adapter configuration
+- Auth endpoints (backend only)
+- No pre-built UI components or pages
+
+**Best for:** Projects where you want the BFF architecture and auth infrastructure but will build the UI from scratch.
+
+## Module Dependencies
+
+Modules have dependency relationships that the CLI resolves automatically:
+
+```
+multi-tenant (standalone)
+├── billing (requires multi-tenant)
+├── team (requires multi-tenant)
+│   └── org-rbac (requires multi-tenant + team)
+
+support-chat (standalone)
+ai-assistant (standalone)
+api-platform (standalone, Symfony only)
+```
+
+If you select a module with dependencies, the CLI includes the required modules automatically. For example, selecting "Org-level RBAC" automatically adds "Multi-tenant orgs" and "Team management".
+
+## Module Details
+
+### Multi-tenant Orgs
+
+Organization management with user switching. Users can belong to multiple organizations and switch between them. Each organization has its own data scope.
+
+- Backend: Organization CRUD, membership management, context switching
+- Frontend: Org switcher component, org settings page
+
+### Billing & Plans
+
+Subscription management with plan selection and billing history. Depends on multi-tenant since billing is per-organization.
+
+- Backend: Plans, subscriptions, invoices, usage tracking
+- Frontend: Pricing page, plan selector, billing dashboard
+
+### Team Management
+
+Invite team members, assign roles, manage membership. Depends on multi-tenant for organization context.
+
+- Backend: Invitations, member CRUD, role assignment
+- Frontend: Team members list, invite dialog, role selector
+
+### Org-level RBAC
+
+Fine-grained role-based access control within organizations. Extends team management with custom roles and permissions per org.
+
+- Backend: Custom roles, permission definitions, role-permission mapping
+- Frontend: Role management UI, permission matrix
+
+### Support Chat
+
+Customer support system with conversations and an agent queue.
+
+- Backend: Tickets, conversations, message history, agent assignment
+- Frontend: Customer ticket view, agent dashboard, real-time conversation UI
+
+### AI Assistant
+
+AI-powered chat interface using the Vercel AI SDK and assistant-ui components.
+
+- Backend: Chat endpoint (streaming)
+- Frontend: Chat interface with provider selection (Anthropic, OpenAI, Google, Mistral)
+- Dependencies: `ai`, `@ai-sdk/*`, `@assistant-ui/react`
+
+### API Platform CRUD (Symfony Only)
+
+Replaces hand-written CRUD controllers with API Platform auto-generated endpoints. Only available when Symfony is the selected backend.
+
+- Backend: API Platform resource configuration, serialization groups
+- Frontend: No changes (API contract remains the same)
+
+## Customization After Scaffolding
+
+Presets are a starting point. After scaffolding, you can:
+
+- **Add modules**: Copy module templates from the CLI package into your project
+- **Remove sections**: Delete route groups and their corresponding components
+- **Modify layouts**: Edit the sidebar, header, and navigation components
+- **Change styling**: Update the theme in `src/styles/theme.css`
+
+The generated code is fully yours. There is no runtime dependency on the CLI or preset system.

@@ -1,0 +1,179 @@
+---
+title: "Installation"
+description: "Install Headless Kit via CLI or manual setup, configure backends, and run your first dev server."
+section: "getting-started"
+order: 1
+---
+
+# Installation
+
+Headless Kit can be installed via the interactive CLI or manually by cloning the monorepo.
+
+## Quick Start with CLI
+
+The fastest way to scaffold a new project:
+
+```bash
+bunx create-headless-app
+```
+
+The CLI walks you through:
+
+1. **Project name** (lowercase, hyphens only)
+2. **Backend** (Laravel, Symfony, or Hono)
+3. **Frontend** (Next.js or TanStack Start)
+4. **Preset** (SaaS, Admin, Landing, Ecommerce, or Minimal)
+5. **Modules** (multi-tenant, billing, team, support chat, AI assistant, etc.)
+6. **Database** (SQLite for dev, PostgreSQL for production)
+
+After scaffolding, the CLI generates secrets automatically and prints the next steps.
+
+## Manual Setup
+
+Clone the repository and install root dependencies:
+
+```bash
+git clone https://github.com/your-org/headless-kit.git my-project
+cd my-project
+bun install
+```
+
+This installs all workspace dependencies across every app and package.
+
+## Backend Setup
+
+Each backend requires its own setup steps after `bun install`.
+
+### Laravel (port 8002)
+
+```bash
+cd apps/api-laravel
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+```
+
+### Symfony (port 8001)
+
+```bash
+cd apps/api-sf
+composer install
+cp .env.example .env.local
+php bin/console doctrine:database:create
+php bin/console doctrine:schema:create
+php bin/console doctrine:fixtures:load --no-interaction
+```
+
+### Hono (port 3333)
+
+```bash
+cd apps/api-hono
+bun install
+cp .env.example .env
+bun run db:migrate
+bun run db:seed
+```
+
+## Frontend Setup
+
+Both frontends are configured via environment variables. Copy the example env file:
+
+```bash
+# Next.js BFF
+cd apps/web
+cp .env.example .env.local
+
+# TanStack Start
+cd apps/web-tanstack
+cp .env.example .env
+```
+
+Set `AUTH_BACKEND` to match your backend choice (`laravel`, `symfony`, or `hono`).
+
+## Running the Dev Servers
+
+The Makefile provides pre-configured targets that launch both frontend and backend together.
+
+### Next.js + Backend
+
+```bash
+make dev-next-laravel     # Next.js :3300 + Laravel :8002
+make dev-next-sf          # Next.js :3300 + Symfony :8001
+make dev-next-hono        # Next.js :3300 + Hono :3333
+```
+
+### TanStack Start + Backend
+
+```bash
+make dev-tanstack-laravel  # TanStack :3301 + Laravel :8002
+make dev-tanstack-sf       # TanStack :3301 + Symfony :8001
+make dev-tanstack-hono     # TanStack :3301 + Hono :3333
+```
+
+### All Apps
+
+```bash
+make dev-all              # All 6 apps simultaneously
+```
+
+### Using Turborepo Directly
+
+You can also run individual apps with Turborepo filters:
+
+```bash
+bun run --filter @headless/web dev          # Next.js only
+bun run --filter @headless/web-tanstack dev # TanStack only
+bun run --filter @headless/api-hono dev     # Hono only
+```
+
+## Port Reference
+
+| App              | Port |
+|------------------|------|
+| Next.js BFF      | 3300 |
+| TanStack Start   | 3301 |
+| Symfony API      | 8001 |
+| Laravel API      | 8002 |
+| Hono API         | 3333 |
+
+## Database Reset
+
+If you need to reset a backend database to a fresh state with seed data:
+
+```bash
+make api-reset        # Laravel: migrate:fresh --seed
+make api-sf-reset     # Symfony: schema:create + fixtures
+make api-hono-reset   # Hono: db:push + seed
+```
+
+## QA and Tests
+
+Run the full QA suite across all backends:
+
+```bash
+make qa               # All checks (lint + hono + laravel + sf)
+make qa-lint          # TypeScript lint (turbo) + PHP lint (pint + cs-fixer)
+make qa-hono          # Hono tests (bun test)
+make qa-laravel       # Pint + Larastan + PHPUnit
+make qa-sf            # CS-Fixer + PHPStan + PHPUnit
+```
+
+## Prerequisites
+
+| Tool        | Version  | Required for           |
+|-------------|----------|------------------------|
+| Bun         | 1.x      | All apps               |
+| Node.js     | 20+      | Next.js build          |
+| PHP         | 8.3+     | Laravel, Symfony       |
+| Composer    | 2.x      | Laravel, Symfony       |
+| SQLite      | 3.x      | Default dev database   |
+| PostgreSQL  | 16+      | Production (optional)  |
+
+## Troubleshooting
+
+**Port already in use**: Check that no other process is running on the expected port. The Makefile targets do not kill existing processes automatically.
+
+**Composer dependencies fail**: Ensure you have the required PHP extensions: `pdo_sqlite`, `pdo_pgsql`, `zip`, `mbstring`, `xml`.
+
+**Bun lockfile mismatch**: Run `bun install` from the monorepo root, not from individual app directories.

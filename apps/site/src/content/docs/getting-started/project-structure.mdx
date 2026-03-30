@@ -1,0 +1,189 @@
+---
+title: "Project Structure"
+description: "Monorepo layout, app responsibilities, and key configuration files."
+section: "getting-started"
+order: 2
+---
+
+# Project Structure
+
+Headless Kit is a Turborepo monorepo with Bun workspaces. Every app lives under `apps/` and shared code lives under `packages/`.
+
+## Top-Level Layout
+
+```
+headless-kit/
+├── apps/
+│   ├── web/              # Next.js 16 App Router (BFF) — port 3300
+│   ├── web-tanstack/     # TanStack Start + Vite — port 3301
+│   ├── api-laravel/      # Laravel 12 + BetterAuth — port 8002
+│   ├── api-sf/           # Symfony 8 + BetterAuth (Paseto V4) — port 8001
+│   └── api-hono/         # Hono + Drizzle + Bun — port 3333
+├── packages/
+│   ├── config/           # Shared ESLint + TSConfig (@headless/config)
+│   ├── types/            # Shared TypeScript types (@headless/types)
+│   └── create-headless-app/  # CLI scaffolder
+├── turbo.json            # Turborepo pipeline configuration
+├── package.json          # Root workspace definition
+├── bun.lock              # Lockfile (bun only)
+└── Makefile              # Dev, QA, and CLI targets
+```
+
+## What Each App Does
+
+### `apps/web` -- Next.js BFF
+
+The primary frontend and Backend-for-Frontend proxy. The browser never contacts backend APIs directly. All traffic flows through:
+
+- **Server Actions** that call the BFF client
+- **Route handlers** at `/api/v1/*` that proxy to the active backend
+
+The BFF adds authentication token management, CSRF validation, and path transformation per backend.
+
+### `apps/web-tanstack` -- TanStack Start
+
+An alternative frontend using TanStack Start with Vite. Uses the same BFF proxy pattern with a catch-all route at `/api/v1/*`. State management uses Zustand instead of React Server Components.
+
+### `apps/api-laravel` -- Laravel API
+
+PHP backend with BetterAuth, RBAC, and vertical slice architecture. Features are organized under `app/Features/` by domain (Auth, Shop, Saas, Support, Admin, etc.).
+
+### `apps/api-sf` -- Symfony API
+
+PHP backend with BetterAuth using Paseto V4 tokens. Features are organized under `src/Feature/` by domain, following the same vertical slice pattern.
+
+### `apps/api-hono` -- Hono API
+
+Lightweight TypeScript backend running on Bun with Drizzle ORM. Features live in `src/features/` with a 5-file convention per domain (routes, handlers, service, repository, schema).
+
+## Next.js BFF Structure
+
+```
+apps/web/src/
+├── app/
+│   ├── (dashboard)/dashboard/    # Admin/RBAC section (auth required)
+│   │   ├── auth/                 # Login, register, forgot-password
+│   │   └── (app)/                # Protected pages with sidebar layout
+│   │       ├── page.tsx          # /dashboard
+│   │       ├── users/
+│   │       ├── roles/
+│   │       ├── permissions/
+│   │       ├── posts/
+│   │       ├── todos/
+│   │       ├── api-keys/
+│   │       └── settings/
+│   ├── (shop)/shop/              # E-commerce (public + optional auth)
+│   │   ├── auth/
+│   │   ├── (storefront)/         # Products, cart, checkout, orders
+│   │   └── admin/                # Shop admin panel
+│   ├── (saas)/saas/              # SaaS section (auth required)
+│   │   ├── auth/
+│   │   ├── onboarding/
+│   │   └── (app)/                # Billing, settings, team, usage
+│   ├── (support)/support/        # Helpdesk section (auth required)
+│   │   ├── auth/
+│   │   └── (app)/                # Tickets, agent view, conversations
+│   ├── api/
+│   │   ├── v1/[...path]/route.ts # BFF catch-all proxy to backends
+│   │   └── ai/chat/route.ts      # AI streaming endpoint
+│   ├── layout.tsx                # Root layout
+│   └── page.tsx                  # Landing page
+├── components/
+│   ├── ui/                       # shadcn/ui components
+│   ├── auth/                     # Auth forms
+│   ├── dashboard/                # Dashboard widgets
+│   ├── shop/                     # Product cards, cart
+│   ├── saas/                     # Billing, org UI
+│   └── support/                  # Ticket, conversation UI
+├── lib/
+│   ├── actions/                  # Server Actions (use bff-client)
+│   ├── adapters/                 # Backend adapters + proxy config
+│   ├── auth/                     # Backend context, cookie names
+│   ├── config/                   # Environment variables
+│   ├── http/                     # Fetch wrapper
+│   ├── logger/                   # Pino (server), JSON (edge)
+│   └── services/                 # Token service
+├── stores/                       # Zustand stores (auth, cart, org)
+└── proxy.ts                      # Edge middleware
+```
+
+Each route group `(dashboard)`, `(shop)`, `(saas)`, `(support)` has its own auth pages and layout. Pages live under the `(app)` sub-group to inherit the sidebar layout.
+
+## TanStack Start Route Structure
+
+```
+apps/web-tanstack/src/routes/
+├── __root.tsx              # Root layout
+├── _auth.tsx               # Auth layout group
+├── _auth/                  # Auth pages (login, register)
+├── index.tsx               # Landing page
+├── dashboard.tsx           # Dashboard layout
+├── dashboard/              # Dashboard pages
+├── shop.tsx                # Shop layout
+├── shop/                   # Shop pages
+├── saas.tsx                # SaaS layout
+├── saas/                   # SaaS pages
+├── support.tsx             # Support layout
+├── support/                # Support pages
+├── oauth.callback.tsx      # OAuth callback handler
+└── api/v1/$.tsx            # BFF catch-all proxy
+```
+
+TanStack Start uses file-based routing with TanStack Router. The `$.tsx` file is a catch-all that proxies API requests to backends.
+
+## Shared Packages
+
+### `packages/config`
+
+Shared ESLint and TypeScript configuration. Apps reference it via:
+
+```json
+{
+  "devDependencies": {
+    "@headless/config": "workspace:*"
+  }
+}
+```
+
+### `packages/types`
+
+Shared TypeScript types used across frontends and the Hono backend:
+
+```json
+{
+  "dependencies": {
+    "@headless/types": "workspace:*"
+  }
+}
+```
+
+## Key Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `turbo.json` | Turborepo pipeline (build, dev, lint, test tasks) |
+| `package.json` | Workspace definition, root scripts |
+| `bun.lock` | Dependency lockfile |
+| `Makefile` | Dev server combos, QA, DB reset, CLI targets |
+| `apps/web/.env.local` | Next.js environment variables |
+| `apps/api-laravel/.env` | Laravel environment variables |
+| `apps/api-sf/.env.local` | Symfony environment variables |
+| `apps/api-hono/.env` | Hono environment variables |
+
+## Turborepo Pipeline
+
+The `turbo.json` defines four main tasks:
+
+- **build**: Depends on upstream package builds. Outputs `.next/`, `.output/`, `dist/`.
+- **dev**: Persistent, no cache. Runs dev servers.
+- **lint**: Depends on upstream builds for type information.
+- **test**: Independent, no dependencies.
+
+Run any task across all workspaces:
+
+```bash
+bun run build    # Build everything
+bun run dev      # Dev servers for all apps
+bun run lint     # Lint all workspaces
+bun run test     # Test all workspaces
+```

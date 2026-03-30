@@ -1,0 +1,63 @@
+---
+import { navigation } from "@/lib/navigation"
+
+type Props = {
+  currentSlug: string
+}
+
+const { currentSlug } = Astro.props
+
+const colorMap: Record<string, string> = {
+  "cyber-green": "text-primary",
+  "cyber-cyan": "text-primary",
+  "cyber-magenta": "text-primary",
+  "cyber-amber": "text-primary",
+}
+
+const bgMap: Record<string, string> = {
+  "cyber-green": "bg-primary/10 text-primary",
+  "cyber-cyan": "bg-primary/10 text-primary",
+  "cyber-magenta": "bg-primary/10 text-primary",
+  "cyber-amber": "bg-primary/10 text-primary",
+}
+---
+
+<nav class="p-4 space-y-1" aria-label="Documentation sidebar">
+  {navigation.map((section) => {
+    const isActive = currentSlug.startsWith(section.slug)
+    return (
+      <details open={isActive} class="group">
+        <summary class:list={[
+          "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none",
+          isActive ? colorMap[section.color] : "text-muted-foreground",
+        ]}>
+          <span class:list={["text-[10px] transition-transform group-open:rotate-90", isActive ? colorMap[section.color] : "text-muted-foreground"]}>
+            ▶
+          </span>
+          {section.label}
+        </summary>
+        <ul class="mt-1 space-y-0.5 pl-4">
+          {section.items.map((item) => {
+            const isCurrent = currentSlug === item.slug
+            return (
+              <li>
+                <a
+                  href={`/docs/${item.slug}`}
+                  class:list={[
+                    "block rounded-md px-3 py-1.5 text-xs transition-colors",
+                    isCurrent
+                      ? bgMap[section.color]
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                  ]}
+                  aria-current={isCurrent ? "page" : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+      </details>
+    )
+  })}
+</nav>

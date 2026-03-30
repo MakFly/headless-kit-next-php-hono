@@ -1,0 +1,48 @@
+---
+import { ThemeToggle } from "@/components/landing/ThemeToggle"
+import { AuthNavButtons } from "@/components/landing/AuthNavButtons"
+import { getMessages, getLocale } from "@/i18n"
+
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+---
+
+<nav class="fixed top-0 z-50 w-full border-b border-border backdrop-blur-md bg-background/80" aria-label="Documentation navigation">
+  <div class="flex h-14 items-center justify-between px-4 md:px-6">
+    <!-- Left: Logo + mobile menu -->
+    <div class="flex items-center gap-3">
+      <button
+        data-toggle-sidebar
+        class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted md:hidden"
+        aria-label="Toggle sidebar"
+      >
+        <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
+      </button>
+
+      <a href="/" class="flex items-center gap-2 text-sm font-semibold text-foreground">
+        Headless Kit
+      </a>
+
+      <span class="hidden text-border md:inline">|</span>
+      <a href="/docs/getting-started/installation" class="hidden text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground md:inline">
+        {t.nav.docs}
+      </a>
+    </div>
+
+    <!-- Right: Links + Theme + Auth -->
+    <div class="flex items-center gap-3">
+      <a
+        href="https://github.com/headless-kit/headless-kit"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hidden font-mono text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline"
+      >
+        {t.nav.github}
+      </a>
+      <ThemeToggle client:load />
+      <AuthNavButtons client:load />
+    </div>
+  </div>
+</nav>

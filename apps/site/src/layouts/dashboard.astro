@@ -1,0 +1,53 @@
+---
+import "@/styles/global.css"
+import { DashboardShell } from "@/components/dashboard/DashboardShell"
+import { Toaster } from "@/components/ui/sonner"
+import { getLocale } from "@/i18n"
+import SEOHead from "@/components/SEOHead.astro"
+
+type Crumb = {
+  label: string
+  href?: string
+}
+
+type Props = {
+  title: string
+  currentPath: string
+  breadcrumbs?: Crumb[]
+}
+
+const { title, currentPath, breadcrumbs } = Astro.props
+const user = Astro.locals.user!
+const locale = getLocale(Astro.currentLocale)
+---
+
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="color-scheme" content="light dark" />
+    <SEOHead title={`${title} — Headless Kit`} description={`${title} dashboard`} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} — Headless Kit</title>
+    <script is:inline>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script>
+  </head>
+  <body class="min-h-svh antialiased">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+      Skip to content
+    </a>
+    <DashboardShell
+      client:load
+      user={{ name: user.name, email: user.email, role: user.role }}
+      currentPath={currentPath}
+      title={title}
+      locale={locale}
+      breadcrumbs={breadcrumbs}
+    >
+      <slot />
+    </DashboardShell>
+    <Toaster client:load position="bottom-right" richColors />
+  </body>
+</html>

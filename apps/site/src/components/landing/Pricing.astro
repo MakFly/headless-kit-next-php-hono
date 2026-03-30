@@ -1,0 +1,222 @@
+---
+import { getMessages, getLocale } from "@/i18n"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+
+const siteMode = import.meta.env.PUBLIC_SITE_MODE || "development"
+const isProductionMode = siteMode === "production"
+const pricingEnabled = !isProductionMode || import.meta.env.PUBLIC_PRICING_ENABLED === "true"
+
+const tiers = [
+  {
+    name: t.pricing.starter.name,
+    price: t.pricing.starter.price,
+    period: t.pricing.starter.period,
+    description: t.pricing.starter.description,
+    cta: t.pricing.starter.cta,
+    ctaVariant: "outline" as const,
+    ctaClass: "",
+    popular: false,
+    features: t.pricing.starter.features,
+    limits: t.pricing.starter.limits,
+    tierKey: "starter",
+  },
+  {
+    name: t.pricing.pro.name,
+    price: t.pricing.pro.price,
+    period: t.pricing.pro.period,
+    description: t.pricing.pro.description,
+    cta: t.pricing.pro.cta,
+    ctaVariant: "default" as const,
+    ctaClass: "bg-primary text-primary-foreground hover:bg-primary/90",
+    popular: true,
+    features: t.pricing.pro.features,
+    limits: [] as readonly string[],
+    tierKey: "pro",
+  },
+  {
+    name: t.pricing.business.name,
+    price: t.pricing.business.price,
+    period: t.pricing.business.period,
+    description: t.pricing.business.description,
+    cta: t.pricing.business.cta,
+    ctaVariant: "outline" as const,
+    ctaClass: "",
+    popular: false,
+    features: [t.pricing.business.includesProPlus, ...t.pricing.business.features],
+    limits: [] as readonly string[],
+    tierKey: "business",
+  },
+]
+---
+
+<section id="pricing" class="section-padding">
+  <div class="mx-auto max-w-6xl px-6">
+    <!-- Section header -->
+    <div class="mb-16 text-center">
+      <p class="text-sm font-medium uppercase tracking-widest text-primary">{t.pricing.eyebrow}</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+        {t.pricing.title}
+        <span class="gradient-text">{t.pricing.titleAccent}</span>
+      </h2>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
+        {t.pricing.subtitle}
+      </p>
+    </div>
+
+    <!-- Pricing grid -->
+    <div class="grid gap-6 md:grid-cols-3">
+      {tiers.map((tier) => (
+        <div
+          class:list={[
+            "relative glass-card p-6 flex flex-col",
+            tier.popular && "border-primary/50 shadow-md",
+          ]}
+        >
+          {tier.popular && (
+            <div class="absolute -top-3 left-1/2 z-10 -translate-x-1/2">
+              <Badge className="rounded-full bg-primary text-primary-foreground px-3 py-1 text-[10px] uppercase tracking-widest">
+                {t.pricing.mostPopular}
+              </Badge>
+            </div>
+          )}
+
+          <div>
+            <h3 class="text-sm font-bold tracking-wide text-foreground">
+              {tier.name}
+            </h3>
+            <div class="mt-4 flex items-baseline gap-1">
+              {pricingEnabled ? (
+                <>
+                  <span class="text-4xl font-bold text-foreground">{tier.price}</span>
+                  <span class="text-xs text-muted-foreground">/ {tier.period}</span>
+                </>
+              ) : (
+                <span class="text-4xl font-bold text-foreground">{locale === "fr" ? "Bientot" : "Coming"}</span>
+              )}
+            </div>
+            <p class="mt-2 text-sm text-muted-foreground">
+              {tier.description}
+            </p>
+          </div>
+
+          <ul class="mt-6 flex-1 space-y-3">
+            {tier.features.map((feature, fi) => (
+              <li class="flex items-start gap-2 text-sm text-muted-foreground">
+                <span class:list={["mt-0.5 text-xs", fi === 0 && tier.tierKey === "business" ? "text-transparent" : "text-apple-green"]}>
+                  {fi === 0 && tier.tierKey === "business" ? "—" : "✓"}
+                </span>
+                <span class={fi === 0 && tier.tierKey === "business" ? "font-semibold text-foreground" : ""}>
+                  {feature}
+                </span>
+              </li>
+            ))}
+            {tier.limits && tier.limits.length > 0 && (
+              <>
+                <li class="border-t border-border pt-3"></li>
+                {tier.limits.map((limit) => (
+                  <li class="flex items-start gap-2 text-sm text-muted-foreground/60">
+                    <span class="mt-0.5 text-xs text-destructive">✕</span>
+                    {limit}
+                  </li>
+                ))}
+              </>
+            )}
+          </ul>
+
+          <div class="mt-8">
+            {pricingEnabled ? (
+              tier.tierKey === "starter" ? (
+                <a href="/auth/register" class="block">
+                  <Button
+                    client:load
+                    size="lg"
+                    variant={tier.ctaVariant}
+                    className="w-full rounded-full text-sm"
+                  >
+                    {tier.cta}
+                  </Button>
+                </a>
+              ) : (
+                <Button
+                  client:load
+                  size="lg"
+                  variant={tier.ctaVariant}
+                  className={`w-full rounded-full text-sm checkout-btn ${tier.ctaClass}`}
+                  data-tier={tier.tierKey}
+                >
+                  {tier.cta}
+                </Button>
+              )
+            ) : (
+              <Button
+                client:load
+                size="lg"
+                variant={tier.ctaVariant}
+                className="w-full rounded-full text-sm"
+                disabled
+              >
+                {locale === "fr" ? "Bientot disponible" : "Coming soon"}
+              </Button>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Trust note -->
+    {pricingEnabled && (
+      <p class="mt-10 text-center text-sm text-muted-foreground">
+        <span class="text-apple-green">✓</span> {t.pricing.trustGuarantee} &nbsp;&middot;&nbsp;
+        <span class="text-apple-green">✓</span> {t.pricing.trustStripe} &nbsp;&middot;&nbsp;
+        <span class="text-apple-green">✓</span> {t.pricing.trustAccess}
+      </p>
+    )}
+  </div>
+</section>
+
+<script>
+  document.addEventListener("click", async (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-tier]")
+    if (!btn) return
+
+    const tier = btn.dataset.tier
+    if (!tier) return
+
+    btn.setAttribute("disabled", "true")
+    btn.style.opacity = "0.6"
+    btn.style.pointerEvents = "none"
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier }),
+      })
+
+      if (res.status === 401) {
+        window.location.href = `/auth/login?redirect=${encodeURIComponent("/#pricing")}`
+        return
+      }
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Checkout failed")
+      }
+
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } catch (err) {
+      console.error("Checkout error:", err)
+      alert(document.documentElement.lang === "fr" ? "Une erreur est survenue. Veuillez réessayer." : "Something went wrong. Please try again.")
+      btn.removeAttribute("disabled")
+      btn.style.opacity = ""
+      btn.style.pointerEvents = ""
+    }
+  })
+</script>

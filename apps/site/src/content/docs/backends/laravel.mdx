@@ -1,0 +1,209 @@
+---
+title: "Laravel Backend"
+description: "Laravel 12 API backend with BetterAuth, Vertical Slice Architecture, and API Platform OpenAPI docs."
+section: "backends"
+order: 1
+---
+
+# Laravel Backend
+
+The Laravel backend (`apps/api-laravel/`) runs on **port 8002** and provides a full-featured REST API using Laravel 12, BetterAuth for authentication, and Eloquent ORM with SQLite.
+
+## Setup
+
+```bash
+cd apps/api-laravel
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve --port=8002
+```
+
+The API is now available at `http://localhost:8002/api/v1/`.
+
+## Project Structure
+
+The codebase follows **Vertical Slice Architecture** (VSA). Each feature is self-contained under `app/Features/`:
+
+```
+app/
+├── Features/
+│   ├── Auth/          # Authentication (BetterAuth + custom actions)
+│   ├── Shop/          # Products & categories (public)
+│   ├── Cart/          # Cart management (authenticated)
+│   ├── Orders/        # Order management (authenticated)
+│   ├── Users/         # User endpoints
+│   ├── Admin/         # Admin CRUD + analytics (role:admin)
+│   ├── Saas/          # Multi-tenant SaaS (org.rbac)
+│   └── Support/       # Helpdesk & conversations
+├── Shared/
+│   ├── Models/        # ALL Eloquent models (User, Product, Order, Cart...)
+│   ├── Middleware/     # CheckRole, CheckPermission, OrgRbacMiddleware
+│   ├── Helpers/       # ApiResponse standardized responses
+│   └── Traits/        # ApiResponder trait
+```
+
+Each feature directory contains:
+
+| Directory | Purpose |
+|-----------|---------|
+| `Actions/` | Invokable Action classes (1 per endpoint) |
+| `Requests/` | Form Request validation (optional) |
+| `Services/` | Business logic (optional) |
+| `Formatters/` | Static format methods (optional) |
+| `routes.php` | Feature route definitions |
+
+All feature routes are included inside the `Route::prefix('v1')` group in `routes/api.php`.
+
+## Authentication
+
+Laravel uses **BetterAuth** (`betterauth/laravel`) with Bearer tokens. BetterAuth handles the core auth routes natively; custom endpoints (password reset, 2FA, OAuth) are added as invokable Action classes.
+
+### Auth Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/v1/auth/register` | Public | Register a new user |
+| POST | `/api/v1/auth/login` | Public | Login (returns access + refresh tokens) |
+| POST | `/api/v1/auth/refresh` | Public | Refresh access token |
+| GET | `/api/v1/auth/me` | Bearer | Get current user |
+| PATCH | `/api/v1/auth/me` | Bearer | Update profile |
+| DELETE | `/api/v1/auth/me` | Bearer | Delete account |
+| POST | `/api/v1/auth/logout` | Bearer | Logout |
+| POST | `/api/v1/auth/revoke-all` | Bearer | Revoke all sessions |
+| PUT | `/api/v1/auth/password` | Bearer | Update password |
+
+### Password Reset
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/v1/auth/password/forgot` | Public (rate-limited) | Send reset email |
+| POST | `/api/v1/auth/password/reset` | Public | Reset password with token |
+| POST | `/api/v1/auth/password/verify-token` | Public | Verify reset token validity |
+
+### Two-Factor Authentication
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/v1/auth/2fa/status` | Bearer | Check 2FA status |
+| POST | `/api/v1/auth/2fa/setup` | Bearer | Generate TOTP secret + QR code |
+| POST | `/api/v1/auth/2fa/verify` | Bearer | Verify TOTP code to enable 2FA |
+| POST | `/api/v1/auth/2fa/disable` | Bearer | Disable 2FA |
+
+### OAuth
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/v1/auth/oauth/providers` | Public | List available providers |
+| GET | `/api/v1/auth/oauth/{provider}` | Public | Redirect to OAuth provider |
+| GET | `/api/v1/auth/oauth/{provider}/callback` | Public | OAuth callback |
+
+### Magic Link
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/v1/auth/magic-link` | Public | Send magic link email |
+| GET | `/api/v1/auth/magic-link/verify` | Public | Verify magic link token |
+| POST | `/api/v1/auth/magic-link/check` | Public | Check magic link status |
+
+## Shop Endpoints (Public)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/products` | List products (paginated, filterable) |
+| GET | `/api/v1/products/{slug}` | Get product by slug |
+| GET | `/api/v1/categories` | List categories |
+| GET | `/api/v1/categories/{slug}` | Get category by slug |
+
+Source: `app/Features/Shop/Actions/`
+
+## Cart Endpoints (Authenticated)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/cart` | Get current user's cart |
+| POST | `/api/v1/cart/items` | Add item to cart |
+| PATCH | `/api/v1/cart/items/{id}` | Update cart item quantity |
+| DELETE | `/api/v1/cart/items/{id}` | Remove item from cart |
+
+Source: `app/Features/Cart/Actions/`
+
+## Order Endpoints (Authenticated)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/orders` | Create order from cart |
+| GET | `/api/v1/orders` | List user's orders |
+| GET | `/api/v1/orders/{id}` | Get order detail |
+
+Source: `app/Features/Orders/Actions/`
+
+## Admin Endpoints (role:admin)
+
+All admin endpoints require `auth:betterauth` + `role:admin` middleware.
+
+See the [Admin module](/docs/modules/admin) and [Shop module](/docs/modules/shop) documentation for the full admin endpoint tables.
+
+## SaaS Endpoints
+
+See the [SaaS module](/docs/modules/saas) documentation.
+
+## Support Endpoints
+
+See the [Support module](/docs/modules/support) documentation.
+
+## Middleware
+
+| Alias | Class | Purpose |
+|-------|-------|---------|
+| `auth:betterauth` | BetterAuth guard | JWT authentication |
+| `role` | `CheckRole` | Requires specific role (e.g. `role:admin`) |
+| `permission` | `CheckPermission` | Requires specific permission |
+| `api.security` | `ApiSecurityHeadersMiddleware` | Security headers |
+| `org.rbac` | `OrgRbacMiddleware` | Organization membership check |
+
+Middleware aliases are defined in `bootstrap/app.php`.
+
+## Response Format
+
+All responses use the `ApiResponse` helper with a consistent envelope:
+
+```json
+{
+  "success": true,
+  "data": { "..." },
+  "status": 200,
+  "request_id": "abc123"
+}
+```
+
+Error responses:
+
+```json
+{
+  "success": false,
+  "error": { "code": "VALIDATION_ERROR", "message": "..." },
+  "status": 422
+}
+```
+
+## Testing
+
+```bash
+php artisan test                            # Run all tests
+php artisan test tests/Feature/ShopTest.php # Specific test file
+php artisan test --filter=test_name         # Single test
+```
+
+Test files in `tests/Feature/`: `BetterAuthTest.php`, `ShopTest.php`, `CartTest.php`, `OrderTest.php`, `AdminShopTest.php`, `SaasTest.php`, `SupportTest.php`.
+
+## QA
+
+```bash
+make qa-laravel    # Runs Pint (formatter) + Larastan (static analysis) + PHPUnit
+```
+
+## API Platform
+
+`api-platform/laravel` is used exclusively as an **OpenAPI documentation source**. BetterAuth routes remain as classic Laravel routes and are never migrated to API Platform resources.

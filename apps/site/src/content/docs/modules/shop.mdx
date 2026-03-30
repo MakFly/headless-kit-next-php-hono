@@ -1,0 +1,187 @@
+---
+title: "Shop Module"
+description: "E-commerce module with products, categories, cart, orders, and admin management across all backends."
+section: "modules"
+order: 1
+---
+
+# Shop Module
+
+The Shop module provides a complete e-commerce flow: product catalog, categories, cart management, checkout, and order tracking. Admin endpoints cover product CRUD, order management, inventory, customer management, reviews, and analytics.
+
+## Public Endpoints
+
+### Products
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/products` | List products (paginated, filterable by category, price range, search) |
+| GET | `/api/v1/products/{slug}` | Get product detail by slug |
+
+Query parameters: `?page=1&per_page=20&category=shoes&min_price=10&max_price=100&search=keyword&sort=-created_at`
+
+### Categories
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/categories` | List all categories |
+| GET | `/api/v1/categories/{slug}` | Get category with its products |
+
+## Authenticated Endpoints
+
+### Cart
+
+All cart endpoints require authentication.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/cart` | Get current user's cart with items |
+| POST | `/api/v1/cart/items` | Add item to cart (`productId`, `quantity`) |
+| PATCH | `/api/v1/cart/items/{id}` | Update cart item quantity |
+| DELETE | `/api/v1/cart/items/{id}` | Remove item from cart |
+
+### Orders
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/orders` | Create order from current cart |
+| GET | `/api/v1/orders` | List user's orders (paginated) |
+| GET | `/api/v1/orders/{id}` | Get order detail with items |
+
+## Admin Endpoints
+
+All admin endpoints require `auth + role:admin` (Laravel/Hono) or `IS_AUTHENTICATED_FULLY + ROLE_ADMIN` (Symfony).
+
+### Product Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/products` | List all products (with admin details) |
+| POST | `/api/v1/admin/products` | Create product |
+| PUT | `/api/v1/admin/products/{id}` | Update product |
+| DELETE | `/api/v1/admin/products/{id}` | Delete product |
+
+### Order Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/orders` | List all orders |
+| PATCH | `/api/v1/admin/orders/{id}/status` | Update order status |
+
+### Inventory
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/inventory` | List product inventory |
+| PATCH | `/api/v1/admin/inventory/{productId}` | Update stock quantity |
+
+### Customers
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/customers` | List customers |
+| POST | `/api/v1/admin/customers` | Create customer |
+| GET | `/api/v1/admin/customers/{id}` | Get customer detail |
+| PUT | `/api/v1/admin/customers/{id}` | Update customer |
+| DELETE | `/api/v1/admin/customers/{id}` | Delete customer |
+
+### Reviews
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/reviews` | List all reviews |
+| GET | `/api/v1/admin/reviews/{id}` | Get review detail |
+| PUT | `/api/v1/admin/reviews/{id}` | Update review (approve/reject) |
+| POST | `/api/v1/admin/reviews/bulk-approve` | Bulk approve reviews |
+| POST | `/api/v1/admin/reviews/bulk-reject` | Bulk reject reviews |
+
+### Dashboard and Analytics
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/dashboard` | Dashboard summary (revenue, orders, customers) |
+| GET | `/api/v1/admin/analytics/revenue` | Revenue analytics over time |
+| GET | `/api/v1/admin/analytics/top-products` | Top selling products |
+| GET | `/api/v1/admin/segments` | Customer segments |
+
+## Implementation per Backend
+
+### Laravel (`apps/api-laravel/`)
+
+| Feature | Path |
+|---------|------|
+| Shop routes | `app/Features/Shop/routes.php` |
+| Shop actions | `app/Features/Shop/Actions/` (ListProducts, ShowProduct, ListCategories, ShowCategory) |
+| Cart routes | `app/Features/Cart/routes.php` |
+| Cart actions | `app/Features/Cart/Actions/` (ShowCart, AddItem, UpdateItem, RemoveItem) |
+| Cart formatter | `app/Features/Cart/Formatters/CartFormatter.php` |
+| Order routes | `app/Features/Orders/routes.php` |
+| Order actions | `app/Features/Orders/Actions/` (CreateOrder, ListOrders, ShowOrder) |
+| Admin routes | `app/Features/Admin/routes.php` |
+| Admin actions | `app/Features/Admin/Actions/` (~25 action classes) |
+| Models | `app/Shared/Models/` (Product, Category, Cart, CartItem, Order, OrderItem) |
+
+### Symfony (`apps/api-sf/`)
+
+| Feature | Path |
+|---------|------|
+| Shop | API Platform resources on `Product` and `Category` entities (no controllers) |
+| Cart controllers | `src/Feature/Cart/Controller/` (ShowCartController, AddItemController, etc.) |
+| Cart repository | `src/Feature/Cart/Repository/CartRepository.php` |
+| Order controller | `src/Feature/Orders/Controller/` (CreateOrder; List/Show via API Platform) |
+| Admin controllers | `src/Feature/Admin/Controller/Shop/` (8 controllers) |
+| Entities | `src/Shared/Entity/` (Product, Category, Order, OrderItem, etc.) |
+
+### Hono (`apps/api-hono/`)
+
+| Feature | Path |
+|---------|------|
+| Shop | `src/features/shop/` (5 files: routes, handlers, service, repository, schemas) |
+| Cart | `src/features/cart/` (5 files) |
+| Orders | `src/features/orders/` (5 files) |
+| Admin | `src/features/admin/` (5 files) |
+| DB schema | `src/shared/db/schema.ts` (products, categories, carts, cart_items, orders, order_items) |
+
+## Frontend (Next.js BFF)
+
+### Storefront Pages
+
+Located in `apps/web/src/app/(shop)/shop/`:
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/shop` | `(storefront)/page.tsx` | Product listing |
+| `/shop/{slug}` | `(storefront)/[slug]/page.tsx` | Product detail |
+| `/shop/categories/{category}` | `(storefront)/categories/[category]/page.tsx` | Category products |
+| `/shop/cart` | `(storefront)/cart/page.tsx` | Cart view |
+| `/shop/checkout` | `(storefront)/checkout/page.tsx` | Checkout flow |
+| `/shop/orders` | `(storefront)/orders/page.tsx` | Order history |
+| `/shop/orders/{id}` | `(storefront)/orders/[id]/page.tsx` | Order detail |
+
+### Admin Pages
+
+Located in `apps/web/src/app/(shop)/shop/admin/`:
+
+| Route | Page |
+|-------|------|
+| `/shop/admin` | Dashboard |
+| `/shop/admin/products` | Product management |
+| `/shop/admin/orders` | Order management |
+| `/shop/admin/inventory` | Inventory management |
+| `/shop/admin/customers` | Customer management |
+| `/shop/admin/categories` | Category management |
+| `/shop/admin/reviews` | Review moderation |
+| `/shop/admin/analytics` | Revenue analytics |
+
+### Server Actions
+
+Located in `apps/web/src/lib/actions/shop/`:
+
+| File | Actions |
+|------|---------|
+| `products.ts` | Fetch products, product detail, categories |
+| `cart.ts` | Get cart, add/update/remove items |
+| `orders.ts` | Create order, list orders, get order detail |
+| `admin.ts` | Admin product CRUD, order management, inventory, customers, reviews, analytics |
+
+All Server Actions use the BFF client (`apps/web/src/lib/actions/_shared/bff-client.ts`) -- never direct `fetch()` calls to backends.

@@ -1,0 +1,80 @@
+---
+import { getMessages, getLocale } from "@/i18n"
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+
+const lines = [
+  { prefix: "$", text: "bunx create-headless-app my-app", color: "text-zinc-100" },
+  { prefix: "?", text: "Select a preset:", color: "text-blue-400" },
+  { prefix: " ", text: "  E-commerce   SaaS   Admin   Landing", color: "text-zinc-500" },
+  { prefix: "?", text: "Choose your frontend:", color: "text-blue-400" },
+  { prefix: " ", text: "▸ Next.js (BFF)    TanStack Start", color: "text-green-400" },
+  { prefix: "?", text: "Choose your backend:", color: "text-blue-400" },
+  { prefix: " ", text: "  Laravel   ▸ Symfony   Hono", color: "text-green-400" },
+  { prefix: "", text: "", color: "" },
+  { prefix: "✓", text: "Scaffolding project...", color: "text-green-400" },
+  { prefix: " ", text: "  Created my-app/frontend (Next.js + BFF)", color: "text-zinc-500" },
+  { prefix: " ", text: "  Created my-app/backend (Symfony)", color: "text-zinc-500" },
+  { prefix: " ", text: "  Installed 4 modules: Auth, Shop, SaaS, Support", color: "text-amber-400" },
+  { prefix: "", text: "", color: "" },
+  { prefix: "✓", text: "Done. cd my-app && bun dev", color: "text-green-300" },
+]
+---
+
+<section id="quickstart" class="section-padding">
+  <div class="mx-auto max-w-3xl px-6">
+    <!-- Section header -->
+    <div class="mb-16 text-center">
+      <p class="text-sm font-medium uppercase tracking-widest text-primary">{t.quickStart.eyebrow}</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+        {t.quickStart.title}
+        <span class="gradient-text">{t.quickStart.titleAccent}</span>
+      </h2>
+    </div>
+
+    <!-- Terminal window -->
+    <div class="overflow-hidden rounded-2xl border border-border shadow-md">
+      <!-- Title bar -->
+      <div class="flex items-center gap-2 border-b border-zinc-800 bg-zinc-900 px-4 py-3">
+        <span class="size-3 rounded-full bg-red-500/80"></span>
+        <span class="size-3 rounded-full bg-yellow-500/80"></span>
+        <span class="size-3 rounded-full bg-green-500/80"></span>
+        <span class="ml-2 font-mono text-xs text-zinc-500">~/projects</span>
+      </div>
+
+      <!-- Terminal body — always dark -->
+      <div class="bg-zinc-950 p-6 font-mono text-sm leading-relaxed">
+        {lines.map((line) => (
+          <div>
+            {line.prefix || line.text ? (
+              <span>
+                {line.prefix === "$" && (
+                  <span class="mr-2 text-green-400">$</span>
+                )}
+                {line.prefix === "?" && (
+                  <span class="mr-2 text-blue-400">?</span>
+                )}
+                {line.prefix === "✓" && (
+                  <span class="mr-2 text-green-400">✓</span>
+                )}
+                {line.prefix === " " && (
+                  <span class="mr-2">&nbsp;</span>
+                )}
+                <span class={line.color}>
+                  {line.text}
+                </span>
+              </span>
+            ) : (
+              <br />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Bottom text -->
+    <p class="mt-8 text-center text-sm text-muted-foreground">
+      {t.quickStart.requires} <span class="font-medium text-foreground">{t.quickStart.bun}</span> {t.quickStart.systemNote}
+    </p>
+  </div>
+</section>

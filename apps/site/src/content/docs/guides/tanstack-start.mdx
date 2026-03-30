@@ -1,0 +1,234 @@
+---
+title: "TanStack Start Integration"
+description: "How TanStack Start works as an alternative frontend with SSR, file-based routing, and Zustand hydration"
+section: "guides"
+order: 2
+---
+
+# TanStack Start Integration
+
+Headless Kit includes a TanStack Start frontend (`apps/web-tanstack`) as an alternative to the Next.js BFF. It runs on port 3301 and connects to the same backends using the same adapter pattern.
+
+## Next.js vs TanStack Start
+
+| Feature | Next.js (`apps/web`) | TanStack Start (`apps/web-tanstack`) |
+|---------|---------------------|--------------------------------------|
+| Router | App Router (file-based) | TanStack Router (file-based) |
+| SSR approach | RSC + Server Actions | `beforeLoad` + `loader` |
+| State management | Zustand | Zustand |
+| Bundler | Turbopack / Webpack | Vite |
+| Port | 3300 | 3301 |
+| BFF pattern | Catch-all route handler | Catch-all server route |
+| Backend calls | Via Server Actions + bff-client | Via `createServerFn` + adapters |
+
+## File-Based Routing
+
+Routes are defined in `src/routes/`. TanStack Router auto-generates `routeTree.gen.ts`.
+
+```
+src/routes/
+  __root.tsx            # Root layout (wraps everything)
+  index.tsx             # / (home page)
+  dashboard.tsx         # /dashboard layout
+  dashboard/
+    index.tsx           # /dashboard (main page)
+    settings.tsx        # /dashboard/settings
+    users/
+      index.tsx         # /dashboard/users
+  api/
+    v1/
+      $.tsx             # Catch-all /api/v1/* (BFF proxy)
+```
+
+Key naming conventions:
+
+- `$param.tsx` -- dynamic parameter
+- `$.tsx` -- catch-all (splat) route
+- `_layout.tsx` -- pathless layout (no URL segment)
+- `index.tsx` -- index route for parent directory
+
+## BFF Catch-All Route
+
+The BFF proxy lives at `src/routes/api/v1/$.tsx`. It handles all HTTP methods and proxies requests to the configured backend:
+
+```typescript
+export const Route = createFileRoute('/api/v1/$')({
+  server: {
+    handlers: {
+      GET: async ({ request }) => handleBffRequest(request),
+      POST: async ({ request }) => handleBffRequest(request),
+      PUT: async ({ request }) => handleBffRequest(request),
+      PATCH: async ({ request }) => handleBffRequest(request),
+      DELETE: async ({ request }) => handleBffRequest(request),
+    },
+  },
+})
+```
+
+The `handleBffRequest` function mirrors the Next.js BFF proxy: it validates paths, checks CSRF, forwards auth tokens, handles 401 refresh, and stores tokens in cookies using TanStack Start's `setCookie`/`getCookie`/`deleteCookie` APIs.
+
+## SSR Data Loading
+
+TanStack Start uses `beforeLoad` for guards and context, and `loader` for page data.
+
+### beforeLoad -- Auth Guards and Context
+
+The root route (`__root.tsx`) fetches the current user server-side:
+
+```typescript
+export const Route = createRootRouteWithContext<RouterContext>()({
+  beforeLoad: async () => {
+    try {
+      const result = await getCurrentUserFn()
+      if (!result) return { user: null, expiresIn: null }
+      return { user: result.user, expiresIn: result.expiresIn }
+    } catch {
+      return { user: null, expiresIn: null }
+    }
+  },
+  component: RootComponent,
+})
+```
+
+The returned context (`user`, `expiresIn`) is available to all child routes via `Route.useRouteContext()`.
+
+### loader -- Page Data
+
+```typescript
+export const Route = createFileRoute('/dashboard')({
+  beforeLoad: async ({ context }) => {
+    if (!context.user) throw redirect({ to: '/login' })
+  },
+  loader: async () => {
+    return { stats: await getDashboardStatsFn() }
+  },
+  component: DashboardPage,
+})
+```
+
+## Anti-Flash Pattern
+
+The key difference from a typical SPA: use `Route.useRouteContext()` for rendering SSR data, and Zustand only for mutations.
+
+```typescript
+function RootComponent() {
+  const context = Route.useRouteContext()
+  const hydrate = useAuthStore((s) => s.hydrate)
+
+  // Hydrate Zustand store client-side for mutations
+  useEffect(() => {
+    hydrate(context.user, context.expiresIn)
+  }, [context.user, context.expiresIn, hydrate])
+
+  return <Outlet />
+}
+```
+
+In layouts and display components, always read from route context:
+
+```typescript
+// CORRECT - no flash, data comes from SSR
+function DashboardLayout() {
+  const context = Route.useRouteContext()
+  return <AppLayout user={context.user ?? null} />
+}
+
+// WRONG - causes flash because Zustand hydrates client-side
+function DashboardLayout() {
+  const user = useAuthStore((s) => s.user) // Flash!
+  return <AppLayout user={user} />
+}
+```
+
+## Server Functions
+
+Backend calls use `createServerFn` from `@tanstack/react-start` instead of Next.js Server Actions:
+
+```typescript
+import { createServerFn } from '@tanstack/react-start'
+
+export const loginFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { email: string; password: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    const response = await adapter.login(data)
+    return {
+      user: toUser(response.user),
+      expiresIn: response.tokens.expires_in ?? null,
+    }
+  })
+```
+
+Server functions are type-safe RPC calls. The bundler replaces the server implementation with a client stub automatically.
+
+## Auth Store
+
+The TanStack auth store is similar to the Next.js version but calls server functions instead of Server Actions:
+
+```typescript
+login: async (credentials) => {
+  set({ error: null, isLoading: true, requires2fa: false })
+  try {
+    const response = await loginFn({ data: credentials })
+    if ('requires2fa' in response && response.requires2fa) {
+      set({ requires2fa: true, isLoading: false })
+      return
+    }
+    set({
+      user: response.user,
+      expiresIn: response.expiresIn,
+      isLoading: false,
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Login failed'
+    set({ error: message, isLoading: false })
+    throw err
+  }
+},
+```
+
+The store also includes 2FA verification methods (`verify2fa`, `verify2faRecovery`) and token expiry tracking via the `expiresIn` field.
+
+## Adapter Integration
+
+TanStack Start uses the same adapter pattern as Next.js. The adapters live in `src/lib/adapters/` with the same structure:
+
+```
+src/lib/adapters/
+  index.ts           # Factory: getAuthAdapter()
+  base-adapter.ts    # Abstract BaseAdapter
+  types.ts           # AuthAdapter type
+  laravel/adapter.ts
+  symfony/adapter.ts
+  node/adapter.ts
+```
+
+The key difference: TanStack Start adapters use `setCookie`/`getCookie` from `@tanstack/react-start/server` instead of Next.js `cookies()`.
+
+## Token Refresh
+
+The TanStack BFF proxy implements the same dual refresh strategy:
+
+1. **Proactive**: reads the `token_expires_at` cookie and calls `shouldRefreshByTimestamp()` before forwarding
+2. **Reactive**: catches 401 responses, attempts refresh, retries the original request
+
+```typescript
+// Proactive check in the BFF proxy
+if (authToken && tokenExpiresAt && refreshToken) {
+  const shouldRefresh = shouldRefreshByTimestamp(tokenExpiresAt)
+  if (shouldRefresh) {
+    const newTokens = await attemptTokenRefresh(backend, config, refreshToken, requestId)
+    if (newTokens) {
+      authToken = newTokens.accessToken
+      await storeTokens(newTokens.accessToken, newTokens.refreshToken, newTokens.expiresIn)
+    }
+  }
+}
+```
+
+## Current Limitations
+
+- No Edge middleware equivalent -- auth redirects happen in `beforeLoad` instead of at the edge
+- No RSC support -- all components are standard React components
+- The TanStack Start BFF proxy does not support the multi-backend cookie switching (uses `AUTH_BACKEND` env var only)
+- Magic link auth is not yet implemented in the TanStack frontend

@@ -1,0 +1,156 @@
+---
+title: "Admin & RBAC Module"
+description: "Role-based access control with users, roles, permissions management and admin dashboard."
+section: "modules"
+order: 2
+---
+
+# Admin & RBAC Module
+
+The Admin module provides role-based access control (RBAC), user management, and a dashboard with analytics. All admin endpoints require authentication with the `admin` role.
+
+## RBAC Model
+
+### Roles
+
+The system ships with three default roles:
+
+| Role | Description |
+|------|-------------|
+| `admin` | Full access to all admin endpoints |
+| `manager` | Can manage specific resources (configurable via permissions) |
+| `user` | Standard authenticated user (no admin access) |
+
+### Permissions
+
+Permissions follow a `resource:action` format:
+
+- `users:manage` -- manage user accounts
+- `products:create`, `products:update`, `products:delete` -- product CRUD
+- `orders:manage` -- manage orders and statuses
+- `reviews:moderate` -- approve/reject reviews
+
+Permissions are assigned to roles, and roles are assigned to users. A user's effective permissions are the union of all permissions from their assigned roles.
+
+## RBAC Endpoints
+
+All endpoints under `/api/v1/admin/` require `auth + role:admin`.
+
+### User Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/users` | List all users (paginated) |
+| GET | `/api/v1/admin/users/{id}` | Get user detail with roles |
+
+### Role Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/roles` | List all roles |
+| POST | `/api/v1/admin/roles` | Create a new role |
+| POST | `/api/v1/admin/users/{id}/roles` | Assign role to user |
+| DELETE | `/api/v1/admin/users/{id}/roles/{role}` | Remove role from user |
+
+### Permission Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/permissions` | List all available permissions |
+| POST | `/api/v1/admin/roles/{role}/permissions` | Sync permissions for a role |
+
+## Dashboard Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/dashboard` | Summary stats (revenue, orders, users, etc.) |
+| GET | `/api/v1/admin/analytics/revenue` | Revenue over time |
+| GET | `/api/v1/admin/analytics/top-products` | Best selling products |
+| GET | `/api/v1/admin/segments` | Customer segments |
+
+## Implementation per Backend
+
+### Laravel (`apps/api-laravel/`)
+
+RBAC is enforced via middleware aliases defined in `bootstrap/app.php`:
+
+| Middleware | Class | Purpose |
+|-----------|-------|---------|
+| `role:admin` | `App\Shared\Middleware\CheckRole` | Requires the `admin` role |
+| `permission:X` | `App\Shared\Middleware\CheckPermission` | Requires a specific permission |
+
+All admin routes are grouped under `Route::middleware(['auth:betterauth', 'role:admin'])->prefix('admin')` in `app/Features/Admin/routes.php`.
+
+Key files:
+- Routes: `app/Features/Admin/routes.php`
+- Actions: `app/Features/Admin/Actions/` (ListUsers, ShowUser, AssignRole, RemoveRole, CreateRole, ListRoles, ListPermissions, SyncPermissions, Dashboard, RevenueAnalytics, TopProducts, ListSegments)
+- Models: `app/Shared/Models/User.php`, `app/Shared/Models/Role.php`, `app/Shared/Models/Permission.php`
+
+### Symfony (`apps/api-sf/`)
+
+RBAC uses Symfony's **Voter** system and the firewall security layer:
+
+- Admin routes require `ROLE_ADMIN` via `#[IsGranted('ROLE_ADMIN')]` or firewall config
+- Organization-level authorization uses custom Voters
+
+Key files:
+- RBAC controllers: `src/Feature/Admin/Controller/Rbac/` (6 controllers: AssignRoleController, CreateRoleController, GetUserRolesController, ListPermissionsController, ListRolesController, RemoveRoleController)
+- Shop admin controllers: `src/Feature/Admin/Controller/Shop/` (8 controllers)
+- Segment service: `src/Feature/Admin/Service/SegmentQueryService.php`
+- Security: `src/Shared/Security/` (Voters, traits)
+
+### Hono (`apps/api-hono/`)
+
+RBAC uses the `adminMiddleware` which checks the user's role from the JWT payload:
+
+```typescript
+admin.use('*', authMiddleware);
+admin.use('*', adminMiddleware);
+```
+
+Key files:
+- Feature: `src/features/admin/` (admin.routes.ts, admin.handlers.ts, admin.service.ts, admin.repository.ts, admin.schemas.ts)
+- Middleware: `src/shared/middleware/admin.ts`
+
+## Frontend (Next.js BFF)
+
+### Dashboard Pages
+
+Located in `apps/web/src/app/(dashboard)/dashboard/(app)/`:
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/dashboard` | `page.tsx` | Main dashboard overview |
+| `/dashboard/users` | `users/page.tsx` | User management table |
+| `/dashboard/roles` | `roles/page.tsx` | Role management |
+| `/dashboard/permissions` | `permissions/page.tsx` | Permission management |
+| `/dashboard/settings` | `settings/page.tsx` | Application settings |
+| `/dashboard/api-keys` | `api-keys/page.tsx` | API key management |
+| `/dashboard/posts` | `posts/page.tsx` | Content management |
+| `/dashboard/todos` | `todos/page.tsx` | Task management |
+
+### Server Actions
+
+Located in `apps/web/src/lib/actions/rbac/`:
+
+| File | Actions |
+|------|---------|
+| `users.ts` | List users, get user detail |
+| `roles.ts` | List roles, create role, assign/remove role |
+| `permissions.ts` | List permissions, sync permissions to role |
+
+### Data Tables
+
+The admin pages use TanStack Table for data grids with server-side pagination, sorting, and filtering. Tables are configured per resource with column definitions, filter controls, and action menus.
+
+## Auth Flow
+
+The dashboard has its own auth pages at `apps/web/src/app/(dashboard)/dashboard/auth/`:
+
+| Route | Page |
+|-------|------|
+| `/dashboard/auth/login` | Admin login |
+| `/dashboard/auth/register` | Admin registration |
+| `/dashboard/auth/forgot-password` | Password reset request |
+| `/dashboard/auth/reset-password` | Password reset form |
+| `/dashboard/auth/oauth/callback` | OAuth callback |

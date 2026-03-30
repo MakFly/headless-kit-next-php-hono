@@ -1,0 +1,249 @@
+---
+title: "OAuth Integration"
+description: "Social login with Google and GitHub providers across Laravel and Symfony backends"
+section: "guides"
+order: 5
+---
+
+# OAuth Integration
+
+Headless Kit supports social login via OAuth with Google and GitHub providers. OAuth is currently implemented in the Laravel and Symfony backends.
+
+## Supported Providers
+
+| Provider | Laravel | Symfony | Hono |
+|----------|---------|---------|------|
+| Google | Yes | Yes | Not yet |
+| GitHub | Yes | Yes | Not yet |
+
+## OAuth Flow
+
+The complete OAuth flow involves five steps:
+
+### 1. Frontend Redirects to Backend
+
+The user clicks "Sign in with Google" or "Sign in with GitHub". The frontend calls the OAuth action:
+
+```typescript
+// Next.js auth store
+loginWithOAuth: async (provider) => {
+  try {
+    const { url } = await getOAuthUrlAction(provider);
+    window.location.href = url;
+  } catch (err) {
+    set({ error: err.message });
+    throw err;
+  }
+},
+```
+
+The Server Action fetches the redirect URL from the backend:
+
+```typescript
+export async function getOAuthUrlAction(provider: string): Promise<{ url: string }> {
+  const backend = await getCurrentBackend();
+  const adapter = getAuthAdapter(backend);
+  const url = await adapter.getOAuthUrl(provider);
+  return { url };
+}
+```
+
+### 2. Backend Redirects to Provider
+
+The backend endpoint (`/api/v1/auth/oauth/{provider}`) generates the OAuth authorization URL with the appropriate scopes and redirects the browser to Google/GitHub.
+
+### 3. Provider Authenticates User
+
+The user authenticates with the OAuth provider (enters Google/GitHub credentials, grants permissions).
+
+### 4. Provider Callbacks to Backend
+
+The provider redirects back to the backend callback URL:
+
+```
+/api/v1/auth/oauth/{provider}/callback?code=...&state=...
+```
+
+The backend:
+- Exchanges the authorization code for an access token
+- Fetches the user's profile from the provider
+- Creates a new user or links to an existing account (matched by email)
+- Generates auth tokens (access + refresh)
+
+### 5. Backend Redirects to Frontend
+
+After processing, the backend redirects to the frontend callback page with tokens in the URL or stores them directly.
+
+## Backend Configuration
+
+### Laravel
+
+OAuth in Laravel uses Laravel Socialite. Configure providers in `config/services.php`:
+
+```php
+'google' => [
+    'client_id' => env('GOOGLE_CLIENT_ID'),
+    'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+    'redirect' => env('GOOGLE_REDIRECT_URI', 'http://localhost:8002/api/v1/auth/oauth/google/callback'),
+],
+
+'github' => [
+    'client_id' => env('GITHUB_CLIENT_ID'),
+    'client_secret' => env('GITHUB_CLIENT_SECRET'),
+    'redirect' => env('GITHUB_REDIRECT_URI', 'http://localhost:8002/api/v1/auth/oauth/github/callback'),
+],
+```
+
+Required environment variables:
+
+```ini
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+```
+
+### Symfony
+
+OAuth in Symfony is configured in the BetterAuth bundle:
+
+```yaml
+# config/packages/better_auth.yaml
+better_auth:
+    oauth:
+        providers:
+            google:
+                client_id: '%env(GOOGLE_CLIENT_ID)%'
+                client_secret: '%env(GOOGLE_CLIENT_SECRET)%'
+                redirect_uri: '%env(GOOGLE_REDIRECT_URI)%'
+            github:
+                client_id: '%env(GITHUB_CLIENT_ID)%'
+                client_secret: '%env(GITHUB_CLIENT_SECRET)%'
+                redirect_uri: '%env(GITHUB_REDIRECT_URI)%'
+```
+
+## Listing Available Providers
+
+The frontend can query which OAuth providers are available:
+
+```typescript
+export async function getOAuthProvidersAction(): Promise<ApiResponse<string[]>> {
+  const backend = await getCurrentBackend();
+  const adapter = getAuthAdapter(backend);
+  const providers = await adapter.getOAuthProviders();
+  return { data: providers };
+}
+```
+
+This calls `GET /api/v1/auth/oauth/providers` on the backend, which returns:
+
+```json
+{
+  "data": ["google", "github"]
+}
+```
+
+The login form uses this to conditionally render OAuth buttons only for configured providers.
+
+## Frontend: OAuth Actions
+
+### Next.js
+
+The OAuth flow is triggered from the auth store:
+
+```typescript
+// stores/auth-store.ts
+loginWithOAuth: async (provider) => {
+  try {
+    const { url } = await getOAuthUrlAction(provider);
+    window.location.href = url; // Full page redirect to provider
+  } catch (err) {
+    set({ error: err.message });
+    throw err;
+  }
+},
+```
+
+### TanStack Start
+
+```typescript
+// stores/auth-store.ts
+loginWithOAuth: async (provider) => {
+  try {
+    const { url } = await getOAuthUrlFn({ data: { provider } })
+    window.location.href = url
+  } catch (err) {
+    set({ error: err.message })
+    throw err
+  }
+},
+```
+
+The server function:
+
+```typescript
+export const getOAuthUrlFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { provider: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    const url = await adapter.getOAuthUrl(data.provider)
+    return { url }
+  })
+```
+
+## Callback Handling
+
+After the OAuth provider redirects back to the backend, the backend processes the callback and redirects to the frontend. Both Next.js and TanStack Start have callback pages that:
+
+1. Read tokens from URL parameters or cookies
+2. Store the user in the auth store
+3. Redirect to the dashboard or the originally requested page
+
+## Adapter Interface
+
+The `AuthAdapter` type includes two OAuth methods:
+
+```typescript
+type AuthAdapter = {
+  // ... other methods
+  getOAuthProviders(): Promise<string[]>;
+  getOAuthUrl(provider: string): Promise<string>;
+};
+```
+
+Each backend adapter implements these:
+
+- **LaravelAdapter**: calls `/api/v1/auth/oauth/providers` and `/api/v1/auth/oauth/{provider}`
+- **SymfonyAdapter**: calls the equivalent Symfony endpoints
+- **NodeAdapter**: not yet implemented (returns empty providers list)
+
+## Adding a New Provider
+
+To add a new OAuth provider (e.g., Microsoft, Discord):
+
+### 1. Backend Setup
+
+**Laravel**: Install the Socialite provider package, add config to `config/services.php`, register the provider in the OAuth controller.
+
+**Symfony**: Add the provider configuration to `better_auth.yaml`, implement the provider handler.
+
+### 2. Environment Variables
+
+Add the client ID, secret, and redirect URI for the new provider:
+
+```ini
+DISCORD_CLIENT_ID=...
+DISCORD_CLIENT_SECRET=...
+DISCORD_REDIRECT_URI=http://localhost:8002/api/v1/auth/oauth/discord/callback
+```
+
+### 3. Frontend
+
+No frontend changes needed. The login form dynamically queries available providers via `getOAuthProviders()` and renders buttons accordingly. The OAuth flow is provider-agnostic on the frontend side.
+
+## Security Considerations
+
+- OAuth state parameter is validated on callback to prevent CSRF
+- User accounts are matched by verified email address
+- If an account already exists with the same email, the OAuth identity is linked rather than creating a duplicate
+- OAuth tokens from the provider are not stored long-term -- only used during the callback to fetch the profile

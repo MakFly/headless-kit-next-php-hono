@@ -1,0 +1,47 @@
+---
+type Props = {
+  type?: "note" | "warning" | "tip" | "danger"
+  title?: string
+}
+
+const { type = "note", title } = Astro.props
+
+const config = {
+  note: {
+    color: "border-cyber-cyan bg-cyber-cyan/5",
+    icon: "ℹ",
+    defaultTitle: "Note",
+    textColor: "text-cyber-cyan",
+  },
+  warning: {
+    color: "border-cyber-amber bg-cyber-amber/5",
+    icon: "⚠",
+    defaultTitle: "Warning",
+    textColor: "text-cyber-amber",
+  },
+  tip: {
+    color: "border-cyber-green bg-cyber-green/5",
+    icon: "✓",
+    defaultTitle: "Tip",
+    textColor: "text-cyber-green",
+  },
+  danger: {
+    color: "border-destructive bg-destructive/5",
+    icon: "✕",
+    defaultTitle: "Danger",
+    textColor: "text-destructive",
+  },
+} as const
+
+const c = config[type]
+---
+
+<div class:list={["my-6 rounded-lg border-l-4 p-4", c.color]}>
+  <p class:list={["mb-2 font-mono text-xs font-semibold uppercase tracking-widest", c.textColor]}>
+    <span class="mr-1.5">{c.icon}</span>
+    {title || c.defaultTitle}
+  </p>
+  <div class="text-sm text-muted-foreground [&>p]:mb-2 [&>p:last-child]:mb-0">
+    <slot />
+  </div>
+</div>

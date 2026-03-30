@@ -1,0 +1,183 @@
+---
+title: "Configuration"
+description: "Environment variables, backend switching, and cookie structure for each app."
+section: "getting-started"
+order: 3
+---
+
+# Configuration
+
+Each app in Headless Kit uses environment variables for runtime configuration. Never hardcode URLs, secrets, or backend choices.
+
+## Next.js BFF (`apps/web`)
+
+Create `.env.local` in the `apps/web` directory:
+
+```ini
+# App URL (used for CORS and redirects)
+NEXT_PUBLIC_APP_URL=http://localhost:3300
+
+# Backend API URLs
+LARAVEL_API_URL=http://localhost:8002
+SYMFONY_API_URL=http://localhost:8001
+NODE_API_URL=http://localhost:3333
+
+# Active backend: laravel | symfony | node
+AUTH_BACKEND=laravel
+
+# Cookie names (optional, defaults shown)
+AUTH_COOKIE_NAME=auth_token
+REFRESH_COOKIE_NAME=refresh_token
+TOKEN_EXPIRES_COOKIE_NAME=token_expires_at
+
+# BFF proxy timeout (optional, default: 30000ms)
+PROXY_TIMEOUT_MS=30000
+
+# AI providers (optional)
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-...
+```
+
+All environment variables should be accessed via `src/lib/config/env.ts`, never through `process.env` directly. This module validates and types every variable.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PROXY_TIMEOUT_MS` | `30000` | BFF proxy timeout in milliseconds. Refresh calls use `min(PROXY_TIMEOUT_MS, 5000)`. |
+
+### Health Check
+
+Both BFFs expose `GET /api/health` returning `{ status: "ok", timestamp, version }`. Use this for Docker health checks, Kubernetes liveness probes, and load balancer monitoring.
+
+## TanStack Start (`apps/web-tanstack`)
+
+Create `.env` in the `apps/web-tanstack` directory:
+
+```ini
+VITE_APP_URL=http://localhost:3301
+
+# Backend URLs
+LARAVEL_API_URL=http://localhost:8002
+SYMFONY_API_URL=http://localhost:8001
+NODE_API_URL=http://localhost:3333
+
+# Active backend
+AUTH_BACKEND=laravel
+```
+
+The `AUTH_BACKEND` variable is forwarded to the Vite config so it is available at build time.
+
+## Laravel (`apps/api-laravel`)
+
+Standard Laravel `.env` file:
+
+```ini
+APP_URL=http://localhost:8002
+FRONTEND_URL=http://localhost:3300
+
+APP_KEY=base64:...
+APP_DEBUG=true
+
+DB_CONNECTION=sqlite
+DB_DATABASE=/absolute/path/to/database.sqlite
+
+BETTER_AUTH_SECRET=change-me-in-production
+```
+
+## Symfony (`apps/api-sf`)
+
+Create `.env.local` to override defaults:
+
+```ini
+DATABASE_URL="sqlite:///%kernel.project_dir%/var/data_dev.db"
+BETTER_AUTH_SECRET=change-me-in-production
+FRONTEND_URL=http://localhost:3300
+```
+
+Symfony uses the `%env()%` processor which crashes at container compilation if a required variable is missing. This is the intended behavior for production safety.
+
+## Hono (`apps/api-hono`)
+
+```ini
+PORT=3333
+JWT_SECRET=change-me-in-production
+FRONTEND_URL=http://localhost:3301
+DATABASE_URL=file:./dev.db
+```
+
+In production, `JWT_SECRET` must be at least 32 characters. The app throws at startup if the secret is too short or uses the default placeholder.
+
+## Backend Switching
+
+Headless Kit supports switching between backends at two levels.
+
+### Via Environment Variable
+
+Set `AUTH_BACKEND` in your frontend `.env` file:
+
+```ini
+AUTH_BACKEND=laravel   # or symfony, or node (for Hono)
+```
+
+This is the default mechanism. The adapter factory reads this value and returns the matching adapter singleton.
+
+### Via Cookie (Runtime Switching)
+
+The Next.js BFF also reads an `auth_backend` cookie to allow runtime backend switching. This is useful for demos and development where you want to test multiple backends without restarting.
+
+The cookie takes precedence over the environment variable. If neither is set, the default is `laravel`.
+
+Backend resolution order:
+
+1. `auth_backend` cookie value
+2. `AUTH_BACKEND` environment variable
+3. Fallback to `laravel`
+
+## Cookie Structure
+
+Authentication tokens are stored in HttpOnly cookies. Cookie names include the backend suffix to avoid collisions when switching backends:
+
+| Cookie | Purpose | HttpOnly | Secure (prod) |
+|--------|---------|----------|----------------|
+| `auth_token` | Access token (JWT or Paseto) | Yes | Yes |
+| `refresh_token` | Refresh token | Yes | Yes |
+| `token_expires_at` | Token expiry timestamp | No | Yes |
+| `auth_backend` | Active backend identifier | No | No |
+
+The `token_expires_at` cookie is not HttpOnly because the Edge middleware reads it to decide whether to trigger proactive token refresh. It contains only a Unix timestamp, not sensitive data.
+
+### Cookie Security Settings
+
+```typescript
+{
+  httpOnly: true,       // Tokens inaccessible to JavaScript
+  secure: true,         // HTTPS only in production
+  sameSite: 'lax',      // CSRF protection
+  path: '/',            // Available across all routes
+}
+```
+
+## Secret Rotation
+
+When deploying to production, generate unique secrets for each environment:
+
+| Secret | Used by | Minimum length |
+|--------|---------|----------------|
+| `JWT_SECRET` | Hono | 32 characters |
+| `BETTER_AUTH_SECRET` | Symfony, Laravel | 32 characters |
+| `APP_KEY` | Laravel | Generated via `php artisan key:generate` |
+
+The CLI generates random secrets automatically during scaffolding. For manual setup, use:
+
+```bash
+openssl rand -base64 32
+```
+
+## Production Validation
+
+All backends validate critical environment variables at boot:
+
+- **Hono**: Throws if `JWT_SECRET` is the default value or under 32 characters in production
+- **Laravel**: Throws if `APP_KEY` is missing (framework enforced) and validates `BETTER_AUTH_SECRET` in `AppServiceProvider`
+- **Symfony**: Crashes at container compilation if `BETTER_AUTH_SECRET` is undefined via `%env()%` processor
+
+This means a misconfigured production deployment fails fast at startup instead of silently accepting requests without proper security.

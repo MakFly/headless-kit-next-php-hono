@@ -1,0 +1,10 @@
+---
+import { getLocale } from "@/i18n"
+import { HeroContent } from "./HeroContent"
+
+const locale = getLocale(Astro.currentLocale)
+---
+
+<section class="relative flex min-h-svh items-center justify-center overflow-hidden pt-16">
+  <HeroContent client:load locale={locale} />
+</section>

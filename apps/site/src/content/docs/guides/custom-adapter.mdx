@@ -1,0 +1,362 @@
+---
+title: "Creating a Custom Adapter"
+description: "How to integrate a new backend by implementing the AuthAdapter type and extending BaseAdapter"
+section: "guides"
+order: 6
+---
+
+# Creating a Custom Adapter
+
+The adapter pattern allows Headless Kit to work with any backend. Each adapter normalizes a backend's auth API into a common interface. This guide walks through creating a custom adapter for a new backend.
+
+## The AuthAdapter Type
+
+Every adapter must implement the `AuthAdapter` type defined in `apps/web/src/lib/adapters/types.ts`:
+
+```typescript
+type AuthAdapter = {
+  login(credentials: LoginRequest): Promise<AuthResponse>;
+  register(data: RegisterRequest): Promise<AuthResponse>;
+  logout(): Promise<void>;
+  refresh(request?: RefreshTokenRequest): Promise<AuthResponse>;
+  getUser(): Promise<NormalizedUser | null>;
+  getOAuthProviders(): Promise<string[]>;
+  getOAuthUrl(provider: string): Promise<string>;
+  sendMagicLink?(email: string): Promise<void>;
+  storeTokens(tokens: TokenStorage): Promise<void>;
+  clearTokens(): Promise<void>;
+  getAccessToken(): Promise<string | null>;
+};
+```
+
+Key types used by the adapter:
+
+```typescript
+type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+type RegisterRequest = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation?: string;
+};
+
+type NormalizedUser = {
+  id: string | number;
+  email: string;
+  name: string;
+  email_verified_at?: string | null;
+  avatar_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  roles?: Array<{ id: number; name: string; slug: string }>;
+  permissions?: Array<{
+    id: number; name: string; slug: string;
+    resource: string; action: string;
+  }>;
+};
+
+type TokenStorage = {
+  access_token: string;
+  refresh_token?: string;
+  expires_in?: number;
+  token_type?: string;
+};
+
+type AuthResponse = {
+  user: NormalizedUser;
+  tokens: TokenStorage;
+};
+```
+
+## The BaseAdapter Class
+
+The `BaseAdapter` abstract class provides common functionality so you only need to implement the auth-specific methods:
+
+```typescript
+export abstract class BaseAdapter implements AuthAdapter {
+  protected config: AdapterConfig;
+
+  // HTTP client with auth headers
+  protected async makeRequest<T>(
+    method: string,
+    path: string,
+    options?: { body?: unknown; headers?: Record<string, string>; includeAuth?: boolean }
+  ): Promise<T>;
+
+  // Gets Bearer token header (override for different auth schemes)
+  protected async getAuthHeaders(): Promise<Record<string, string>>;
+
+  // Cookie management (implemented for you)
+  async storeTokens(tokens: TokenStorage): Promise<void>;
+  async clearTokens(): Promise<void>;
+  async getAccessToken(): Promise<string | null>;
+  protected async getRefreshToken(): Promise<string | null>;
+
+  // You must implement these:
+  abstract login(credentials: LoginRequest): Promise<AuthResponse>;
+  abstract register(data: RegisterRequest): Promise<AuthResponse>;
+  abstract logout(): Promise<void>;
+  abstract refresh(request?: RefreshTokenRequest): Promise<AuthResponse>;
+  abstract getUser(): Promise<NormalizedUser | null>;
+  abstract getOAuthProviders(): Promise<string[]>;
+  abstract getOAuthUrl(provider: string): Promise<string>;
+}
+```
+
+The `BaseAdapter` handles:
+
+- **Cookie management**: `storeTokens()`, `clearTokens()`, `getAccessToken()` use Next.js `cookies()` API with HttpOnly, secure, SameSite=lax settings
+- **HTTP requests**: `makeRequest()` wraps fetch with timeout, JSON handling, and automatic Bearer token injection
+- **Token expiration**: access tokens get 1h max-age, refresh tokens 30 days
+
+## Step-by-Step Guide
+
+### 1. Create the Adapter Directory
+
+```
+apps/web/src/lib/adapters/
+  my-backend/
+    adapter.ts
+    transformer.ts
+    index.ts
+```
+
+### 2. Create the Transformer
+
+The transformer normalizes your backend's response format to the common types:
+
+```typescript
+// my-backend/transformer.ts
+
+import type { NormalizedUser, TokenStorage, AuthResponse } from '../types';
+
+type MyBackendUser = {
+  user_id: string;
+  full_name: string;
+  email_address: string;
+  // ... your backend's user shape
+};
+
+type MyBackendAuthResponse = {
+  user: MyBackendUser;
+  token: string;
+  refresh: string;
+  ttl: number;
+};
+
+export function transformUser(raw: MyBackendUser): NormalizedUser {
+  return {
+    id: raw.user_id,
+    email: raw.email_address,
+    name: raw.full_name,
+    roles: [],
+    permissions: [],
+  };
+}
+
+export function transformAuthResponse(raw: MyBackendAuthResponse): AuthResponse {
+  return {
+    user: transformUser(raw.user),
+    tokens: {
+      access_token: raw.token,
+      refresh_token: raw.refresh,
+      expires_in: raw.ttl,
+      token_type: 'Bearer',
+    },
+  };
+}
+```
+
+The transformer is the key to supporting different response formats. Every backend has its own naming conventions -- the transformer maps them to the common shape.
+
+### 3. Create the Adapter
+
+```typescript
+// my-backend/adapter.ts
+
+import type {
+  AdapterConfig, LoginRequest, RegisterRequest,
+  RefreshTokenRequest, AuthResponse, NormalizedUser,
+} from '../types';
+import { BaseAdapter } from '../base-adapter';
+import { transformAuthResponse, transformUser } from './transformer';
+
+const ENDPOINTS = {
+  LOGIN: '/auth/signin',
+  REGISTER: '/auth/signup',
+  LOGOUT: '/auth/signout',
+  REFRESH: '/auth/token/refresh',
+  ME: '/auth/profile',
+  OAUTH_PROVIDERS: '/auth/oauth/providers',
+  OAUTH_REDIRECT: (provider: string) => `/auth/oauth/${provider}/redirect`,
+};
+
+export class MyBackendAdapter extends BaseAdapter {
+  constructor(config: Partial<AdapterConfig> = {}) {
+    super({
+      baseUrl: process.env.MY_BACKEND_URL || 'http://localhost:4000',
+      timeout: 30000,
+      ...config,
+    });
+  }
+
+  async login(credentials: LoginRequest): Promise<AuthResponse> {
+    const response = await this.makeRequest('POST', ENDPOINTS.LOGIN, {
+      body: credentials,
+      includeAuth: false,
+    });
+    const authResponse = transformAuthResponse(response);
+    await this.storeTokens(authResponse.tokens);
+    return authResponse;
+  }
+
+  async register(data: RegisterRequest): Promise<AuthResponse> {
+    const response = await this.makeRequest('POST', ENDPOINTS.REGISTER, {
+      body: data,
+      includeAuth: false,
+    });
+    const authResponse = transformAuthResponse(response);
+    await this.storeTokens(authResponse.tokens);
+    return authResponse;
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await this.makeRequest('POST', ENDPOINTS.LOGOUT);
+    } finally {
+      await this.clearTokens();
+    }
+  }
+
+  async refresh(request?: RefreshTokenRequest): Promise<AuthResponse> {
+    const refreshToken = request?.refresh_token || await this.getRefreshToken();
+    const response = await this.makeRequest('POST', ENDPOINTS.REFRESH, {
+      body: { refresh_token: refreshToken },
+    });
+    const authResponse = transformAuthResponse(response);
+    await this.storeTokens(authResponse.tokens);
+    return authResponse;
+  }
+
+  async getUser(): Promise<NormalizedUser | null> {
+    try {
+      const response = await this.makeRequest('GET', ENDPOINTS.ME);
+      return transformUser(response);
+    } catch (error) {
+      if (error.statusCode === 401 || error.statusCode === 403) return null;
+      throw error;
+    }
+  }
+
+  async getOAuthProviders(): Promise<string[]> {
+    const response = await this.makeRequest('GET', ENDPOINTS.OAUTH_PROVIDERS, {
+      includeAuth: false,
+    });
+    return response.providers || [];
+  }
+
+  async getOAuthUrl(provider: string): Promise<string> {
+    const response = await this.makeRequest('GET', ENDPOINTS.OAUTH_REDIRECT(provider), {
+      includeAuth: false,
+    });
+    return response.url;
+  }
+}
+```
+
+### 4. Export from Index
+
+```typescript
+// my-backend/index.ts
+
+export { MyBackendAdapter } from './adapter';
+```
+
+### 5. Register in the Factory
+
+Edit `apps/web/src/lib/adapters/index.ts` to add your adapter:
+
+```typescript
+import { MyBackendAdapter } from './my-backend';
+
+// Add to BackendType
+export type BackendType = 'laravel' | 'symfony' | 'node' | 'my-backend';
+
+// Add to getAdapterConfig
+case 'my-backend':
+  return {
+    baseUrl: process.env.MY_BACKEND_URL || 'http://localhost:4000',
+  };
+
+// Add to getAuthAdapter switch
+case 'my-backend':
+  adapterInstances[backendType] = new MyBackendAdapter(config);
+  break;
+```
+
+### 6. Add Proxy Config
+
+Edit `apps/web/src/lib/adapters/proxy-config.ts` to configure path transformation for your backend:
+
+```typescript
+function getMyBackendConfig(): ProxyConfig {
+  return {
+    baseUrl: process.env.MY_BACKEND_URL || 'http://localhost:4000',
+    timeout: 30000,
+    transformPath: (bffPath: string) => {
+      // Map BFF paths to your backend's paths
+      return bffPath.replace('/api/v1/auth/', '/auth/');
+    },
+    publicRoutes: [
+      '/auth/signin',
+      '/auth/signup',
+      '/auth/token/refresh',
+      '/auth/oauth/providers',
+    ],
+  };
+}
+```
+
+## API Contract
+
+Your backend must implement at minimum these endpoints:
+
+| Endpoint | Method | Request Body | Response |
+|----------|--------|-------------|----------|
+| Login | POST | `{ email, password }` | `{ user, access_token, refresh_token, expires_in }` |
+| Register | POST | `{ name, email, password }` | Same as login |
+| Logout | POST | - | 204 |
+| Refresh | POST | `{ refresh_token }` | Same as login |
+| Get User | GET | - (Bearer token) | `{ user }` |
+
+The exact field names do not matter -- that is what the transformer handles.
+
+## CookieStore Injection
+
+The `BaseAdapter` uses Next.js `cookies()` from `next/headers` to manage auth cookies. For non-Next.js frameworks (like TanStack Start), the adapter uses a different cookie API:
+
+- **Next.js**: `cookies()` from `next/headers`
+- **TanStack Start**: `setCookie`/`getCookie`/`deleteCookie` from `@tanstack/react-start/server`
+
+If you are creating an adapter for TanStack Start, extend the TanStack `BaseAdapter` at `apps/web-tanstack/src/lib/adapters/base-adapter.ts` instead.
+
+## Testing
+
+You can create an adapter instance directly for testing:
+
+```typescript
+import { createAdapter } from '@/lib/adapters';
+
+const adapter = createAdapter('my-backend', {
+  baseUrl: 'http://test-server:4000',
+  timeout: 5000,
+});
+
+const user = await adapter.getUser();
+```
+
+The `createAdapter` factory function creates a fresh instance (not the singleton) so tests can use custom configuration.

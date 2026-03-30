@@ -1,0 +1,21 @@
+---
+export const prerender = false
+
+import { getMessages, getLocale } from "@/i18n"
+import Layout from "@/layouts/main.astro"
+import { LoginForm } from "@/components/auth/LoginForm"
+
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+---
+
+<Layout title="Sign In" description="Sign in to your Headless Kit account">
+  <div class="relative flex min-h-svh items-center justify-center px-4 py-12">
+    <div class="relative z-10 w-full max-w-md">
+      <a href="/" class="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+        <span>&larr;</span> {t.nav.backToHome}
+      </a>
+      <LoginForm client:only="react" isDev={true} locale={locale} />
+    </div>
+  </div>
+</Layout>

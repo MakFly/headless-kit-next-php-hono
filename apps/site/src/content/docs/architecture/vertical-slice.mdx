@@ -1,0 +1,188 @@
+---
+title: "Vertical Slice Architecture"
+description: "Feature-based code organization across Laravel, Symfony, and Hono backends."
+section: "architecture"
+order: 4
+---
+
+# Vertical Slice Architecture
+
+All three backends organize code by feature domain rather than by technical layer. Instead of `controllers/`, `models/`, `services/` directories, code is grouped by what it does: Auth, Shop, Saas, Support, Admin.
+
+## Why Vertical Slices
+
+Traditional layered architecture scatters a single feature across many directories:
+
+```
+# Layered (NOT used)
+app/Controllers/AuthController.php
+app/Models/User.php
+app/Services/AuthService.php
+app/Requests/LoginRequest.php
+```
+
+Vertical slices keep everything for a feature together:
+
+```
+# Vertical slice (used in Headless Kit)
+app/Features/Auth/
+  Controllers/LoginController.php
+  Models/User.php
+  Services/AuthService.php
+  Requests/LoginRequest.php
+```
+
+This makes it easy to understand, modify, and delete entire features without hunting across the codebase.
+
+## Laravel Feature Structure
+
+```
+apps/api-laravel/app/Features/
+├── Admin/          # Admin dashboard data
+├── Auth/           # Authentication and account management
+│   ├── Actions/
+│   │   ├── DeleteAccountAction.php
+│   │   ├── ForgotPasswordAction.php
+│   │   ├── OAuthProviders.php
+│   │   ├── ResetPasswordAction.php
+│   │   ├── TestAccounts.php
+│   │   ├── UpdateProfileAction.php
+│   │   └── VerifyResetTokenAction.php
+│   └── routes.php
+├── Cart/           # Shopping cart
+├── Orders/         # Order management
+├── Saas/           # Multi-tenant, billing, teams
+├── Shop/           # Product catalog
+├── Support/        # Helpdesk tickets
+└── Users/          # User management and RBAC
+```
+
+Laravel features use the **Action pattern**: each action is a single-responsibility invokable class. Controllers are thin and delegate to actions.
+
+Routes are defined per feature in a `routes.php` file, then loaded by the service provider.
+
+### Adding a Laravel Feature
+
+1. Create `app/Features/NewFeature/` directory
+2. Add Actions, Controllers, Models, Requests as needed
+3. Create `routes.php` with route definitions
+4. Register routes in `routes/api.php` or the feature service provider
+
+## Symfony Feature Structure
+
+```
+apps/api-sf/src/Feature/
+├── Admin/          # Admin endpoints
+├── Auth/           # Authentication
+│   ├── Controller/
+│   │   ├── LoginController.php
+│   │   ├── RegisterController.php
+│   │   ├── LogoutController.php
+│   │   ├── MeController.php
+│   │   ├── RefreshController.php
+│   │   ├── ForgotPasswordController.php
+│   │   ├── ResetPasswordController.php
+│   │   ├── DeleteAccountController.php
+│   │   ├── UpdateProfileController.php
+│   │   ├── Login2faController.php
+│   │   ├── TwoFactor/
+│   │   ├── RevokeAllController.php
+│   │   ├── TestAccountsController.php
+│   │   └── VerifyResetTokenController.php
+│   └── Service/
+├── Cart/           # Shopping cart
+├── Orders/         # Order management
+├── Saas/           # SaaS features
+├── Shop/           # Product catalog
+└── Support/        # Support tickets
+```
+
+Symfony features use **single-action controllers** (one controller per endpoint). Services handle business logic, and entities live alongside their feature.
+
+Symfony uses attributes for routing (`#[Route]`), so there is no separate routes file.
+
+### Adding a Symfony Feature
+
+1. Create `src/Feature/NewFeature/` with Controller, Service, Entity, Repository subdirectories
+2. Add controllers with `#[Route]` attributes
+3. Add entities with Doctrine mappings
+4. Register services via autowiring (automatic in Symfony)
+
+## Hono Feature Structure
+
+Hono uses a strict **5-file convention** per feature:
+
+```
+apps/api-hono/src/features/
+├── admin/
+├── auth/
+│   ├── auth.routes.ts       # Route definitions
+│   ├── auth.handlers.ts     # Request handlers
+│   ├── auth.service.ts      # Business logic
+│   ├── auth.repository.ts   # Database queries (Drizzle)
+│   └── auth.schemas.ts      # Zod validation schemas
+├── cart/
+├── orders/
+├── saas/
+├── shop/
+└── support/
+```
+
+| File | Responsibility |
+|------|---------------|
+| `*.routes.ts` | Route registration with Hono, middleware binding |
+| `*.handlers.ts` | Request parsing, response formatting, calling service |
+| `*.service.ts` | Business logic, orchestration |
+| `*.repository.ts` | Database access via Drizzle ORM |
+| `*.schemas.ts` | Zod schemas for request/response validation |
+
+Sub-features follow the same convention with a prefix. For example, the auth feature has additional two-factor files:
+
+```
+auth/
+├── auth.routes.ts
+├── auth.handlers.ts
+├── auth.service.ts
+├── auth.repository.ts
+├── auth.schemas.ts
+├── two-factor.routes.ts
+├── two-factor.handlers.ts
+├── two-factor.service.ts
+├── two-factor.repository.ts
+├── two-factor.schemas.ts
+├── password-reset.repository.ts
+└── password-reset.service.ts
+```
+
+### Adding a Hono Feature
+
+1. Create `src/features/new-feature/` directory
+2. Create the 5 files: routes, handlers, service, repository, schemas
+3. Register routes in `src/index.ts`
+4. Add Drizzle schema to `src/shared/db/schema.ts` if new tables are needed
+
+## Shared Code
+
+Code that is truly shared across features lives outside the feature directories:
+
+| Backend | Shared location | Contains |
+|---------|----------------|----------|
+| Laravel | `app/Http/Middleware/`, `app/Providers/` | Global middleware, service providers |
+| Symfony | `src/Shared/`, `src/EventSubscriber/` | Security subscribers, shared services |
+| Hono | `src/shared/` | Database connection, middleware, error handling |
+
+## Feature Parity
+
+All three backends implement the same features with the same API contracts:
+
+| Feature | Endpoints | All backends |
+|---------|-----------|-------------|
+| Auth | login, register, me, refresh, logout | Yes |
+| 2FA | enable, verify, recovery codes | Yes |
+| Password reset | forgot, verify token, reset | Yes |
+| Shop | products, categories, cart, checkout | Yes |
+| Saas | orgs, teams, billing, plans | Yes |
+| Support | tickets, conversations, agents | Yes |
+| Admin | users, roles, permissions | Yes |
+
+The BFF adapter pattern ensures the frontend works identically regardless of which backend is active.

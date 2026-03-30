@@ -1,0 +1,281 @@
+---
+title: "Two-Factor Authentication"
+description: "TOTP-based 2FA setup, login flow, recovery codes, and implementation across backends"
+section: "guides"
+order: 4
+---
+
+# Two-Factor Authentication
+
+Headless Kit supports TOTP-based two-factor authentication across all three backends. Users can enable 2FA with any authenticator app (Google Authenticator, Authy, 1Password, etc.) and use recovery codes as backup.
+
+## 2FA Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/auth/2fa/status` | Check if 2FA is enabled for the user |
+| POST | `/api/v1/auth/2fa/setup` | Generate TOTP secret + QR code URI + recovery codes |
+| POST | `/api/v1/auth/2fa/verify` | Verify a TOTP code (enable 2FA or complete login) |
+| POST | `/api/v1/auth/2fa/disable` | Disable 2FA (requires current TOTP code) |
+| POST | `/api/v1/auth/2fa/recovery/verify` | Verify a recovery code (login fallback) |
+
+## Setup Flow
+
+Enabling 2FA is a three-step process:
+
+### 1. Check Status
+
+First, check whether 2FA is already enabled:
+
+```
+GET /api/v1/auth/2fa/status
+```
+
+Response:
+
+```json
+{
+  "enabled": false
+}
+```
+
+### 2. Generate Secret
+
+Request a new TOTP secret and recovery codes:
+
+```
+POST /api/v1/auth/2fa/setup
+```
+
+Response:
+
+```json
+{
+  "secret": "JBSWY3DPEHPK3PXP",
+  "uri": "otpauth://totp/HeadlessKit:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=HeadlessKit",
+  "recovery_codes": [
+    "a1b2c3d4e5",
+    "f6g7h8i9j0",
+    "k1l2m3n4o5",
+    "p6q7r8s9t0",
+    "u1v2w3x4y5",
+    "z6a7b8c9d0"
+  ]
+}
+```
+
+The `uri` field is used to generate a QR code that the user scans with their authenticator app. Recovery codes should be displayed once and the user should store them securely.
+
+### 3. Verify and Enable
+
+The user enters the 6-digit code from their authenticator app to confirm setup:
+
+```
+POST /api/v1/auth/2fa/verify
+Content-Type: application/json
+
+{ "code": "123456" }
+```
+
+If the code is valid, 2FA is enabled for the account.
+
+## Login with 2FA
+
+When a user with 2FA enabled logs in, the login endpoint returns a special response:
+
+### Step 1: Normal Login
+
+```
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{ "email": "user@example.com", "password": "password" }
+```
+
+Response when 2FA is required:
+
+```json
+{
+  "requires2fa": true
+}
+```
+
+No tokens are returned at this stage.
+
+### Step 2: Submit 2FA Code
+
+```
+POST /api/v1/auth/2fa/verify
+Content-Type: application/json
+
+{ "code": "123456" }
+```
+
+On success, the response includes the full auth payload with tokens:
+
+```json
+{
+  "user": { "id": 1, "email": "user@example.com", "name": "John" },
+  "access_token": "...",
+  "refresh_token": "...",
+  "expires_in": 3600
+}
+```
+
+## Recovery Codes
+
+If the user loses access to their authenticator app, they can use a recovery code:
+
+```
+POST /api/v1/auth/2fa/recovery/verify
+Content-Type: application/json
+
+{ "code": "a1b2c3d4e5" }
+```
+
+Each recovery code can only be used once. After use, it is invalidated.
+
+## Disabling 2FA
+
+To disable 2FA, the user must provide a valid TOTP code:
+
+```
+POST /api/v1/auth/2fa/disable
+Content-Type: application/json
+
+{ "code": "123456" }
+```
+
+## Frontend Implementation
+
+### TanStack Start
+
+The TanStack auth store handles the 2FA flow with a `requires2fa` state:
+
+```typescript
+login: async (credentials) => {
+  set({ error: null, isLoading: true, requires2fa: false })
+  try {
+    const response = await loginFn({ data: credentials })
+    if ('requires2fa' in response && response.requires2fa) {
+      set({ requires2fa: true, isLoading: false })
+      return
+    }
+    set({
+      user: response.user,
+      expiresIn: response.expiresIn,
+      isLoading: false,
+      requires2fa: false,
+    })
+  } catch (err) {
+    set({ error: err.message, isLoading: false })
+    throw err
+  }
+},
+```
+
+When `requires2fa` is `true`, the login form switches to a 2FA code input. After the user submits the code:
+
+```typescript
+verify2fa: async (code) => {
+  set({ error: null, isLoading: true })
+  try {
+    const response = await verify2faFn({ data: { code } })
+    set({
+      user: response.user,
+      expiresIn: response.expiresIn,
+      isLoading: false,
+      requires2fa: false,
+    })
+  } catch (err) {
+    set({ error: err.message, isLoading: false })
+    throw err
+  }
+},
+```
+
+Recovery code verification works the same way:
+
+```typescript
+verify2faRecovery: async (code) => {
+  set({ error: null, isLoading: true })
+  try {
+    const response = await verify2faRecoveryFn({ data: { code } })
+    set({
+      user: response.user,
+      expiresIn: response.expiresIn,
+      isLoading: false,
+      requires2fa: false,
+    })
+  } catch (err) {
+    set({ error: err.message, isLoading: false })
+    throw err
+  }
+},
+```
+
+### Server Functions (TanStack)
+
+The 2FA server functions are defined in `apps/web-tanstack/src/lib/server/two-factor.ts`:
+
+```typescript
+export const setup2faFn = createServerFn({ method: 'POST' })
+  .handler(async () => {
+    const adapter = getAuthAdapter()
+    return adapter.setup2fa()
+  })
+
+export const enable2faFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { code: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    return adapter.enable2fa(data.code)
+  })
+
+export const verify2faFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { code: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    const response = await adapter.verify2fa(data.code)
+    return { user: toUser(response.user), expiresIn: response.tokens.expires_in ?? null }
+  })
+
+export const disable2faFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { code: string }) => data)
+  .handler(async ({ data }) => {
+    const adapter = getAuthAdapter()
+    return adapter.disable2fa(data.code)
+  })
+```
+
+## Backend Implementation
+
+All three backends use standard TOTP libraries:
+
+| Backend | Library | Storage |
+|---------|---------|---------|
+| Laravel | `pragmarx/google2fa-laravel` | `two_factor_secret` column on users table |
+| Symfony | `scheb/2fa-totp` | `twoFactorSecret` property on User entity |
+| Hono | `otpauth` (npm) | `two_factor_secret` column in users table |
+
+Recovery codes are stored as hashed values. Each code is deleted after successful use.
+
+## Rate Limiting
+
+2FA endpoints are rate-limited to prevent brute force attacks:
+
+| Endpoint | Max Attempts | Window |
+|----------|-------------|--------|
+| 2FA verify | 10 | 15 minutes |
+| Recovery verify | 5 | 15 minutes |
+
+After exceeding the limit, the user must wait for the window to reset. The rate limit is scoped to IP + user ID.
+
+## Settings Page
+
+The user settings page provides a 2FA management UI:
+
+1. **Status display**: Shows whether 2FA is enabled
+2. **Setup wizard**: QR code display, code verification, recovery codes download
+3. **Disable button**: Requires TOTP code confirmation
+4. **Regenerate recovery codes**: Available when 2FA is already enabled

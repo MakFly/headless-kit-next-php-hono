@@ -4,13 +4,13 @@ import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "astro/config"
 import react from "@astrojs/react"
 import mdx from "@astrojs/mdx"
-import node from "@astrojs/node"
+import vercel from "@astrojs/vercel"
 import sitemap from "@astrojs/sitemap"
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://headlesskit.dev",
-  adapter: node({ mode: "standalone" }),
+  adapter: vercel(),
   i18n: {
     defaultLocale: "en",
     locales: ["en", "fr"],

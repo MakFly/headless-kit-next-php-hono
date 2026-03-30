@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { signIn } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -20,11 +20,10 @@ export function LoginForm({ isDev = false, locale = "en" }: { isDev?: boolean; l
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [redirect, setRedirect] = useState("/dashboard")
-
-  useEffect(() => {
-    setRedirect(new URLSearchParams(window.location.search).get("redirect") || "/dashboard")
-  }, [])
+  const redirect = useMemo(
+    () => new URLSearchParams(window.location.search).get("redirect") || "/dashboard",
+    []
+  )
 
   function fillAccount(account: (typeof DEV_ACCOUNTS)[number]) {
     setEmail(account.email)

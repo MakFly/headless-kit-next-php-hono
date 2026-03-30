@@ -6,21 +6,9 @@
  */
 
 import postgres from "postgres"
-import { randomBytes } from "crypto"
 
 const DATABASE_URL = process.env.DATABASE_URL || "postgres://headless:headless@localhost:5432/headless_site"
 const client = postgres(DATABASE_URL)
-
-function generateLicenseKey(): string {
-  const segments = Array.from({ length: 4 }, () =>
-    randomBytes(4).toString("hex").toUpperCase()
-  )
-  return `HK-${segments.join("-")}`
-}
-
-function createId(): string {
-  return randomBytes(12).toString("hex")
-}
 
 async function seed() {
   console.log("🌱 Checking if data already exists...")

@@ -13,12 +13,14 @@ function json(data: Record<string, unknown>, status = 200) {
 }
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const user = locals.user as any
   if (!user || user.role !== "admin") {
     return json({ success: false, message: "Unauthorized" }, 403)
   }
 
   const action = params.action
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let body: Record<string, any> = {}
   try {
     body = await request.json()

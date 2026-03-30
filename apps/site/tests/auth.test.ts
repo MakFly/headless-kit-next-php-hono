@@ -5,7 +5,7 @@
  * Run: bun test tests/auth.test.ts
  */
 
-import { describe, it, expect, beforeAll } from "bun:test"
+import { describe, it, expect } from "bun:test"
 
 const BASE = process.env.SITE_URL || "http://localhost:4321"
 

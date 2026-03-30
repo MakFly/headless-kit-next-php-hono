@@ -4,11 +4,10 @@ import { getMessages, type Locale } from "@/i18n"
 export function AuthNavButtons({ locale = "en", productionMode = false }: { locale?: Locale; productionMode?: boolean }) {
   const t = getMessages(locale)
   const [user, setUser] = useState<{ name: string; email: string; role?: string } | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!productionMode)
 
   useEffect(() => {
     if (productionMode) {
-      setLoading(false)
       return
     }
     fetch("/api/auth/get-session", { credentials: "include" })

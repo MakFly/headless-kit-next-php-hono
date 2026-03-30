@@ -5,13 +5,11 @@
  */
 
 import postgres from "postgres"
-import { drizzle } from "drizzle-orm/postgres-js"
 import { randomBytes } from "crypto"
 
 const DATABASE_URL = process.env.DATABASE_URL || "postgres://headless:headless@localhost:5432/headless_site"
 
 const client = postgres(DATABASE_URL)
-const db = drizzle(client)
 
 function generateLicenseKey(): string {
   const segments = Array.from({ length: 4 }, () =>

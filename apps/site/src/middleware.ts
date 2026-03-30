@@ -47,7 +47,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     })
 
     if (session) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       context.locals.user = session.user as any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       context.locals.session = session.session as any
     } else {
       context.locals.user = null

@@ -41,6 +41,7 @@ import { Route as DashboardPostsRouteImport } from './routes/dashboard/posts'
 import { Route as DashboardPermissionsRouteImport } from './routes/dashboard/permissions'
 import { Route as DashboardHelpRouteImport } from './routes/dashboard/help'
 import { Route as DashboardApiKeysRouteImport } from './routes/dashboard/api-keys'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
@@ -227,6 +228,11 @@ const DashboardApiKeysRoute = DashboardApiKeysRouteImport.update({
   path: '/api-keys',
   getParentRoute: () => DashboardRoute,
 } as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -370,6 +376,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/api/health': typeof ApiHealthRoute
   '/dashboard/api-keys': typeof DashboardApiKeysRoute
   '/dashboard/help': typeof DashboardHelpRoute
   '/dashboard/permissions': typeof DashboardPermissionsRoute
@@ -425,6 +432,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/api/health': typeof ApiHealthRoute
   '/dashboard/api-keys': typeof DashboardApiKeysRoute
   '/dashboard/help': typeof DashboardHelpRoute
   '/dashboard/permissions': typeof DashboardPermissionsRoute
@@ -484,6 +492,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/api/health': typeof ApiHealthRoute
   '/dashboard/api-keys': typeof DashboardApiKeysRoute
   '/dashboard/help': typeof DashboardHelpRoute
   '/dashboard/permissions': typeof DashboardPermissionsRoute
@@ -545,6 +554,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/api/health'
     | '/dashboard/api-keys'
     | '/dashboard/help'
     | '/dashboard/permissions'
@@ -600,6 +610,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/api/health'
     | '/dashboard/api-keys'
     | '/dashboard/help'
     | '/dashboard/permissions'
@@ -658,6 +669,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/_auth/reset-password'
+    | '/api/health'
     | '/dashboard/api-keys'
     | '/dashboard/help'
     | '/dashboard/permissions'
@@ -715,6 +727,7 @@ export interface RootRouteChildren {
   SaasRoute: typeof SaasRouteWithChildren
   ShopRoute: typeof ShopRouteWithChildren
   SupportRoute: typeof SupportRouteWithChildren
+  ApiHealthRoute: typeof ApiHealthRoute
   OauthCallbackRoute: typeof OauthCallbackRoute
   ApiAiChatRoute: typeof ApiAiChatRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
@@ -945,6 +958,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/api-keys'
       preLoaderRoute: typeof DashboardApiKeysRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_auth/reset-password': {
       id: '/_auth/reset-password'
@@ -1319,6 +1339,7 @@ const rootRouteChildren: RootRouteChildren = {
   SaasRoute: SaasRouteWithChildren,
   ShopRoute: ShopRouteWithChildren,
   SupportRoute: SupportRouteWithChildren,
+  ApiHealthRoute: ApiHealthRoute,
   OauthCallbackRoute: OauthCallbackRoute,
   ApiAiChatRoute: ApiAiChatRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,

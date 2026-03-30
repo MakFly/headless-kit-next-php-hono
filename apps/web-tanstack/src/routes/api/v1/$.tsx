@@ -4,18 +4,14 @@ import {
   getCookie,
   setCookie,
 } from '@tanstack/react-start/server'
-import type {AdapterConfig, BackendType} from '@/lib/adapters';
 import {
-
-
-  getAdapterConfig
-} from '@/lib/adapters'
-import { ApiException, apiRequest, readResponseBody } from '@/lib/http'
-import {
-  isAuthRoute,
   checkRateLimit,
+  isAuthRoute,
   validatePathSegments,
 } from './proxy-utils'
+import type { AdapterConfig, BackendType } from '@/lib/adapters'
+import { getAdapterConfig } from '@/lib/adapters'
+import { ApiException, apiRequest, readResponseBody } from '@/lib/http'
 import {
   COOKIE_NAMES,
   TOKEN_CONFIG,

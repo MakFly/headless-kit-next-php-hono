@@ -44,8 +44,7 @@ apps/
 ├── api-laravel/      # Laravel 12 + BetterAuth — port 8000
 ├── api-sf/           # Symfony 8 + BetterAuth (Paseto V4) — port 8002
 ├── api-hono/         # Hono 4 + Drizzle + Bun — port 8003
-├── landing/          # Astro landing page — port 4000
-└── docs/             # Astro Starlight docs — port 4001
+└── site/             # Astro site (landing + docs) — port 4321
 
 packages/
 └── create-headless-app/  # CLI scaffolder

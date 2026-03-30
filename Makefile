@@ -18,7 +18,7 @@ TMP_DIR   := /tmp/headless-test
 .PHONY: help install build lint test clean \
         dev-next-laravel dev-next-hono dev-next-sf \
         dev-tanstack-laravel dev-tanstack-hono dev-tanstack-sf \
-        dev-all dev-landing dev-docs \
+        dev-all dev-site dev-docs \
         api-reset api-sf-reset api-hono-reset \
         qa qa-hono qa-laravel qa-sf qa-lint \
         cli-build cli-test cli-try cli-try-all cli-clean \
@@ -47,8 +47,7 @@ help:
 	@echo "  $(C_GREEN)dev-all$(C_RESET)              Tout $(C_DIM)(6 apps)$(C_RESET)"
 	@echo ""
 	@echo "  $(C_BOLD)  Sites$(C_RESET)"
-	@echo "  $(C_GREEN)dev-landing$(C_RESET)          Landing page  $(C_DIM):4000$(C_RESET)"
-	@echo "  $(C_GREEN)dev-docs$(C_RESET)             Documentation $(C_DIM):4001$(C_RESET)"
+	@echo "  $(C_GREEN)dev-site$(C_RESET)             Site (landing + docs) $(C_DIM):4321$(C_RESET)"
 	@echo ""
 	@echo "  $(C_BOLD)QA$(C_RESET)  $(C_DIM)lint + analyse + tests$(C_RESET)"
 	@echo "  $(C_GREEN)qa$(C_RESET)                   Tous les checks $(C_DIM)(lint + hono + laravel + sf)$(C_RESET)"
@@ -119,13 +118,9 @@ dev-all:
 	@echo "  $(C_CYAN)►$(C_RESET) All apps"
 	@bun run dev:all
 
-dev-landing:
-	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Landing$(C_RESET) $(C_DIM):4000$(C_RESET)"
-	@cd apps/landing && bun run dev
-
-dev-docs:
-	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Docs$(C_RESET) $(C_DIM):4001$(C_RESET)"
-	@cd apps/docs && bun run dev
+dev-site:
+	@echo "  $(C_CYAN)►$(C_RESET) $(C_BOLD)Site$(C_RESET) $(C_DIM):4321$(C_RESET)"
+	@cd apps/site && bun run dev
 
 # ============================================================================
 # QA — lint + analyse + tests

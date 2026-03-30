@@ -1,0 +1,50 @@
+---
+export const prerender = false
+
+import { getLocale, getMessages } from "@/i18n"
+import Layout from "@/layouts/main.astro"
+import JsonLd from "@/components/JsonLd.astro"
+import Navbar from "@/components/landing/Navbar.astro"
+import Hero from "@/components/landing/Hero.astro"
+import SocialProof from "@/components/landing/SocialProof.astro"
+import FeaturesGrid from "@/components/landing/FeaturesGrid.astro"
+import ModulesShowcase from "@/components/landing/ModulesShowcase.astro"
+import ArchitectureDiagram from "@/components/landing/ArchitectureDiagram.astro"
+import QuickStart from "@/components/landing/QuickStart.astro"
+import Pricing from "@/components/landing/Pricing.astro"
+import FAQ from "@/components/landing/FAQ.astro"
+import CTABanner from "@/components/landing/CTABanner.astro"
+import Footer from "@/components/landing/Footer.astro"
+
+const locale = getLocale(Astro.currentLocale)
+const t = getMessages(locale)
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": t.faq.items.map((item) => ({
+    "@type": "Question",
+    "name": item.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.a,
+    },
+  })),
+}
+---
+
+<Layout>
+  <JsonLd data={faqJsonLd} />
+  <Navbar />
+  <main>
+    <Hero />
+    <SocialProof />
+    <FeaturesGrid />
+    <ModulesShowcase />
+    <ArchitectureDiagram />
+    <QuickStart />
+    <Pricing />
+    <FAQ />
+    <CTABanner />
+  </main>
+  <Footer />
+</Layout>

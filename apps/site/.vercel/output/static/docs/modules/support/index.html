@@ -1,0 +1,314 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light dark"><!-- Primary Meta --><meta name="description" content="Helpdesk and support ticket system with conversations, agent queue, canned responses, and ratings."><!-- Open Graph --><meta property="og:type" content="article"><meta property="og:url" content="https://headlesskit.dev/docs/modules/support/"><meta property="og:title" content="Support Module — Headless Kit Docs"><meta property="og:description" content="Helpdesk and support ticket system with conversations, agent queue, canned responses, and ratings."><meta property="og:image" content="https://headlesskit.dev/og-image.png"><meta property="og:site_name" content="Headless Kit"><meta property="og:locale" content="en_US"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Support Module — Headless Kit Docs"><meta name="twitter:description" content="Helpdesk and support ticket system with conversations, agent queue, canned responses, and ratings."><meta name="twitter:image" content="https://headlesskit.dev/og-image.png"><!-- Canonical --><link rel="canonical" href="https://headlesskit.dev/docs/modules/support/"><!-- Hreflang --><link rel="alternate" hreflang="en" href="https://headlesskit.dev/docs/modules/support/"><link rel="alternate" hreflang="fr" href="https://headlesskit.dev/fr/docs/modules/support/"><link rel="alternate" hreflang="x-default" href="https://headlesskit.dev/docs/modules/support/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Support Module — Headless Kit Docs</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://headlesskit.dev/docs"},{"@type":"ListItem","position":2,"name":"Modules","item":"https://headlesskit.dev/docs/modules"},{"@type":"ListItem","position":3,"name":"Support Module"}]}</script><script>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script><link rel="stylesheet" href="/_astro/index.BXyRLzR7.css">
+<style>.pagefind-ui[data-astro-cid-t4y4xlal]{--pagefind-ui-scale: .9;--pagefind-ui-primary: hsl(var(--primary));--pagefind-ui-text: hsl(var(--foreground));--pagefind-ui-background: hsl(var(--background));--pagefind-ui-border: hsl(var(--border));--pagefind-ui-border-width: 1px;--pagefind-ui-border-radius: 8px;--pagefind-ui-font: inherit}
+</style></head> <body class="min-h-svh antialiased bg-background text-foreground"> <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+Skip to content
+</a> <nav class="fixed top-0 z-50 w-full border-b border-border backdrop-blur-md bg-background/80" aria-label="Documentation navigation"> <div class="flex h-14 items-center justify-between px-4 md:px-6"> <!-- Left: Logo + mobile menu --> <div class="flex items-center gap-3"> <button data-toggle-sidebar class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted md:hidden" aria-label="Toggle sidebar"> <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"></path> </svg> </button> <a href="/" class="flex items-center gap-2 text-sm font-semibold text-foreground">
+Headless Kit
+</a> <span class="hidden text-border md:inline">|</span> <a href="/docs/getting-started/installation" class="hidden text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground md:inline"> Docs </a> </div> <!-- Right: Links + Theme + Auth --> <div class="flex items-center gap-3"> <a href="https://github.com/headless-kit/headless-kit" target="_blank" rel="noopener noreferrer" class="hidden font-mono text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline"> GitHub </a> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z1Dpcgz" prefix="r4" component-url="/_astro/ThemeToggle.BdSTQQ74.js" component-export="ThemeToggle" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;ThemeToggle&quot;,&quot;value&quot;:true}" await-children><button data-slot="button" data-variant="ghost" data-size="icon" class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 rounded-full text-muted-foreground hover:text-foreground" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon size-4" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button><!--astro:end--></astro-island> <astro-island uid="ZGOCeI" prefix="r5" component-url="/_astro/AuthNavButtons.C9pdFHE9.js" component-export="AuthNavButtons" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;AuthNavButtons&quot;,&quot;value&quot;:true}" await-children><div class="hidden h-8 w-20 animate-pulse rounded-full bg-muted sm:block"></div><!--astro:end--></astro-island> </div> </div> </nav> <div class="flex pt-14"> <!-- Sidebar --> <aside id="docs-sidebar" class="fixed top-14 left-0 z-40 hidden h-[calc(100svh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm md:block"> <div class="border-b border-border p-3"> <div id="search" class="pagefind-ui" data-pagefind-ui data-astro-cid-t4y4xlal></div> <link href="/pagefind/pagefind-ui.css" rel="stylesheet"> <script src="/pagefind/pagefind-ui.js"></script> <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+    })
+  })
+</script>  </div> <nav class="p-4 space-y-1" aria-label="Documentation sidebar"> <details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Getting Started </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/getting-started/installation" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Installation </a> </li><li> <a href="/docs/getting-started/project-structure" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Project Structure </a> </li><li> <a href="/docs/getting-started/configuration" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Configuration </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Architecture </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/architecture/bff-pattern" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> BFF Pattern </a> </li><li> <a href="/docs/architecture/auth-flow" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Auth Flow </a> </li><li> <a href="/docs/architecture/adapters" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Adapters </a> </li><li> <a href="/docs/architecture/vertical-slice" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Vertical Slice </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Backends </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/backends/laravel" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Laravel </a> </li><li> <a href="/docs/backends/symfony" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Symfony </a> </li><li> <a href="/docs/backends/hono" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Hono </a> </li> </ul> </details><details open class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-primary"> <span class="text-[10px] transition-transform group-open:rotate-90 text-primary">
+▶
+</span> Modules </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/modules/shop" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Shop </a> </li><li> <a href="/docs/modules/admin" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Admin </a> </li><li> <a href="/docs/modules/saas" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> SaaS </a> </li><li> <a href="/docs/modules/support" class="block rounded-md px-3 py-1.5 text-xs transition-colors bg-primary/10 text-primary" aria-current="page"> Support </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> CLI </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/cli/getting-started" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Getting Started </a> </li><li> <a href="/docs/cli/presets" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Presets </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Guides </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/guides/authentication" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Authentication </a> </li><li> <a href="/docs/guides/tanstack-start" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> TanStack Start </a> </li><li> <a href="/docs/guides/rbac" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> RBAC </a> </li><li> <a href="/docs/guides/two-factor" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Two-Factor Auth </a> </li><li> <a href="/docs/guides/oauth" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> OAuth </a> </li><li> <a href="/docs/guides/custom-adapter" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Custom Adapter </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Deploy </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/deploy/docker" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Docker </a> </li><li> <a href="/docs/deploy/production" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Production </a> </li> </ul> </details> </nav> </aside> <!-- Main content --> <main id="main-content" class="min-w-0 flex-1 md:ml-64 lg:mr-56"> <div class="mx-auto max-w-3xl px-6 py-10 md:px-8"> <nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted-foreground"> <ol class="flex items-center gap-1.5"> <li><a href="/docs" class="hover:text-foreground transition-colors">Docs</a></li> <li class="text-muted-foreground/50">/</li> <li><a href="/docs/modules" class="hover:text-foreground transition-colors">Modules</a></li> <li class="text-muted-foreground/50">/</li> <li class="text-foreground font-medium">Support Module</li> </ol> </nav> <article class="docs-prose"> <h1>Support Module</h1> <p class="text-lg text-muted-foreground mb-8 !mt-0">Helpdesk and support ticket system with conversations, agent queue, canned responses, and ratings.</p>  <h1 id="support-module">Support Module</h1>
+<p>The Support module provides a helpdesk system with conversation-based tickets, agent assignment, canned responses, and customer satisfaction ratings.</p>
+<h2 id="user-endpoints">User Endpoints</h2>
+<p>All user endpoints require authentication.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/support/conversations</code></td><td>List user’s conversations</td></tr><tr><td>POST</td><td><code>/api/v1/support/conversations</code></td><td>Create a new support ticket</td></tr><tr><td>GET</td><td><code>/api/v1/support/conversations/{id}</code></td><td>Get conversation with messages</td></tr><tr><td>POST</td><td><code>/api/v1/support/conversations/{id}/messages</code></td><td>Send a message in conversation</td></tr><tr><td>POST</td><td><code>/api/v1/support/conversations/{id}/rate</code></td><td>Rate a resolved conversation</td></tr></tbody></table>
+<h3 id="creating-a-ticket">Creating a Ticket</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#24292E;--shiki-dark:#A9B1D6">POST /api/v</span><span style="color:#005CC5;--shiki-dark:#FF9E64">1</span><span style="color:#24292E;--shiki-dark:#A9B1D6">/support/conversations</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">subject</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">Order issue</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">message</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">I have a problem with my order #123</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<h3 id="sending-a-message">Sending a Message</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#24292E;--shiki-dark:#A9B1D6">POST /api/v</span><span style="color:#005CC5;--shiki-dark:#FF9E64">1</span><span style="color:#24292E;--shiki-dark:#A9B1D6">/support/conversations/</span><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FF5370;--shiki-dark-font-style:inherit">id</span><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span><span style="color:#24292E;--shiki-dark:#A9B1D6">/messages</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">content</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">Here are the details...</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<h3 id="rating-a-conversation">Rating a Conversation</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#24292E;--shiki-dark:#A9B1D6">POST /api/v</span><span style="color:#005CC5;--shiki-dark:#FF9E64">1</span><span style="color:#24292E;--shiki-dark:#A9B1D6">/support/conversations/</span><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span><span style="color:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FF5370;--shiki-dark-font-style:inherit">id</span><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span><span style="color:#24292E;--shiki-dark:#A9B1D6">/rate</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">rating</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> 5</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">comment</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">Great support, thanks!</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<h2 id="agent-endpoints">Agent Endpoints</h2>
+<p>Agent endpoints require <code>auth + role:admin</code>. These are used by support agents to manage the ticket queue.</p>
+<h3 id="queue-management">Queue Management</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/support/agent/queue</code></td><td>Get unassigned conversations</td></tr><tr><td>GET</td><td><code>/api/v1/support/agent/assigned</code></td><td>Get conversations assigned to current agent</td></tr><tr><td>PATCH</td><td><code>/api/v1/support/agent/conversations/{id}/assign</code></td><td>Assign/claim a conversation</td></tr><tr><td>PATCH</td><td><code>/api/v1/support/agent/conversations/{id}/status</code></td><td>Update conversation status (open, in_progress, resolved, closed)</td></tr></tbody></table>
+<h3 id="canned-responses">Canned Responses</h3>
+<p>Canned responses are pre-written templates that agents can use to quickly reply to common questions.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/support/agent/canned</code></td><td>List all canned responses</td></tr><tr><td>POST</td><td><code>/api/v1/support/agent/canned</code></td><td>Create canned response</td></tr><tr><td>PUT</td><td><code>/api/v1/support/agent/canned/{id}</code></td><td>Update canned response</td></tr><tr><td>DELETE</td><td><code>/api/v1/support/agent/canned/{id}</code></td><td>Delete canned response</td></tr></tbody></table>
+<p>Note: Hono uses <code>PATCH</code> instead of <code>PUT</code> for updating canned responses.</p>
+<h3 id="analytics">Analytics</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/support/agent/ratings</code></td><td>Get rating statistics (average, distribution)</td></tr></tbody></table>
+<h2 id="conversation-lifecycle">Conversation Lifecycle</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>1. User creates conversation    → status: &quot;open&quot;</span></span>
+<span class="line"><span>2. Agent claims from queue      → status: &quot;in_progress&quot;, assigned_to: agent_id</span></span>
+<span class="line"><span>3. Messages exchanged           → (status unchanged)</span></span>
+<span class="line"><span>4. Agent resolves               → status: &quot;resolved&quot;</span></span>
+<span class="line"><span>5. User rates conversation      → rating saved</span></span>
+<span class="line"><span>6. Agent or system closes       → status: &quot;closed&quot;</span></span></code></pre>
+<h2 id="implementation-per-backend">Implementation per Backend</h2>
+<h3 id="laravel-appsapi-laravel">Laravel (<code>apps/api-laravel/</code>)</h3>
+<p>Key files:</p>
+<ul>
+<li>Routes: <code>app/Features/Support/routes.php</code></li>
+<li>User actions: <code>app/Features/Support/Actions/</code> — ListConversations, CreateConversation, ShowConversation, SendMessage, RateConversation</li>
+<li>Agent actions: <code>app/Features/Support/Actions/</code> — AgentQueue, AgentAssigned, AssignConversation, UpdateConversationStatus, ListCannedResponses, CreateCannedResponse, UpdateCannedResponse, DeleteCannedResponse, RatingsStats</li>
+</ul>
+<p>User routes use <code>auth:betterauth</code> middleware. Agent routes add <code>role:admin</code>:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="php"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">Route</span><span style="color:#D73A49;--shiki-dark:#89DDFF">::</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">middleware</span><span style="color:#24292E;--shiki-dark:#9ABDF5">([</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">auth:betterauth</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">role:admin</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#9ABDF5">])</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">    -&gt;</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">prefix</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">support/agent</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">    -&gt;</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">group</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#D73A49;--shiki-dark:#BB9AF7">function</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> ()</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> {</span><span style="color:#D73A49;--shiki-light-font-weight:inherit;--shiki-dark:#F7768E;--shiki-dark-font-weight:bold"> ...</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> })</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span></code></pre>
+<h3 id="symfony-appsapi-sf">Symfony (<code>apps/api-sf/</code>)</h3>
+<p>Key files:</p>
+<ul>
+<li>Controllers: <code>src/Feature/Support/Controller/</code> (8 controllers: CreateConversationController, SendMessageController, RateConversationController, AgentQueueController, AgentAssignedController, AssignConversationController, UpdateStatusController, RatingStatsController)</li>
+<li>API Platform resources: Conversation (GetCollection, Get, Patch), ChatMessage (GetCollection, Post), CannedResponse (GetCollection, Get, Post, Patch, Delete)</li>
+</ul>
+<p>Conversation listing and detail for users go through API Platform with security scoping. Business operations (create, send message, assign, rate) use invokable controllers.</p>
+<h3 id="hono-appsapi-hono">Hono (<code>apps/api-hono/</code>)</h3>
+<p>Key files:</p>
+<ul>
+<li>Feature: <code>src/features/support/</code> (5 files: support.routes.ts, support.handlers.ts, support.service.ts, support.repository.ts, support.schemas.ts)</li>
+</ul>
+<p>User endpoints use <code>authMiddleware</code> (applied to all support routes). Agent endpoints add <code>adminMiddleware</code> inline:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#24292E;--shiki-dark:#C0CAF5">support</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">get</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">/agent/queue</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> adminMiddleware</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> (</span><span style="color:#E36209;--shiki-dark:#E0AF68">c</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#D73A49;--shiki-dark:#BB9AF7"> =&gt;</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> supportHandlers</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">getAgentQueue</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#24292E;--shiki-dark:#C0CAF5">c</span><span style="color:#24292E;--shiki-dark:#9ABDF5">))</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span></code></pre>
+<h2 id="frontend-nextjs-bff">Frontend (Next.js BFF)</h2>
+<h3 id="pages">Pages</h3>
+<p>Located in <code>apps/web/src/app/(support)/support/</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Route</th><th>Page</th><th>Description</th></tr></thead><tbody><tr><td><code>/support</code></td><td><code>(app)/page.tsx</code></td><td>Conversation list</td></tr><tr><td><code>/support/{ticketId}</code></td><td><code>(app)/[ticketId]/page.tsx</code></td><td>Conversation detail</td></tr><tr><td><code>/support/c/{id}</code></td><td><code>(app)/c/[id]/page.tsx</code></td><td>Conversation view (alternate)</td></tr><tr><td><code>/support/agent</code></td><td><code>(app)/agent/page.tsx</code></td><td>Agent queue dashboard</td></tr><tr><td><code>/support/agent/canned</code></td><td><code>(app)/agent/canned/page.tsx</code></td><td>Canned response management</td></tr><tr><td><code>/support/agent/ratings</code></td><td><code>(app)/agent/ratings/page.tsx</code></td><td>Rating analytics</td></tr></tbody></table>
+<p>The support section has its own auth pages at <code>/support/auth/</code> (login, register, forgot-password, reset-password).</p>
+<h3 id="server-actions">Server Actions</h3>
+<p>Located in <code>apps/web/src/lib/actions/support/</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>File</th><th>Actions</th></tr></thead><tbody><tr><td><code>agent.ts</code></td><td>Agent queue, assigned conversations, assign/claim, update status</td></tr><tr><td><code>canned.ts</code></td><td>CRUD operations for canned responses</td></tr><tr><td><code>ai.ts</code></td><td>AI-assisted response suggestions</td></tr></tbody></table>
+<p>Conversation creation, message sending, and listing are handled through the general support actions. All actions use the BFF client for backend communication.</p>
+<h2 id="response-format">Response Format</h2>
+<p>Conversations include nested messages and metadata:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">success</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> true</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">data</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> {</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">id</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">conv-123</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">subject</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">Order issue</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">status</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">in_progress</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">assignedTo</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">agent-456</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">messages</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> [</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">      {</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">        &quot;</span><span style="color:#005CC5;--shiki-dark:#7DCFFF">id</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">msg-1</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">        &quot;</span><span style="color:#005CC5;--shiki-dark:#7DCFFF">content</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">I have a problem...</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">        &quot;</span><span style="color:#005CC5;--shiki-dark:#7DCFFF">sender</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">user</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">        &quot;</span><span style="color:#005CC5;--shiki-dark:#7DCFFF">createdAt</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">2025-01-15T10:30:00Z</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">      }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">    ]</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">rating</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> null</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">createdAt</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">2025-01-15T10:30:00Z</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">updatedAt</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">2025-01-15T11:00:00Z</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">  }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>  </article> <nav class="mt-16 flex items-stretch gap-4 border-t border-border pt-6" aria-label="Page navigation"> <a href="/docs/modules/saas" class="group flex flex-1 flex-col rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Previous</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors">
+← SaaS </span> </a> <a href="/docs/cli/getting-started" class="group flex flex-1 flex-col items-end rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Next</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors"> Getting Started →
+</span> </a> </nav> </div> </main> <!-- Table of Contents --> <aside class="fixed top-14 right-0 hidden h-[calc(100svh-3.5rem)] w-56 overflow-y-auto border-l border-border bg-background/95 p-4 lg:block"> <astro-island uid="Z2orOR0" prefix="r3" component-url="/_astro/TableOfContents.CkQmb82v.js" component-export="TableOfContents" renderer-url="/_astro/client.CwSvYkGX.js" props="{&quot;headings&quot;:[1,[[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;user-endpoints&quot;],&quot;text&quot;:[0,&quot;User Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;creating-a-ticket&quot;],&quot;text&quot;:[0,&quot;Creating a Ticket&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;sending-a-message&quot;],&quot;text&quot;:[0,&quot;Sending a Message&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;rating-a-conversation&quot;],&quot;text&quot;:[0,&quot;Rating a Conversation&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;agent-endpoints&quot;],&quot;text&quot;:[0,&quot;Agent Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;queue-management&quot;],&quot;text&quot;:[0,&quot;Queue Management&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;canned-responses&quot;],&quot;text&quot;:[0,&quot;Canned Responses&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;analytics&quot;],&quot;text&quot;:[0,&quot;Analytics&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;conversation-lifecycle&quot;],&quot;text&quot;:[0,&quot;Conversation Lifecycle&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;implementation-per-backend&quot;],&quot;text&quot;:[0,&quot;Implementation per Backend&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;laravel-appsapi-laravel&quot;],&quot;text&quot;:[0,&quot;Laravel (apps/api-laravel/)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;symfony-appsapi-sf&quot;],&quot;text&quot;:[0,&quot;Symfony (apps/api-sf/)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;hono-appsapi-hono&quot;],&quot;text&quot;:[0,&quot;Hono (apps/api-hono/)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;frontend-nextjs-bff&quot;],&quot;text&quot;:[0,&quot;Frontend (Next.js BFF)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;pages&quot;],&quot;text&quot;:[0,&quot;Pages&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;server-actions&quot;],&quot;text&quot;:[0,&quot;Server Actions&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;response-format&quot;],&quot;text&quot;:[0,&quot;Response Format&quot;]}]]],&quot;locale&quot;:[0,&quot;en&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;TableOfContents&quot;,&quot;value&quot;:true}" await-children><nav aria-label="Table of contents"><p class="mb-3 text-[10px] uppercase tracking-widest text-muted-foreground">On this page</p><ul class="space-y-1"><li><a href="#user-endpoints" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">User Endpoints</a></li><li><a href="#creating-a-ticket" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Creating a Ticket</a></li><li><a href="#sending-a-message" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Sending a Message</a></li><li><a href="#rating-a-conversation" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Rating a Conversation</a></li><li><a href="#agent-endpoints" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Agent Endpoints</a></li><li><a href="#queue-management" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Queue Management</a></li><li><a href="#canned-responses" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Canned Responses</a></li><li><a href="#analytics" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Analytics</a></li><li><a href="#conversation-lifecycle" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Conversation Lifecycle</a></li><li><a href="#implementation-per-backend" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Implementation per Backend</a></li><li><a href="#laravel-appsapi-laravel" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Laravel (apps/api-laravel/)</a></li><li><a href="#symfony-appsapi-sf" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Symfony (apps/api-sf/)</a></li><li><a href="#hono-appsapi-hono" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Hono (apps/api-hono/)</a></li><li><a href="#frontend-nextjs-bff" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Frontend (Next.js BFF)</a></li><li><a href="#pages" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Pages</a></li><li><a href="#server-actions" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Server Actions</a></li><li><a href="#response-format" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Response Format</a></li></ul></nav><!--astro:end--></astro-island> </aside> </div> <!-- Mobile sidebar overlay --> <script>
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-sidebar]');
+        if (btn) {
+          const sidebar = document.getElementById('docs-sidebar');
+          sidebar.classList.toggle('hidden');
+          sidebar.classList.toggle('block');
+        }
+        // Close on backdrop click
+        if (e.target.id === 'sidebar-backdrop') {
+          document.getElementById('docs-sidebar').classList.add('hidden');
+          document.getElementById('docs-sidebar').classList.remove('block');
+        }
+      });
+    </script> </body> </html>

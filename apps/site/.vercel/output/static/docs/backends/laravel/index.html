@@ -1,0 +1,467 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light dark"><!-- Primary Meta --><meta name="description" content="Laravel 12 API backend with BetterAuth, Vertical Slice Architecture, and API Platform OpenAPI docs."><!-- Open Graph --><meta property="og:type" content="article"><meta property="og:url" content="https://headlesskit.dev/docs/backends/laravel/"><meta property="og:title" content="Laravel Backend — Headless Kit Docs"><meta property="og:description" content="Laravel 12 API backend with BetterAuth, Vertical Slice Architecture, and API Platform OpenAPI docs."><meta property="og:image" content="https://headlesskit.dev/og-image.png"><meta property="og:site_name" content="Headless Kit"><meta property="og:locale" content="en_US"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Laravel Backend — Headless Kit Docs"><meta name="twitter:description" content="Laravel 12 API backend with BetterAuth, Vertical Slice Architecture, and API Platform OpenAPI docs."><meta name="twitter:image" content="https://headlesskit.dev/og-image.png"><!-- Canonical --><link rel="canonical" href="https://headlesskit.dev/docs/backends/laravel/"><!-- Hreflang --><link rel="alternate" hreflang="en" href="https://headlesskit.dev/docs/backends/laravel/"><link rel="alternate" hreflang="fr" href="https://headlesskit.dev/fr/docs/backends/laravel/"><link rel="alternate" hreflang="x-default" href="https://headlesskit.dev/docs/backends/laravel/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Laravel Backend — Headless Kit Docs</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://headlesskit.dev/docs"},{"@type":"ListItem","position":2,"name":"Backends","item":"https://headlesskit.dev/docs/backends"},{"@type":"ListItem","position":3,"name":"Laravel Backend"}]}</script><script>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script><link rel="stylesheet" href="/_astro/index.BXyRLzR7.css">
+<style>.pagefind-ui[data-astro-cid-t4y4xlal]{--pagefind-ui-scale: .9;--pagefind-ui-primary: hsl(var(--primary));--pagefind-ui-text: hsl(var(--foreground));--pagefind-ui-background: hsl(var(--background));--pagefind-ui-border: hsl(var(--border));--pagefind-ui-border-width: 1px;--pagefind-ui-border-radius: 8px;--pagefind-ui-font: inherit}
+</style></head> <body class="min-h-svh antialiased bg-background text-foreground"> <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+Skip to content
+</a> <nav class="fixed top-0 z-50 w-full border-b border-border backdrop-blur-md bg-background/80" aria-label="Documentation navigation"> <div class="flex h-14 items-center justify-between px-4 md:px-6"> <!-- Left: Logo + mobile menu --> <div class="flex items-center gap-3"> <button data-toggle-sidebar class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted md:hidden" aria-label="Toggle sidebar"> <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"></path> </svg> </button> <a href="/" class="flex items-center gap-2 text-sm font-semibold text-foreground">
+Headless Kit
+</a> <span class="hidden text-border md:inline">|</span> <a href="/docs/getting-started/installation" class="hidden text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground md:inline"> Docs </a> </div> <!-- Right: Links + Theme + Auth --> <div class="flex items-center gap-3"> <a href="https://github.com/headless-kit/headless-kit" target="_blank" rel="noopener noreferrer" class="hidden font-mono text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline"> GitHub </a> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z1Dpcgz" prefix="r4" component-url="/_astro/ThemeToggle.BdSTQQ74.js" component-export="ThemeToggle" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;ThemeToggle&quot;,&quot;value&quot;:true}" await-children><button data-slot="button" data-variant="ghost" data-size="icon" class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 rounded-full text-muted-foreground hover:text-foreground" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon size-4" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button><!--astro:end--></astro-island> <astro-island uid="ZGOCeI" prefix="r5" component-url="/_astro/AuthNavButtons.C9pdFHE9.js" component-export="AuthNavButtons" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;AuthNavButtons&quot;,&quot;value&quot;:true}" await-children><div class="hidden h-8 w-20 animate-pulse rounded-full bg-muted sm:block"></div><!--astro:end--></astro-island> </div> </div> </nav> <div class="flex pt-14"> <!-- Sidebar --> <aside id="docs-sidebar" class="fixed top-14 left-0 z-40 hidden h-[calc(100svh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm md:block"> <div class="border-b border-border p-3"> <div id="search" class="pagefind-ui" data-pagefind-ui data-astro-cid-t4y4xlal></div> <link href="/pagefind/pagefind-ui.css" rel="stylesheet"> <script src="/pagefind/pagefind-ui.js"></script> <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+    })
+  })
+</script>  </div> <nav class="p-4 space-y-1" aria-label="Documentation sidebar"> <details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Getting Started </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/getting-started/installation" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Installation </a> </li><li> <a href="/docs/getting-started/project-structure" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Project Structure </a> </li><li> <a href="/docs/getting-started/configuration" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Configuration </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Architecture </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/architecture/bff-pattern" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> BFF Pattern </a> </li><li> <a href="/docs/architecture/auth-flow" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Auth Flow </a> </li><li> <a href="/docs/architecture/adapters" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Adapters </a> </li><li> <a href="/docs/architecture/vertical-slice" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Vertical Slice </a> </li> </ul> </details><details open class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-primary"> <span class="text-[10px] transition-transform group-open:rotate-90 text-primary">
+▶
+</span> Backends </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/backends/laravel" class="block rounded-md px-3 py-1.5 text-xs transition-colors bg-primary/10 text-primary" aria-current="page"> Laravel </a> </li><li> <a href="/docs/backends/symfony" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Symfony </a> </li><li> <a href="/docs/backends/hono" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Hono </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Modules </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/modules/shop" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Shop </a> </li><li> <a href="/docs/modules/admin" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Admin </a> </li><li> <a href="/docs/modules/saas" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> SaaS </a> </li><li> <a href="/docs/modules/support" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Support </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> CLI </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/cli/getting-started" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Getting Started </a> </li><li> <a href="/docs/cli/presets" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Presets </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Guides </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/guides/authentication" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Authentication </a> </li><li> <a href="/docs/guides/tanstack-start" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> TanStack Start </a> </li><li> <a href="/docs/guides/rbac" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> RBAC </a> </li><li> <a href="/docs/guides/two-factor" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Two-Factor Auth </a> </li><li> <a href="/docs/guides/oauth" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> OAuth </a> </li><li> <a href="/docs/guides/custom-adapter" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Custom Adapter </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Deploy </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/deploy/docker" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Docker </a> </li><li> <a href="/docs/deploy/production" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Production </a> </li> </ul> </details> </nav> </aside> <!-- Main content --> <main id="main-content" class="min-w-0 flex-1 md:ml-64 lg:mr-56"> <div class="mx-auto max-w-3xl px-6 py-10 md:px-8"> <nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted-foreground"> <ol class="flex items-center gap-1.5"> <li><a href="/docs" class="hover:text-foreground transition-colors">Docs</a></li> <li class="text-muted-foreground/50">/</li> <li><a href="/docs/backends" class="hover:text-foreground transition-colors">Backends</a></li> <li class="text-muted-foreground/50">/</li> <li class="text-foreground font-medium">Laravel Backend</li> </ol> </nav> <article class="docs-prose"> <h1>Laravel Backend</h1> <p class="text-lg text-muted-foreground mb-8 !mt-0">Laravel 12 API backend with BetterAuth, Vertical Slice Architecture, and API Platform OpenAPI docs.</p>  <h1 id="laravel-backend">Laravel Backend</h1>
+<p>The Laravel backend (<code>apps/api-laravel/</code>) runs on <strong>port 8002</strong> and provides a full-featured REST API using Laravel 12, BetterAuth for authentication, and Eloquent ORM with SQLite.</p>
+<h2 id="setup">Setup</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">cd</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> apps/api-laravel</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">composer</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> install</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">cp</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> .env.example</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> .env</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> key:generate</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> migrate</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --seed</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> serve</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --port=8002</span></span></code></pre>
+<p>The API is now available at <code>http://localhost:8002/api/v1/</code>.</p>
+<h2 id="project-structure">Project Structure</h2>
+<p>The codebase follows <strong>Vertical Slice Architecture</strong> (VSA). Each feature is self-contained under <code>app/Features/</code>:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>app/</span></span>
+<span class="line"><span>├── Features/</span></span>
+<span class="line"><span>│   ├── Auth/          # Authentication (BetterAuth + custom actions)</span></span>
+<span class="line"><span>│   ├── Shop/          # Products &amp; categories (public)</span></span>
+<span class="line"><span>│   ├── Cart/          # Cart management (authenticated)</span></span>
+<span class="line"><span>│   ├── Orders/        # Order management (authenticated)</span></span>
+<span class="line"><span>│   ├── Users/         # User endpoints</span></span>
+<span class="line"><span>│   ├── Admin/         # Admin CRUD + analytics (role:admin)</span></span>
+<span class="line"><span>│   ├── Saas/          # Multi-tenant SaaS (org.rbac)</span></span>
+<span class="line"><span>│   └── Support/       # Helpdesk &amp; conversations</span></span>
+<span class="line"><span>├── Shared/</span></span>
+<span class="line"><span>│   ├── Models/        # ALL Eloquent models (User, Product, Order, Cart...)</span></span>
+<span class="line"><span>│   ├── Middleware/     # CheckRole, CheckPermission, OrgRbacMiddleware</span></span>
+<span class="line"><span>│   ├── Helpers/       # ApiResponse standardized responses</span></span>
+<span class="line"><span>│   └── Traits/        # ApiResponder trait</span></span></code></pre>
+<p>Each feature directory contains:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Directory</th><th>Purpose</th></tr></thead><tbody><tr><td><code>Actions/</code></td><td>Invokable Action classes (1 per endpoint)</td></tr><tr><td><code>Requests/</code></td><td>Form Request validation (optional)</td></tr><tr><td><code>Services/</code></td><td>Business logic (optional)</td></tr><tr><td><code>Formatters/</code></td><td>Static format methods (optional)</td></tr><tr><td><code>routes.php</code></td><td>Feature route definitions</td></tr></tbody></table>
+<p>All feature routes are included inside the <code>Route::prefix(&#39;v1&#39;)</code> group in <code>routes/api.php</code>.</p>
+<h2 id="authentication">Authentication</h2>
+<p>Laravel uses <strong>BetterAuth</strong> (<code>betterauth/laravel</code>) with Bearer tokens. BetterAuth handles the core auth routes natively; custom endpoints (password reset, 2FA, OAuth) are added as invokable Action classes.</p>
+<h3 id="auth-endpoints">Auth Endpoints</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead><tbody><tr><td>POST</td><td><code>/api/v1/auth/register</code></td><td>Public</td><td>Register a new user</td></tr><tr><td>POST</td><td><code>/api/v1/auth/login</code></td><td>Public</td><td>Login (returns access + refresh tokens)</td></tr><tr><td>POST</td><td><code>/api/v1/auth/refresh</code></td><td>Public</td><td>Refresh access token</td></tr><tr><td>GET</td><td><code>/api/v1/auth/me</code></td><td>Bearer</td><td>Get current user</td></tr><tr><td>PATCH</td><td><code>/api/v1/auth/me</code></td><td>Bearer</td><td>Update profile</td></tr><tr><td>DELETE</td><td><code>/api/v1/auth/me</code></td><td>Bearer</td><td>Delete account</td></tr><tr><td>POST</td><td><code>/api/v1/auth/logout</code></td><td>Bearer</td><td>Logout</td></tr><tr><td>POST</td><td><code>/api/v1/auth/revoke-all</code></td><td>Bearer</td><td>Revoke all sessions</td></tr><tr><td>PUT</td><td><code>/api/v1/auth/password</code></td><td>Bearer</td><td>Update password</td></tr></tbody></table>
+<h3 id="password-reset">Password Reset</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead><tbody><tr><td>POST</td><td><code>/api/v1/auth/password/forgot</code></td><td>Public (rate-limited)</td><td>Send reset email</td></tr><tr><td>POST</td><td><code>/api/v1/auth/password/reset</code></td><td>Public</td><td>Reset password with token</td></tr><tr><td>POST</td><td><code>/api/v1/auth/password/verify-token</code></td><td>Public</td><td>Verify reset token validity</td></tr></tbody></table>
+<h3 id="two-factor-authentication">Two-Factor Authentication</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/auth/2fa/status</code></td><td>Bearer</td><td>Check 2FA status</td></tr><tr><td>POST</td><td><code>/api/v1/auth/2fa/setup</code></td><td>Bearer</td><td>Generate TOTP secret + QR code</td></tr><tr><td>POST</td><td><code>/api/v1/auth/2fa/verify</code></td><td>Bearer</td><td>Verify TOTP code to enable 2FA</td></tr><tr><td>POST</td><td><code>/api/v1/auth/2fa/disable</code></td><td>Bearer</td><td>Disable 2FA</td></tr></tbody></table>
+<h3 id="oauth">OAuth</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/auth/oauth/providers</code></td><td>Public</td><td>List available providers</td></tr><tr><td>GET</td><td><code>/api/v1/auth/oauth/{provider}</code></td><td>Public</td><td>Redirect to OAuth provider</td></tr><tr><td>GET</td><td><code>/api/v1/auth/oauth/{provider}/callback</code></td><td>Public</td><td>OAuth callback</td></tr></tbody></table>
+<h3 id="magic-link">Magic Link</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead><tbody><tr><td>POST</td><td><code>/api/v1/auth/magic-link</code></td><td>Public</td><td>Send magic link email</td></tr><tr><td>GET</td><td><code>/api/v1/auth/magic-link/verify</code></td><td>Public</td><td>Verify magic link token</td></tr><tr><td>POST</td><td><code>/api/v1/auth/magic-link/check</code></td><td>Public</td><td>Check magic link status</td></tr></tbody></table>
+<h2 id="shop-endpoints-public">Shop Endpoints (Public)</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/products</code></td><td>List products (paginated, filterable)</td></tr><tr><td>GET</td><td><code>/api/v1/products/{slug}</code></td><td>Get product by slug</td></tr><tr><td>GET</td><td><code>/api/v1/categories</code></td><td>List categories</td></tr><tr><td>GET</td><td><code>/api/v1/categories/{slug}</code></td><td>Get category by slug</td></tr></tbody></table>
+<p>Source: <code>app/Features/Shop/Actions/</code></p>
+<h2 id="cart-endpoints-authenticated">Cart Endpoints (Authenticated)</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/cart</code></td><td>Get current user’s cart</td></tr><tr><td>POST</td><td><code>/api/v1/cart/items</code></td><td>Add item to cart</td></tr><tr><td>PATCH</td><td><code>/api/v1/cart/items/{id}</code></td><td>Update cart item quantity</td></tr><tr><td>DELETE</td><td><code>/api/v1/cart/items/{id}</code></td><td>Remove item from cart</td></tr></tbody></table>
+<p>Source: <code>app/Features/Cart/Actions/</code></p>
+<h2 id="order-endpoints-authenticated">Order Endpoints (Authenticated)</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>POST</td><td><code>/api/v1/orders</code></td><td>Create order from cart</td></tr><tr><td>GET</td><td><code>/api/v1/orders</code></td><td>List user’s orders</td></tr><tr><td>GET</td><td><code>/api/v1/orders/{id}</code></td><td>Get order detail</td></tr></tbody></table>
+<p>Source: <code>app/Features/Orders/Actions/</code></p>
+<h2 id="admin-endpoints-roleadmin">Admin Endpoints (role:admin)</h2>
+<p>All admin endpoints require <code>auth:betterauth</code> + <code>role:admin</code> middleware.</p>
+<p>See the <a href="/docs/modules/admin">Admin module</a> and <a href="/docs/modules/shop">Shop module</a> documentation for the full admin endpoint tables.</p>
+<h2 id="saas-endpoints">SaaS Endpoints</h2>
+<p>See the <a href="/docs/modules/saas">SaaS module</a> documentation.</p>
+<h2 id="support-endpoints">Support Endpoints</h2>
+<p>See the <a href="/docs/modules/support">Support module</a> documentation.</p>
+<h2 id="middleware">Middleware</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Alias</th><th>Class</th><th>Purpose</th></tr></thead><tbody><tr><td><code>auth:betterauth</code></td><td>BetterAuth guard</td><td>JWT authentication</td></tr><tr><td><code>role</code></td><td><code>CheckRole</code></td><td>Requires specific role (e.g. <code>role:admin</code>)</td></tr><tr><td><code>permission</code></td><td><code>CheckPermission</code></td><td>Requires specific permission</td></tr><tr><td><code>api.security</code></td><td><code>ApiSecurityHeadersMiddleware</code></td><td>Security headers</td></tr><tr><td><code>org.rbac</code></td><td><code>OrgRbacMiddleware</code></td><td>Organization membership check</td></tr></tbody></table>
+<p>Middleware aliases are defined in <code>bootstrap/app.php</code>.</p>
+<h2 id="response-format">Response Format</h2>
+<p>All responses use the <code>ApiResponse</code> helper with a consistent envelope:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">success</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> true</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">data</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> {</span><span style="color:#005CC5;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">...</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> }</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">status</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> 200</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">request_id</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">abc123</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<p>Error responses:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">success</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> false</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">error</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> {</span><span style="color:#005CC5;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">code</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">VALIDATION_ERROR</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#005CC5;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">message</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">...</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> }</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">status</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> 422</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<h2 id="testing">Testing</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> test</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">                            # Run all tests</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> test</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> tests/Feature/ShopTest.php</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"> # Specific test file</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> test</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --filter=test_name</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">         # Single test</span></span></code></pre>
+<p>Test files in <code>tests/Feature/</code>: <code>BetterAuthTest.php</code>, <code>ShopTest.php</code>, <code>CartTest.php</code>, <code>OrderTest.php</code>, <code>AdminShopTest.php</code>, <code>SaasTest.php</code>, <code>SupportTest.php</code>.</p>
+<h2 id="qa">QA</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">make</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> qa-laravel</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">    # Runs Pint (formatter) + Larastan (static analysis) + PHPUnit</span></span></code></pre>
+<h2 id="api-platform">API Platform</h2>
+<p><code>api-platform/laravel</code> is used exclusively as an <strong>OpenAPI documentation source</strong>. BetterAuth routes remain as classic Laravel routes and are never migrated to API Platform resources.</p>  </article> <nav class="mt-16 flex items-stretch gap-4 border-t border-border pt-6" aria-label="Page navigation"> <a href="/docs/architecture/vertical-slice" class="group flex flex-1 flex-col rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Previous</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors">
+← Vertical Slice </span> </a> <a href="/docs/backends/symfony" class="group flex flex-1 flex-col items-end rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Next</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors"> Symfony →
+</span> </a> </nav> </div> </main> <!-- Table of Contents --> <aside class="fixed top-14 right-0 hidden h-[calc(100svh-3.5rem)] w-56 overflow-y-auto border-l border-border bg-background/95 p-4 lg:block"> <astro-island uid="FrU9X" prefix="r3" component-url="/_astro/TableOfContents.CkQmb82v.js" component-export="TableOfContents" renderer-url="/_astro/client.CwSvYkGX.js" props="{&quot;headings&quot;:[1,[[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;setup&quot;],&quot;text&quot;:[0,&quot;Setup&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;project-structure&quot;],&quot;text&quot;:[0,&quot;Project Structure&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;authentication&quot;],&quot;text&quot;:[0,&quot;Authentication&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;auth-endpoints&quot;],&quot;text&quot;:[0,&quot;Auth Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;password-reset&quot;],&quot;text&quot;:[0,&quot;Password Reset&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;two-factor-authentication&quot;],&quot;text&quot;:[0,&quot;Two-Factor Authentication&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;oauth&quot;],&quot;text&quot;:[0,&quot;OAuth&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;magic-link&quot;],&quot;text&quot;:[0,&quot;Magic Link&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;shop-endpoints-public&quot;],&quot;text&quot;:[0,&quot;Shop Endpoints (Public)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;cart-endpoints-authenticated&quot;],&quot;text&quot;:[0,&quot;Cart Endpoints (Authenticated)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;order-endpoints-authenticated&quot;],&quot;text&quot;:[0,&quot;Order Endpoints (Authenticated)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;admin-endpoints-roleadmin&quot;],&quot;text&quot;:[0,&quot;Admin Endpoints (role:admin)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;saas-endpoints&quot;],&quot;text&quot;:[0,&quot;SaaS Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;support-endpoints&quot;],&quot;text&quot;:[0,&quot;Support Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;middleware&quot;],&quot;text&quot;:[0,&quot;Middleware&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;response-format&quot;],&quot;text&quot;:[0,&quot;Response Format&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;testing&quot;],&quot;text&quot;:[0,&quot;Testing&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;qa&quot;],&quot;text&quot;:[0,&quot;QA&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;api-platform&quot;],&quot;text&quot;:[0,&quot;API Platform&quot;]}]]],&quot;locale&quot;:[0,&quot;en&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;TableOfContents&quot;,&quot;value&quot;:true}" await-children><nav aria-label="Table of contents"><p class="mb-3 text-[10px] uppercase tracking-widest text-muted-foreground">On this page</p><ul class="space-y-1"><li><a href="#setup" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Setup</a></li><li><a href="#project-structure" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Project Structure</a></li><li><a href="#authentication" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Authentication</a></li><li><a href="#auth-endpoints" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Auth Endpoints</a></li><li><a href="#password-reset" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Password Reset</a></li><li><a href="#two-factor-authentication" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Two-Factor Authentication</a></li><li><a href="#oauth" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">OAuth</a></li><li><a href="#magic-link" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Magic Link</a></li><li><a href="#shop-endpoints-public" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Shop Endpoints (Public)</a></li><li><a href="#cart-endpoints-authenticated" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Cart Endpoints (Authenticated)</a></li><li><a href="#order-endpoints-authenticated" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Order Endpoints (Authenticated)</a></li><li><a href="#admin-endpoints-roleadmin" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Admin Endpoints (role:admin)</a></li><li><a href="#saas-endpoints" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">SaaS Endpoints</a></li><li><a href="#support-endpoints" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Support Endpoints</a></li><li><a href="#middleware" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Middleware</a></li><li><a href="#response-format" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Response Format</a></li><li><a href="#testing" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Testing</a></li><li><a href="#qa" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">QA</a></li><li><a href="#api-platform" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">API Platform</a></li></ul></nav><!--astro:end--></astro-island> </aside> </div> <!-- Mobile sidebar overlay --> <script>
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-sidebar]');
+        if (btn) {
+          const sidebar = document.getElementById('docs-sidebar');
+          sidebar.classList.toggle('hidden');
+          sidebar.classList.toggle('block');
+        }
+        // Close on backdrop click
+        if (e.target.id === 'sidebar-backdrop') {
+          document.getElementById('docs-sidebar').classList.add('hidden');
+          document.getElementById('docs-sidebar').classList.remove('block');
+        }
+      });
+    </script> </body> </html>

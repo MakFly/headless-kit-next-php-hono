@@ -1,0 +1,358 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light dark"><!-- Primary Meta --><meta name="description" content="Role-based access control with users, roles, permissions management and admin dashboard."><!-- Open Graph --><meta property="og:type" content="article"><meta property="og:url" content="https://headlesskit.dev/docs/modules/admin/"><meta property="og:title" content="Admin &#38; RBAC Module — Headless Kit Docs"><meta property="og:description" content="Role-based access control with users, roles, permissions management and admin dashboard."><meta property="og:image" content="https://headlesskit.dev/og-image.png"><meta property="og:site_name" content="Headless Kit"><meta property="og:locale" content="en_US"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Admin &#38; RBAC Module — Headless Kit Docs"><meta name="twitter:description" content="Role-based access control with users, roles, permissions management and admin dashboard."><meta name="twitter:image" content="https://headlesskit.dev/og-image.png"><!-- Canonical --><link rel="canonical" href="https://headlesskit.dev/docs/modules/admin/"><!-- Hreflang --><link rel="alternate" hreflang="en" href="https://headlesskit.dev/docs/modules/admin/"><link rel="alternate" hreflang="fr" href="https://headlesskit.dev/fr/docs/modules/admin/"><link rel="alternate" hreflang="x-default" href="https://headlesskit.dev/docs/modules/admin/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Admin &amp; RBAC Module — Headless Kit Docs</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://headlesskit.dev/docs"},{"@type":"ListItem","position":2,"name":"Modules","item":"https://headlesskit.dev/docs/modules"},{"@type":"ListItem","position":3,"name":"Admin & RBAC Module"}]}</script><script>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script><link rel="stylesheet" href="/_astro/index.BXyRLzR7.css">
+<style>.pagefind-ui[data-astro-cid-t4y4xlal]{--pagefind-ui-scale: .9;--pagefind-ui-primary: hsl(var(--primary));--pagefind-ui-text: hsl(var(--foreground));--pagefind-ui-background: hsl(var(--background));--pagefind-ui-border: hsl(var(--border));--pagefind-ui-border-width: 1px;--pagefind-ui-border-radius: 8px;--pagefind-ui-font: inherit}
+</style></head> <body class="min-h-svh antialiased bg-background text-foreground"> <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+Skip to content
+</a> <nav class="fixed top-0 z-50 w-full border-b border-border backdrop-blur-md bg-background/80" aria-label="Documentation navigation"> <div class="flex h-14 items-center justify-between px-4 md:px-6"> <!-- Left: Logo + mobile menu --> <div class="flex items-center gap-3"> <button data-toggle-sidebar class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted md:hidden" aria-label="Toggle sidebar"> <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"></path> </svg> </button> <a href="/" class="flex items-center gap-2 text-sm font-semibold text-foreground">
+Headless Kit
+</a> <span class="hidden text-border md:inline">|</span> <a href="/docs/getting-started/installation" class="hidden text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground md:inline"> Docs </a> </div> <!-- Right: Links + Theme + Auth --> <div class="flex items-center gap-3"> <a href="https://github.com/headless-kit/headless-kit" target="_blank" rel="noopener noreferrer" class="hidden font-mono text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline"> GitHub </a> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z1Dpcgz" prefix="r4" component-url="/_astro/ThemeToggle.BdSTQQ74.js" component-export="ThemeToggle" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;ThemeToggle&quot;,&quot;value&quot;:true}" await-children><button data-slot="button" data-variant="ghost" data-size="icon" class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 rounded-full text-muted-foreground hover:text-foreground" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon size-4" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button><!--astro:end--></astro-island> <astro-island uid="ZGOCeI" prefix="r5" component-url="/_astro/AuthNavButtons.C9pdFHE9.js" component-export="AuthNavButtons" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;AuthNavButtons&quot;,&quot;value&quot;:true}" await-children><div class="hidden h-8 w-20 animate-pulse rounded-full bg-muted sm:block"></div><!--astro:end--></astro-island> </div> </div> </nav> <div class="flex pt-14"> <!-- Sidebar --> <aside id="docs-sidebar" class="fixed top-14 left-0 z-40 hidden h-[calc(100svh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm md:block"> <div class="border-b border-border p-3"> <div id="search" class="pagefind-ui" data-pagefind-ui data-astro-cid-t4y4xlal></div> <link href="/pagefind/pagefind-ui.css" rel="stylesheet"> <script src="/pagefind/pagefind-ui.js"></script> <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+    })
+  })
+</script>  </div> <nav class="p-4 space-y-1" aria-label="Documentation sidebar"> <details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Getting Started </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/getting-started/installation" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Installation </a> </li><li> <a href="/docs/getting-started/project-structure" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Project Structure </a> </li><li> <a href="/docs/getting-started/configuration" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Configuration </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Architecture </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/architecture/bff-pattern" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> BFF Pattern </a> </li><li> <a href="/docs/architecture/auth-flow" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Auth Flow </a> </li><li> <a href="/docs/architecture/adapters" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Adapters </a> </li><li> <a href="/docs/architecture/vertical-slice" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Vertical Slice </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Backends </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/backends/laravel" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Laravel </a> </li><li> <a href="/docs/backends/symfony" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Symfony </a> </li><li> <a href="/docs/backends/hono" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Hono </a> </li> </ul> </details><details open class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-primary"> <span class="text-[10px] transition-transform group-open:rotate-90 text-primary">
+▶
+</span> Modules </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/modules/shop" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Shop </a> </li><li> <a href="/docs/modules/admin" class="block rounded-md px-3 py-1.5 text-xs transition-colors bg-primary/10 text-primary" aria-current="page"> Admin </a> </li><li> <a href="/docs/modules/saas" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> SaaS </a> </li><li> <a href="/docs/modules/support" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Support </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> CLI </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/cli/getting-started" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Getting Started </a> </li><li> <a href="/docs/cli/presets" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Presets </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Guides </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/guides/authentication" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Authentication </a> </li><li> <a href="/docs/guides/tanstack-start" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> TanStack Start </a> </li><li> <a href="/docs/guides/rbac" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> RBAC </a> </li><li> <a href="/docs/guides/two-factor" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Two-Factor Auth </a> </li><li> <a href="/docs/guides/oauth" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> OAuth </a> </li><li> <a href="/docs/guides/custom-adapter" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Custom Adapter </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Deploy </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/deploy/docker" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Docker </a> </li><li> <a href="/docs/deploy/production" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Production </a> </li> </ul> </details> </nav> </aside> <!-- Main content --> <main id="main-content" class="min-w-0 flex-1 md:ml-64 lg:mr-56"> <div class="mx-auto max-w-3xl px-6 py-10 md:px-8"> <nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted-foreground"> <ol class="flex items-center gap-1.5"> <li><a href="/docs" class="hover:text-foreground transition-colors">Docs</a></li> <li class="text-muted-foreground/50">/</li> <li><a href="/docs/modules" class="hover:text-foreground transition-colors">Modules</a></li> <li class="text-muted-foreground/50">/</li> <li class="text-foreground font-medium">Admin &amp; RBAC Module</li> </ol> </nav> <article class="docs-prose"> <h1>Admin &amp; RBAC Module</h1> <p class="text-lg text-muted-foreground mb-8 !mt-0">Role-based access control with users, roles, permissions management and admin dashboard.</p>  <h1 id="admin--rbac-module">Admin &amp; RBAC Module</h1>
+<p>The Admin module provides role-based access control (RBAC), user management, and a dashboard with analytics. All admin endpoints require authentication with the <code>admin</code> role.</p>
+<h2 id="rbac-model">RBAC Model</h2>
+<h3 id="roles">Roles</h3>
+<p>The system ships with three default roles:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Role</th><th>Description</th></tr></thead><tbody><tr><td><code>admin</code></td><td>Full access to all admin endpoints</td></tr><tr><td><code>manager</code></td><td>Can manage specific resources (configurable via permissions)</td></tr><tr><td><code>user</code></td><td>Standard authenticated user (no admin access)</td></tr></tbody></table>
+<h3 id="permissions">Permissions</h3>
+<p>Permissions follow a <code>resource:action</code> format:</p>
+<ul>
+<li><code>users:manage</code> — manage user accounts</li>
+<li><code>products:create</code>, <code>products:update</code>, <code>products:delete</code> — product CRUD</li>
+<li><code>orders:manage</code> — manage orders and statuses</li>
+<li><code>reviews:moderate</code> — approve/reject reviews</li>
+</ul>
+<p>Permissions are assigned to roles, and roles are assigned to users. A user’s effective permissions are the union of all permissions from their assigned roles.</p>
+<h2 id="rbac-endpoints">RBAC Endpoints</h2>
+<p>All endpoints under <code>/api/v1/admin/</code> require <code>auth + role:admin</code>.</p>
+<h3 id="user-management">User Management</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/admin/users</code></td><td>List all users (paginated)</td></tr><tr><td>GET</td><td><code>/api/v1/admin/users/{id}</code></td><td>Get user detail with roles</td></tr></tbody></table>
+<h3 id="role-management">Role Management</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/admin/roles</code></td><td>List all roles</td></tr><tr><td>POST</td><td><code>/api/v1/admin/roles</code></td><td>Create a new role</td></tr><tr><td>POST</td><td><code>/api/v1/admin/users/{id}/roles</code></td><td>Assign role to user</td></tr><tr><td>DELETE</td><td><code>/api/v1/admin/users/{id}/roles/{role}</code></td><td>Remove role from user</td></tr></tbody></table>
+<h3 id="permission-management">Permission Management</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/admin/permissions</code></td><td>List all available permissions</td></tr><tr><td>POST</td><td><code>/api/v1/admin/roles/{role}/permissions</code></td><td>Sync permissions for a role</td></tr></tbody></table>
+<h2 id="dashboard-endpoints">Dashboard Endpoints</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/admin/dashboard</code></td><td>Summary stats (revenue, orders, users, etc.)</td></tr><tr><td>GET</td><td><code>/api/v1/admin/analytics/revenue</code></td><td>Revenue over time</td></tr><tr><td>GET</td><td><code>/api/v1/admin/analytics/top-products</code></td><td>Best selling products</td></tr><tr><td>GET</td><td><code>/api/v1/admin/segments</code></td><td>Customer segments</td></tr></tbody></table>
+<h2 id="implementation-per-backend">Implementation per Backend</h2>
+<h3 id="laravel-appsapi-laravel">Laravel (<code>apps/api-laravel/</code>)</h3>
+<p>RBAC is enforced via middleware aliases defined in <code>bootstrap/app.php</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Middleware</th><th>Class</th><th>Purpose</th></tr></thead><tbody><tr><td><code>role:admin</code></td><td><code>App\Shared\Middleware\CheckRole</code></td><td>Requires the <code>admin</code> role</td></tr><tr><td><code>permission:X</code></td><td><code>App\Shared\Middleware\CheckPermission</code></td><td>Requires a specific permission</td></tr></tbody></table>
+<p>All admin routes are grouped under <code>Route::middleware([&#39;auth:betterauth&#39;, &#39;role:admin&#39;])-&gt;prefix(&#39;admin&#39;)</code> in <code>app/Features/Admin/routes.php</code>.</p>
+<p>Key files:</p>
+<ul>
+<li>Routes: <code>app/Features/Admin/routes.php</code></li>
+<li>Actions: <code>app/Features/Admin/Actions/</code> (ListUsers, ShowUser, AssignRole, RemoveRole, CreateRole, ListRoles, ListPermissions, SyncPermissions, Dashboard, RevenueAnalytics, TopProducts, ListSegments)</li>
+<li>Models: <code>app/Shared/Models/User.php</code>, <code>app/Shared/Models/Role.php</code>, <code>app/Shared/Models/Permission.php</code></li>
+</ul>
+<h3 id="symfony-appsapi-sf">Symfony (<code>apps/api-sf/</code>)</h3>
+<p>RBAC uses Symfony’s <strong>Voter</strong> system and the firewall security layer:</p>
+<ul>
+<li>Admin routes require <code>ROLE_ADMIN</code> via <code>#[IsGranted(&#39;ROLE_ADMIN&#39;)]</code> or firewall config</li>
+<li>Organization-level authorization uses custom Voters</li>
+</ul>
+<p>Key files:</p>
+<ul>
+<li>RBAC controllers: <code>src/Feature/Admin/Controller/Rbac/</code> (6 controllers: AssignRoleController, CreateRoleController, GetUserRolesController, ListPermissionsController, ListRolesController, RemoveRoleController)</li>
+<li>Shop admin controllers: <code>src/Feature/Admin/Controller/Shop/</code> (8 controllers)</li>
+<li>Segment service: <code>src/Feature/Admin/Service/SegmentQueryService.php</code></li>
+<li>Security: <code>src/Shared/Security/</code> (Voters, traits)</li>
+</ul>
+<h3 id="hono-appsapi-hono">Hono (<code>apps/api-hono/</code>)</h3>
+<p>RBAC uses the <code>adminMiddleware</code> which checks the user’s role from the JWT payload:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#24292E;--shiki-dark:#C0CAF5">admin</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">use</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">*</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> authMiddleware</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#C0CAF5">admin</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">use</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">*</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> adminMiddleware</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span></code></pre>
+<p>Key files:</p>
+<ul>
+<li>Feature: <code>src/features/admin/</code> (admin.routes.ts, admin.handlers.ts, admin.service.ts, admin.repository.ts, admin.schemas.ts)</li>
+<li>Middleware: <code>src/shared/middleware/admin.ts</code></li>
+</ul>
+<h2 id="frontend-nextjs-bff">Frontend (Next.js BFF)</h2>
+<h3 id="dashboard-pages">Dashboard Pages</h3>
+<p>Located in <code>apps/web/src/app/(dashboard)/dashboard/(app)/</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Route</th><th>Page</th><th>Description</th></tr></thead><tbody><tr><td><code>/dashboard</code></td><td><code>page.tsx</code></td><td>Main dashboard overview</td></tr><tr><td><code>/dashboard/users</code></td><td><code>users/page.tsx</code></td><td>User management table</td></tr><tr><td><code>/dashboard/roles</code></td><td><code>roles/page.tsx</code></td><td>Role management</td></tr><tr><td><code>/dashboard/permissions</code></td><td><code>permissions/page.tsx</code></td><td>Permission management</td></tr><tr><td><code>/dashboard/settings</code></td><td><code>settings/page.tsx</code></td><td>Application settings</td></tr><tr><td><code>/dashboard/api-keys</code></td><td><code>api-keys/page.tsx</code></td><td>API key management</td></tr><tr><td><code>/dashboard/posts</code></td><td><code>posts/page.tsx</code></td><td>Content management</td></tr><tr><td><code>/dashboard/todos</code></td><td><code>todos/page.tsx</code></td><td>Task management</td></tr></tbody></table>
+<h3 id="server-actions">Server Actions</h3>
+<p>Located in <code>apps/web/src/lib/actions/rbac/</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>File</th><th>Actions</th></tr></thead><tbody><tr><td><code>users.ts</code></td><td>List users, get user detail</td></tr><tr><td><code>roles.ts</code></td><td>List roles, create role, assign/remove role</td></tr><tr><td><code>permissions.ts</code></td><td>List permissions, sync permissions to role</td></tr></tbody></table>
+<h3 id="data-tables">Data Tables</h3>
+<p>The admin pages use TanStack Table for data grids with server-side pagination, sorting, and filtering. Tables are configured per resource with column definitions, filter controls, and action menus.</p>
+<h2 id="auth-flow">Auth Flow</h2>
+<p>The dashboard has its own auth pages at <code>apps/web/src/app/(dashboard)/dashboard/auth/</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Route</th><th>Page</th></tr></thead><tbody><tr><td><code>/dashboard/auth/login</code></td><td>Admin login</td></tr><tr><td><code>/dashboard/auth/register</code></td><td>Admin registration</td></tr><tr><td><code>/dashboard/auth/forgot-password</code></td><td>Password reset request</td></tr><tr><td><code>/dashboard/auth/reset-password</code></td><td>Password reset form</td></tr><tr><td><code>/dashboard/auth/oauth/callback</code></td><td>OAuth callback</td></tr></tbody></table>  </article> <nav class="mt-16 flex items-stretch gap-4 border-t border-border pt-6" aria-label="Page navigation"> <a href="/docs/modules/shop" class="group flex flex-1 flex-col rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Previous</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors">
+← Shop </span> </a> <a href="/docs/modules/saas" class="group flex flex-1 flex-col items-end rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Next</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors"> SaaS →
+</span> </a> </nav> </div> </main> <!-- Table of Contents --> <aside class="fixed top-14 right-0 hidden h-[calc(100svh-3.5rem)] w-56 overflow-y-auto border-l border-border bg-background/95 p-4 lg:block"> <astro-island uid="1vI9k7" prefix="r3" component-url="/_astro/TableOfContents.CkQmb82v.js" component-export="TableOfContents" renderer-url="/_astro/client.CwSvYkGX.js" props="{&quot;headings&quot;:[1,[[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;rbac-model&quot;],&quot;text&quot;:[0,&quot;RBAC Model&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;roles&quot;],&quot;text&quot;:[0,&quot;Roles&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;permissions&quot;],&quot;text&quot;:[0,&quot;Permissions&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;rbac-endpoints&quot;],&quot;text&quot;:[0,&quot;RBAC Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;user-management&quot;],&quot;text&quot;:[0,&quot;User Management&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;role-management&quot;],&quot;text&quot;:[0,&quot;Role Management&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;permission-management&quot;],&quot;text&quot;:[0,&quot;Permission Management&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;dashboard-endpoints&quot;],&quot;text&quot;:[0,&quot;Dashboard Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;implementation-per-backend&quot;],&quot;text&quot;:[0,&quot;Implementation per Backend&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;laravel-appsapi-laravel&quot;],&quot;text&quot;:[0,&quot;Laravel (apps/api-laravel/)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;symfony-appsapi-sf&quot;],&quot;text&quot;:[0,&quot;Symfony (apps/api-sf/)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;hono-appsapi-hono&quot;],&quot;text&quot;:[0,&quot;Hono (apps/api-hono/)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;frontend-nextjs-bff&quot;],&quot;text&quot;:[0,&quot;Frontend (Next.js BFF)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;dashboard-pages&quot;],&quot;text&quot;:[0,&quot;Dashboard Pages&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;server-actions&quot;],&quot;text&quot;:[0,&quot;Server Actions&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;data-tables&quot;],&quot;text&quot;:[0,&quot;Data Tables&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;auth-flow&quot;],&quot;text&quot;:[0,&quot;Auth Flow&quot;]}]]],&quot;locale&quot;:[0,&quot;en&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;TableOfContents&quot;,&quot;value&quot;:true}" await-children><nav aria-label="Table of contents"><p class="mb-3 text-[10px] uppercase tracking-widest text-muted-foreground">On this page</p><ul class="space-y-1"><li><a href="#rbac-model" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">RBAC Model</a></li><li><a href="#roles" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Roles</a></li><li><a href="#permissions" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Permissions</a></li><li><a href="#rbac-endpoints" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">RBAC Endpoints</a></li><li><a href="#user-management" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">User Management</a></li><li><a href="#role-management" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Role Management</a></li><li><a href="#permission-management" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Permission Management</a></li><li><a href="#dashboard-endpoints" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Dashboard Endpoints</a></li><li><a href="#implementation-per-backend" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Implementation per Backend</a></li><li><a href="#laravel-appsapi-laravel" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Laravel (apps/api-laravel/)</a></li><li><a href="#symfony-appsapi-sf" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Symfony (apps/api-sf/)</a></li><li><a href="#hono-appsapi-hono" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Hono (apps/api-hono/)</a></li><li><a href="#frontend-nextjs-bff" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Frontend (Next.js BFF)</a></li><li><a href="#dashboard-pages" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Dashboard Pages</a></li><li><a href="#server-actions" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Server Actions</a></li><li><a href="#data-tables" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Data Tables</a></li><li><a href="#auth-flow" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Auth Flow</a></li></ul></nav><!--astro:end--></astro-island> </aside> </div> <!-- Mobile sidebar overlay --> <script>
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-sidebar]');
+        if (btn) {
+          const sidebar = document.getElementById('docs-sidebar');
+          sidebar.classList.toggle('hidden');
+          sidebar.classList.toggle('block');
+        }
+        // Close on backdrop click
+        if (e.target.id === 'sidebar-backdrop') {
+          document.getElementById('docs-sidebar').classList.add('hidden');
+          document.getElementById('docs-sidebar').classList.remove('block');
+        }
+      });
+    </script> </body> </html>

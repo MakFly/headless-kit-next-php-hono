@@ -1,0 +1,473 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light dark"><!-- Primary Meta --><meta name="description" content="Hono 4 API backend running on Bun with Drizzle ORM, JWT auth, and Zod validation."><!-- Open Graph --><meta property="og:type" content="article"><meta property="og:url" content="https://headlesskit.dev/docs/backends/hono/"><meta property="og:title" content="Hono Backend — Headless Kit Docs"><meta property="og:description" content="Hono 4 API backend running on Bun with Drizzle ORM, JWT auth, and Zod validation."><meta property="og:image" content="https://headlesskit.dev/og-image.png"><meta property="og:site_name" content="Headless Kit"><meta property="og:locale" content="en_US"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Hono Backend — Headless Kit Docs"><meta name="twitter:description" content="Hono 4 API backend running on Bun with Drizzle ORM, JWT auth, and Zod validation."><meta name="twitter:image" content="https://headlesskit.dev/og-image.png"><!-- Canonical --><link rel="canonical" href="https://headlesskit.dev/docs/backends/hono/"><!-- Hreflang --><link rel="alternate" hreflang="en" href="https://headlesskit.dev/docs/backends/hono/"><link rel="alternate" hreflang="fr" href="https://headlesskit.dev/fr/docs/backends/hono/"><link rel="alternate" hreflang="x-default" href="https://headlesskit.dev/docs/backends/hono/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Hono Backend — Headless Kit Docs</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://headlesskit.dev/docs"},{"@type":"ListItem","position":2,"name":"Backends","item":"https://headlesskit.dev/docs/backends"},{"@type":"ListItem","position":3,"name":"Hono Backend"}]}</script><script>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script><link rel="stylesheet" href="/_astro/index.BXyRLzR7.css">
+<style>.pagefind-ui[data-astro-cid-t4y4xlal]{--pagefind-ui-scale: .9;--pagefind-ui-primary: hsl(var(--primary));--pagefind-ui-text: hsl(var(--foreground));--pagefind-ui-background: hsl(var(--background));--pagefind-ui-border: hsl(var(--border));--pagefind-ui-border-width: 1px;--pagefind-ui-border-radius: 8px;--pagefind-ui-font: inherit}
+</style></head> <body class="min-h-svh antialiased bg-background text-foreground"> <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+Skip to content
+</a> <nav class="fixed top-0 z-50 w-full border-b border-border backdrop-blur-md bg-background/80" aria-label="Documentation navigation"> <div class="flex h-14 items-center justify-between px-4 md:px-6"> <!-- Left: Logo + mobile menu --> <div class="flex items-center gap-3"> <button data-toggle-sidebar class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted md:hidden" aria-label="Toggle sidebar"> <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"></path> </svg> </button> <a href="/" class="flex items-center gap-2 text-sm font-semibold text-foreground">
+Headless Kit
+</a> <span class="hidden text-border md:inline">|</span> <a href="/docs/getting-started/installation" class="hidden text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground md:inline"> Docs </a> </div> <!-- Right: Links + Theme + Auth --> <div class="flex items-center gap-3"> <a href="https://github.com/headless-kit/headless-kit" target="_blank" rel="noopener noreferrer" class="hidden font-mono text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline"> GitHub </a> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z1Dpcgz" prefix="r4" component-url="/_astro/ThemeToggle.BdSTQQ74.js" component-export="ThemeToggle" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;ThemeToggle&quot;,&quot;value&quot;:true}" await-children><button data-slot="button" data-variant="ghost" data-size="icon" class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 rounded-full text-muted-foreground hover:text-foreground" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon size-4" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button><!--astro:end--></astro-island> <astro-island uid="ZGOCeI" prefix="r5" component-url="/_astro/AuthNavButtons.C9pdFHE9.js" component-export="AuthNavButtons" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;AuthNavButtons&quot;,&quot;value&quot;:true}" await-children><div class="hidden h-8 w-20 animate-pulse rounded-full bg-muted sm:block"></div><!--astro:end--></astro-island> </div> </div> </nav> <div class="flex pt-14"> <!-- Sidebar --> <aside id="docs-sidebar" class="fixed top-14 left-0 z-40 hidden h-[calc(100svh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm md:block"> <div class="border-b border-border p-3"> <div id="search" class="pagefind-ui" data-pagefind-ui data-astro-cid-t4y4xlal></div> <link href="/pagefind/pagefind-ui.css" rel="stylesheet"> <script src="/pagefind/pagefind-ui.js"></script> <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+    })
+  })
+</script>  </div> <nav class="p-4 space-y-1" aria-label="Documentation sidebar"> <details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Getting Started </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/getting-started/installation" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Installation </a> </li><li> <a href="/docs/getting-started/project-structure" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Project Structure </a> </li><li> <a href="/docs/getting-started/configuration" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Configuration </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Architecture </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/architecture/bff-pattern" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> BFF Pattern </a> </li><li> <a href="/docs/architecture/auth-flow" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Auth Flow </a> </li><li> <a href="/docs/architecture/adapters" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Adapters </a> </li><li> <a href="/docs/architecture/vertical-slice" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Vertical Slice </a> </li> </ul> </details><details open class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-primary"> <span class="text-[10px] transition-transform group-open:rotate-90 text-primary">
+▶
+</span> Backends </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/backends/laravel" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Laravel </a> </li><li> <a href="/docs/backends/symfony" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Symfony </a> </li><li> <a href="/docs/backends/hono" class="block rounded-md px-3 py-1.5 text-xs transition-colors bg-primary/10 text-primary" aria-current="page"> Hono </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Modules </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/modules/shop" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Shop </a> </li><li> <a href="/docs/modules/admin" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Admin </a> </li><li> <a href="/docs/modules/saas" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> SaaS </a> </li><li> <a href="/docs/modules/support" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Support </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> CLI </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/cli/getting-started" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Getting Started </a> </li><li> <a href="/docs/cli/presets" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Presets </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Guides </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/guides/authentication" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Authentication </a> </li><li> <a href="/docs/guides/tanstack-start" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> TanStack Start </a> </li><li> <a href="/docs/guides/rbac" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> RBAC </a> </li><li> <a href="/docs/guides/two-factor" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Two-Factor Auth </a> </li><li> <a href="/docs/guides/oauth" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> OAuth </a> </li><li> <a href="/docs/guides/custom-adapter" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Custom Adapter </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Deploy </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/deploy/docker" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Docker </a> </li><li> <a href="/docs/deploy/production" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Production </a> </li> </ul> </details> </nav> </aside> <!-- Main content --> <main id="main-content" class="min-w-0 flex-1 md:ml-64 lg:mr-56"> <div class="mx-auto max-w-3xl px-6 py-10 md:px-8"> <nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted-foreground"> <ol class="flex items-center gap-1.5"> <li><a href="/docs" class="hover:text-foreground transition-colors">Docs</a></li> <li class="text-muted-foreground/50">/</li> <li><a href="/docs/backends" class="hover:text-foreground transition-colors">Backends</a></li> <li class="text-muted-foreground/50">/</li> <li class="text-foreground font-medium">Hono Backend</li> </ol> </nav> <article class="docs-prose"> <h1>Hono Backend</h1> <p class="text-lg text-muted-foreground mb-8 !mt-0">Hono 4 API backend running on Bun with Drizzle ORM, JWT auth, and Zod validation.</p>  <h1 id="hono-backend">Hono Backend</h1>
+<p>The Hono backend (<code>apps/api-hono/</code>) runs on <strong>port 3333</strong> using Bun as the runtime. It provides a lightweight, type-safe REST API with Hono 4, Drizzle ORM (SQLite), JWT authentication via <code>jose</code>, and Zod validation.</p>
+<h2 id="setup">Setup</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">cd</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> apps/api-hono</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> install</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> db:migrate</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> db:seed</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> dev</span></span></code></pre>
+<p>The API is now available at <code>http://localhost:3333/api/v1/</code>.</p>
+<h2 id="5-file-feature-convention">5-File Feature Convention</h2>
+<p>Every feature in <code>src/features/{name}/</code> follows a strict 5-file convention:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>File</th><th>Responsibility</th></tr></thead><tbody><tr><td><code>{name}.routes.ts</code></td><td>Hono route definitions, middleware chain, <code>zValidator</code> calls</td></tr><tr><td><code>{name}.handlers.ts</code></td><td>Parse request, call service, return <code>apiSuccess</code> / <code>apiError</code></td></tr><tr><td><code>{name}.service.ts</code></td><td>Business logic; throws <code>AppError</code> on domain errors</td></tr><tr><td><code>{name}.repository.ts</code></td><td>Drizzle ORM queries only — no business logic</td></tr><tr><td><code>{name}.schemas.ts</code></td><td>Zod validation schemas + inferred TypeScript types</td></tr></tbody></table>
+<h3 id="layer-rules">Layer Rules</h3>
+<ul>
+<li>Handlers never call repositories directly — always go through the service</li>
+<li>Services never access <code>c</code> (Hono Context) — they receive and return plain data</li>
+<li>Repositories never throw <code>AppError</code> — they return <code>null</code>/<code>undefined</code>, services interpret</li>
+<li>Schemas are pure Zod — no runtime imports, no side effects</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>src/</span></span>
+<span class="line"><span>├── index.ts                    # App bootstrap, global middleware, route mounts</span></span>
+<span class="line"><span>├── features/</span></span>
+<span class="line"><span>│   ├── auth/                   # JWT register/login/refresh/logout/me + 2FA</span></span>
+<span class="line"><span>│   ├── shop/                   # Products + categories (public)</span></span>
+<span class="line"><span>│   ├── cart/                   # Cart management (auth)</span></span>
+<span class="line"><span>│   ├── orders/                 # Order management (auth)</span></span>
+<span class="line"><span>│   ├── admin/                  # Admin CRUD (auth + admin)</span></span>
+<span class="line"><span>│   ├── saas/                   # Multi-tenant SaaS (auth + orgRbac)</span></span>
+<span class="line"><span>│   └── support/                # Support chat (auth)</span></span>
+<span class="line"><span>├── shared/</span></span>
+<span class="line"><span>│   ├── db/</span></span>
+<span class="line"><span>│   │   ├── schema.ts           # All Drizzle table definitions</span></span>
+<span class="line"><span>│   │   ├── seed.ts             # Seed entrypoint</span></span>
+<span class="line"><span>│   │   └── index.ts            # DB + schema exports</span></span>
+<span class="line"><span>│   ├── middleware/</span></span>
+<span class="line"><span>│   │   ├── auth.ts             # authMiddleware, optionalAuthMiddleware, requireUser()</span></span>
+<span class="line"><span>│   │   ├── admin.ts            # adminMiddleware (requires admin role)</span></span>
+<span class="line"><span>│   │   ├── org-rbac.ts         # orgRbac middleware (org membership check)</span></span>
+<span class="line"><span>│   │   ├── i18n.ts             # Accept-Language parsing</span></span>
+<span class="line"><span>│   │   └── index.ts            # Re-exports + requestContextMiddleware</span></span>
+<span class="line"><span>│   ├── lib/</span></span>
+<span class="line"><span>│   │   ├── response.ts         # apiSuccess(), apiError()</span></span>
+<span class="line"><span>│   │   ├── errors.ts           # AppError class</span></span>
+<span class="line"><span>│   │   ├── jwt.ts              # signToken(), verifyToken()</span></span>
+<span class="line"><span>│   │   └── hash.ts             # hashPassword(), verifyPassword()</span></span>
+<span class="line"><span>│   └── types/</span></span>
+<span class="line"><span>│       └── index.ts            # AppVariables, SafeUser, JwtPayload</span></span>
+<span class="line"><span>└── tests/</span></span></code></pre>
+<h2 id="jwt-authentication">JWT Authentication</h2>
+<p>Hono uses <strong>JWT HS256</strong> via the <code>jose</code> library. The same secret signs and verifies tokens.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Token</th><th>TTL</th><th>Storage</th></tr></thead><tbody><tr><td>Access token</td><td>1 hour</td><td>Client-side (cookie via BFF)</td></tr><tr><td>Refresh token</td><td>7 days</td><td>Database (<code>sessions</code> table)</td></tr><tr><td>2FA temp token</td><td>10 minutes</td><td>In-memory</td></tr><tr><td>Password reset</td><td>1 hour</td><td>Database (<code>password_reset_tokens</code>)</td></tr></tbody></table>
+<p>The <code>JWT_SECRET</code> is validated at startup — the server crashes if missing or under 32 characters in production.</p>
+<h3 id="auth-endpoints">Auth Endpoints</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead><tbody><tr><td>POST</td><td><code>/api/v1/auth/register</code></td><td>Public</td><td>Register new user</td></tr><tr><td>POST</td><td><code>/api/v1/auth/login</code></td><td>Public (rate-limited)</td><td>Login (returns tokens)</td></tr><tr><td>POST</td><td><code>/api/v1/auth/refresh</code></td><td>Public (rate-limited)</td><td>Refresh access token</td></tr><tr><td>POST</td><td><code>/api/v1/auth/logout</code></td><td>JWT</td><td>Logout</td></tr><tr><td>GET</td><td><code>/api/v1/auth/me</code></td><td>JWT</td><td>Get current user</td></tr><tr><td>GET</td><td><code>/api/v1/auth/oauth/providers</code></td><td>Public</td><td>List OAuth providers</td></tr><tr><td>GET</td><td><code>/api/v1/auth/test-accounts</code></td><td>Public (dev only)</td><td>Get test accounts</td></tr></tbody></table>
+<h3 id="two-factor-authentication">Two-Factor Authentication</h3>
+<p>Mounted at <code>/api/v1/auth/2fa/</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/v1/auth/2fa/status</code></td><td>JWT</td><td>Check 2FA enabled status</td></tr><tr><td>POST</td><td><code>/api/v1/auth/2fa/setup</code></td><td>JWT</td><td>Generate TOTP secret + QR URI</td></tr><tr><td>POST</td><td><code>/api/v1/auth/2fa/enable</code></td><td>JWT</td><td>Confirm TOTP code, activate 2FA</td></tr><tr><td>POST</td><td><code>/api/v1/auth/2fa/disable</code></td><td>JWT</td><td>Disable 2FA (requires valid code)</td></tr><tr><td>GET</td><td><code>/api/v1/auth/2fa/recovery-codes</code></td><td>JWT</td><td>List remaining backup codes</td></tr><tr><td>POST</td><td><code>/api/v1/auth/2fa/verify</code></td><td>Temp token (rate-limited)</td><td>Verify TOTP during login</td></tr><tr><td>POST</td><td><code>/api/v1/auth/2fa/recovery</code></td><td>Temp token (rate-limited)</td><td>Use recovery code during login</td></tr></tbody></table>
+<h3 id="response-format-camelcase">Response Format (camelCase)</h3>
+<p>Hono uses <strong>camelCase</strong> for auth response fields (unlike the PHP backends which use snake_case):</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">success</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> true</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">data</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> {</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">user</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> {</span><span style="color:#005CC5;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#005CC5;--shiki-dark:#7DCFFF">id</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">...</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#005CC5;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#005CC5;--shiki-dark:#7DCFFF">email</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">...</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#005CC5;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#005CC5;--shiki-dark:#7DCFFF">name</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">...</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> }</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">accessToken</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">...</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">refreshToken</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">...</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">expiresIn</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> 3600</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">    &quot;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">tokenType</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">Bearer</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">  }</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">status</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> 200</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">request_id</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">abc123</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<h2 id="drizzle-orm--sqlite">Drizzle ORM + SQLite</h2>
+<p>All table definitions live in <code>src/shared/db/schema.ts</code>. The database is SQLite (<code>data.db</code> at project root).</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> db:generate</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">    # Generate Drizzle migration from schema changes</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> db:migrate</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">     # Apply pending migrations</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> db:push</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">        # Push schema without migration (dev only)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> db:seed</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">        # Seed data</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> db:studio</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">      # Drizzle Studio UI</span></span></code></pre>
+<p>ID convention: <code>text(&#39;id&#39;).primaryKey().$defaultFn(() =&gt; crypto.randomUUID())</code></p>
+<p>Timestamps are stored as ISO 8601 text strings (SQLite has no native date type).</p>
+<h2 id="zod-validation">Zod Validation</h2>
+<p>Every feature has a <code>{name}.schemas.ts</code> file with Zod schemas. Validation is applied at the route level using <code>@hono/zod-validator</code>:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#24292E;--shiki-dark:#C0CAF5">auth</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">post</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#89DDFF">  &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">/register</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#7AA2F7">  zValidator</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">json</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> registerSchema</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> (</span><span style="color:#E36209;--shiki-dark:#E0AF68">result</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#E36209;--shiki-dark:#E0AF68"> c</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#D73A49;--shiki-dark:#BB9AF7"> =&gt;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">    if</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> (</span><span style="color:#D73A49;--shiki-dark:#BB9AF7">!</span><span style="color:#24292E;--shiki-dark:#C0CAF5">result</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#24292E;--shiki-dark:#7DCFFF">success</span><span style="color:#24292E;--shiki-dark:#9ABDF5">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic">      return</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7"> apiError</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#24292E;--shiki-dark:#C0CAF5">c</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">VALIDATION_ERROR</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">Validation failed</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> 400</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#C0CAF5">        result</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#24292E;--shiki-dark:#7DCFFF">error</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">flatten</span><span style="color:#24292E;--shiki-dark:#9ABDF5">()</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#24292E;--shiki-dark:#7DCFFF">fieldErrors</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">  })</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic">  async</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> (</span><span style="color:#E36209;--shiki-dark:#E0AF68">c</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#D73A49;--shiki-dark:#BB9AF7"> =&gt;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> { </span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">/* handler */</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span></code></pre>
+<h2 id="middleware">Middleware</h2>
+<h3 id="global-middleware-applied-to-all-routes">Global Middleware (applied to all routes)</h3>
+<p>Applied in order in <code>src/index.ts</code>: <code>logger()</code>, <code>prettyJSON()</code>, <code>secureHeaders()</code>, <code>requestContextMiddleware</code>, <code>i18nMiddleware</code>, <code>cors()</code>.</p>
+<h3 id="route-middleware">Route Middleware</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Middleware</th><th>Purpose</th></tr></thead><tbody><tr><td><code>authMiddleware</code></td><td>Validates JWT, sets <code>user</code> in context</td></tr><tr><td><code>adminMiddleware</code></td><td>Requires <code>admin</code> role (after authMiddleware)</td></tr><tr><td><code>orgRbac(level)</code></td><td>Requires org membership at given level</td></tr><tr><td><code>rateLimitMiddleware({scope, maxAttempts, windowSeconds})</code></td><td>Configurable rate limiting</td></tr><tr><td><code>noStoreMiddleware</code></td><td>Sets <code>Cache-Control: no-store</code></td></tr></tbody></table>
+<h3 id="rate-limiting">Rate Limiting</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Scope</th><th>Max Attempts</th><th>Window</th></tr></thead><tbody><tr><td><code>auth-login</code></td><td>5</td><td>15 min</td></tr><tr><td><code>auth-refresh</code></td><td>30</td><td>1 min</td></tr><tr><td><code>auth-2fa-verify</code></td><td>10</td><td>15 min</td></tr><tr><td><code>auth-2fa-recovery</code></td><td>5</td><td>15 min</td></tr></tbody></table>
+<h2 id="route-mounts">Route Mounts</h2>
+<p>All routes are mounted in <code>src/index.ts</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Feature</th><th>Mount Path</th><th>Middleware</th></tr></thead><tbody><tr><td>auth</td><td><code>/api/v1/auth</code></td><td>Public (rate-limited)</td></tr><tr><td>shop</td><td><code>/api/v1</code></td><td>Public</td></tr><tr><td>cart</td><td><code>/api/v1/cart</code></td><td><code>authMiddleware</code></td></tr><tr><td>orders</td><td><code>/api/v1/orders</code></td><td><code>authMiddleware</code></td></tr><tr><td>admin</td><td><code>/api/v1/admin</code></td><td><code>authMiddleware</code> + <code>adminMiddleware</code></td></tr><tr><td>saas</td><td><code>/api/v1/saas</code></td><td><code>authMiddleware</code> + <code>orgRbac</code></td></tr><tr><td>support</td><td><code>/api/v1/support</code></td><td><code>authMiddleware</code></td></tr></tbody></table>
+<h2 id="testing">Testing</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> test</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">                        # All tests</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> test</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> src/tests/unit/</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">        # Unit tests only</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> test</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> src/tests/integration/</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"> # Integration tests only</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> test</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --grep</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">Auth</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">          # Filter by name</span></span></code></pre>
+<p>Test files cover: <code>auth.test.ts</code>, <code>health.test.ts</code>, <code>products.test.ts</code>, <code>cart.test.ts</code>, <code>orders.test.ts</code>, <code>saas.test.ts</code>, <code>admin.test.ts</code>, <code>support.test.ts</code>.</p>
+<h2 id="qa">QA</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">make</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> qa-hono</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">    # Runs typecheck + tests</span></span></code></pre>
+<h2 id="environment-variables">Environment Variables</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>PORT</code></td><td><code>3333</code></td><td>Server port</td></tr><tr><td><code>API_VERSION</code></td><td><code>v1</code></td><td>API version prefix</td></tr><tr><td><code>JWT_SECRET</code></td><td>—</td><td>JWT signing secret (required in prod, min 32 chars)</td></tr><tr><td><code>FRONTEND_URL</code></td><td><code>http://localhost:3301</code></td><td>Primary CORS origin</td></tr><tr><td><code>BFF_ORIGIN</code></td><td>—</td><td>Optional additional CORS origin</td></tr><tr><td><code>DATABASE_URL</code></td><td><code>file:./data.db</code></td><td>SQLite file path</td></tr><tr><td><code>NODE_ENV</code></td><td><code>development</code></td><td>Controls error verbosity</td></tr></tbody></table>  </article> <nav class="mt-16 flex items-stretch gap-4 border-t border-border pt-6" aria-label="Page navigation"> <a href="/docs/backends/symfony" class="group flex flex-1 flex-col rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Previous</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors">
+← Symfony </span> </a> <a href="/docs/modules/shop" class="group flex flex-1 flex-col items-end rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Next</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors"> Shop →
+</span> </a> </nav> </div> </main> <!-- Table of Contents --> <aside class="fixed top-14 right-0 hidden h-[calc(100svh-3.5rem)] w-56 overflow-y-auto border-l border-border bg-background/95 p-4 lg:block"> <astro-island uid="Z1G0PYU" prefix="r3" component-url="/_astro/TableOfContents.CkQmb82v.js" component-export="TableOfContents" renderer-url="/_astro/client.CwSvYkGX.js" props="{&quot;headings&quot;:[1,[[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;setup&quot;],&quot;text&quot;:[0,&quot;Setup&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;5-file-feature-convention&quot;],&quot;text&quot;:[0,&quot;5-File Feature Convention&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;layer-rules&quot;],&quot;text&quot;:[0,&quot;Layer Rules&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;jwt-authentication&quot;],&quot;text&quot;:[0,&quot;JWT Authentication&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;auth-endpoints&quot;],&quot;text&quot;:[0,&quot;Auth Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;two-factor-authentication&quot;],&quot;text&quot;:[0,&quot;Two-Factor Authentication&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;response-format-camelcase&quot;],&quot;text&quot;:[0,&quot;Response Format (camelCase)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;drizzle-orm--sqlite&quot;],&quot;text&quot;:[0,&quot;Drizzle ORM + SQLite&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;zod-validation&quot;],&quot;text&quot;:[0,&quot;Zod Validation&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;middleware&quot;],&quot;text&quot;:[0,&quot;Middleware&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;global-middleware-applied-to-all-routes&quot;],&quot;text&quot;:[0,&quot;Global Middleware (applied to all routes)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;route-middleware&quot;],&quot;text&quot;:[0,&quot;Route Middleware&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;rate-limiting&quot;],&quot;text&quot;:[0,&quot;Rate Limiting&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;route-mounts&quot;],&quot;text&quot;:[0,&quot;Route Mounts&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;testing&quot;],&quot;text&quot;:[0,&quot;Testing&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;qa&quot;],&quot;text&quot;:[0,&quot;QA&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;environment-variables&quot;],&quot;text&quot;:[0,&quot;Environment Variables&quot;]}]]],&quot;locale&quot;:[0,&quot;en&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;TableOfContents&quot;,&quot;value&quot;:true}" await-children><nav aria-label="Table of contents"><p class="mb-3 text-[10px] uppercase tracking-widest text-muted-foreground">On this page</p><ul class="space-y-1"><li><a href="#setup" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Setup</a></li><li><a href="#5-file-feature-convention" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">5-File Feature Convention</a></li><li><a href="#layer-rules" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Layer Rules</a></li><li><a href="#jwt-authentication" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">JWT Authentication</a></li><li><a href="#auth-endpoints" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Auth Endpoints</a></li><li><a href="#two-factor-authentication" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Two-Factor Authentication</a></li><li><a href="#response-format-camelcase" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Response Format (camelCase)</a></li><li><a href="#drizzle-orm--sqlite" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Drizzle ORM + SQLite</a></li><li><a href="#zod-validation" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Zod Validation</a></li><li><a href="#middleware" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Middleware</a></li><li><a href="#global-middleware-applied-to-all-routes" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Global Middleware (applied to all routes)</a></li><li><a href="#route-middleware" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Route Middleware</a></li><li><a href="#rate-limiting" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Rate Limiting</a></li><li><a href="#route-mounts" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Route Mounts</a></li><li><a href="#testing" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Testing</a></li><li><a href="#qa" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">QA</a></li><li><a href="#environment-variables" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Environment Variables</a></li></ul></nav><!--astro:end--></astro-island> </aside> </div> <!-- Mobile sidebar overlay --> <script>
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-sidebar]');
+        if (btn) {
+          const sidebar = document.getElementById('docs-sidebar');
+          sidebar.classList.toggle('hidden');
+          sidebar.classList.toggle('block');
+        }
+        // Close on backdrop click
+        if (e.target.id === 'sidebar-backdrop') {
+          document.getElementById('docs-sidebar').classList.add('hidden');
+          document.getElementById('docs-sidebar').classList.remove('block');
+        }
+      });
+    </script> </body> </html>

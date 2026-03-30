@@ -1,0 +1,328 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light dark"><!-- Primary Meta --><meta name="description" content="Pre-deploy checklist, build commands, security hardening, and monitoring setup."><!-- Open Graph --><meta property="og:type" content="article"><meta property="og:url" content="https://headlesskit.dev/docs/deploy/production/"><meta property="og:title" content="Production Deployment — Headless Kit Docs"><meta property="og:description" content="Pre-deploy checklist, build commands, security hardening, and monitoring setup."><meta property="og:image" content="https://headlesskit.dev/og-image.png"><meta property="og:site_name" content="Headless Kit"><meta property="og:locale" content="en_US"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Production Deployment — Headless Kit Docs"><meta name="twitter:description" content="Pre-deploy checklist, build commands, security hardening, and monitoring setup."><meta name="twitter:image" content="https://headlesskit.dev/og-image.png"><!-- Canonical --><link rel="canonical" href="https://headlesskit.dev/docs/deploy/production/"><!-- Hreflang --><link rel="alternate" hreflang="en" href="https://headlesskit.dev/docs/deploy/production/"><link rel="alternate" hreflang="fr" href="https://headlesskit.dev/fr/docs/deploy/production/"><link rel="alternate" hreflang="x-default" href="https://headlesskit.dev/docs/deploy/production/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Production Deployment — Headless Kit Docs</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://headlesskit.dev/docs"},{"@type":"ListItem","position":2,"name":"Deploy","item":"https://headlesskit.dev/docs/deploy"},{"@type":"ListItem","position":3,"name":"Production Deployment"}]}</script><script>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script><link rel="stylesheet" href="/_astro/index.BXyRLzR7.css">
+<style>.pagefind-ui[data-astro-cid-t4y4xlal]{--pagefind-ui-scale: .9;--pagefind-ui-primary: hsl(var(--primary));--pagefind-ui-text: hsl(var(--foreground));--pagefind-ui-background: hsl(var(--background));--pagefind-ui-border: hsl(var(--border));--pagefind-ui-border-width: 1px;--pagefind-ui-border-radius: 8px;--pagefind-ui-font: inherit}
+</style></head> <body class="min-h-svh antialiased bg-background text-foreground"> <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+Skip to content
+</a> <nav class="fixed top-0 z-50 w-full border-b border-border backdrop-blur-md bg-background/80" aria-label="Documentation navigation"> <div class="flex h-14 items-center justify-between px-4 md:px-6"> <!-- Left: Logo + mobile menu --> <div class="flex items-center gap-3"> <button data-toggle-sidebar class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted md:hidden" aria-label="Toggle sidebar"> <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"></path> </svg> </button> <a href="/" class="flex items-center gap-2 text-sm font-semibold text-foreground">
+Headless Kit
+</a> <span class="hidden text-border md:inline">|</span> <a href="/docs/getting-started/installation" class="hidden text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground md:inline"> Docs </a> </div> <!-- Right: Links + Theme + Auth --> <div class="flex items-center gap-3"> <a href="https://github.com/headless-kit/headless-kit" target="_blank" rel="noopener noreferrer" class="hidden font-mono text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline"> GitHub </a> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z1Dpcgz" prefix="r4" component-url="/_astro/ThemeToggle.BdSTQQ74.js" component-export="ThemeToggle" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;ThemeToggle&quot;,&quot;value&quot;:true}" await-children><button data-slot="button" data-variant="ghost" data-size="icon" class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 rounded-full text-muted-foreground hover:text-foreground" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon size-4" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button><!--astro:end--></astro-island> <astro-island uid="ZGOCeI" prefix="r5" component-url="/_astro/AuthNavButtons.C9pdFHE9.js" component-export="AuthNavButtons" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;AuthNavButtons&quot;,&quot;value&quot;:true}" await-children><div class="hidden h-8 w-20 animate-pulse rounded-full bg-muted sm:block"></div><!--astro:end--></astro-island> </div> </div> </nav> <div class="flex pt-14"> <!-- Sidebar --> <aside id="docs-sidebar" class="fixed top-14 left-0 z-40 hidden h-[calc(100svh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm md:block"> <div class="border-b border-border p-3"> <div id="search" class="pagefind-ui" data-pagefind-ui data-astro-cid-t4y4xlal></div> <link href="/pagefind/pagefind-ui.css" rel="stylesheet"> <script src="/pagefind/pagefind-ui.js"></script> <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+    })
+  })
+</script>  </div> <nav class="p-4 space-y-1" aria-label="Documentation sidebar"> <details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Getting Started </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/getting-started/installation" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Installation </a> </li><li> <a href="/docs/getting-started/project-structure" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Project Structure </a> </li><li> <a href="/docs/getting-started/configuration" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Configuration </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Architecture </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/architecture/bff-pattern" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> BFF Pattern </a> </li><li> <a href="/docs/architecture/auth-flow" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Auth Flow </a> </li><li> <a href="/docs/architecture/adapters" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Adapters </a> </li><li> <a href="/docs/architecture/vertical-slice" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Vertical Slice </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Backends </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/backends/laravel" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Laravel </a> </li><li> <a href="/docs/backends/symfony" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Symfony </a> </li><li> <a href="/docs/backends/hono" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Hono </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Modules </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/modules/shop" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Shop </a> </li><li> <a href="/docs/modules/admin" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Admin </a> </li><li> <a href="/docs/modules/saas" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> SaaS </a> </li><li> <a href="/docs/modules/support" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Support </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> CLI </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/cli/getting-started" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Getting Started </a> </li><li> <a href="/docs/cli/presets" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Presets </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Guides </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/guides/authentication" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Authentication </a> </li><li> <a href="/docs/guides/tanstack-start" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> TanStack Start </a> </li><li> <a href="/docs/guides/rbac" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> RBAC </a> </li><li> <a href="/docs/guides/two-factor" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Two-Factor Auth </a> </li><li> <a href="/docs/guides/oauth" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> OAuth </a> </li><li> <a href="/docs/guides/custom-adapter" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Custom Adapter </a> </li> </ul> </details><details open class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-primary"> <span class="text-[10px] transition-transform group-open:rotate-90 text-primary">
+▶
+</span> Deploy </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/deploy/docker" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Docker </a> </li><li> <a href="/docs/deploy/production" class="block rounded-md px-3 py-1.5 text-xs transition-colors bg-primary/10 text-primary" aria-current="page"> Production </a> </li> </ul> </details> </nav> </aside> <!-- Main content --> <main id="main-content" class="min-w-0 flex-1 md:ml-64 lg:mr-56"> <div class="mx-auto max-w-3xl px-6 py-10 md:px-8"> <nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted-foreground"> <ol class="flex items-center gap-1.5"> <li><a href="/docs" class="hover:text-foreground transition-colors">Docs</a></li> <li class="text-muted-foreground/50">/</li> <li><a href="/docs/deploy" class="hover:text-foreground transition-colors">Deploy</a></li> <li class="text-muted-foreground/50">/</li> <li class="text-foreground font-medium">Production Deployment</li> </ol> </nav> <article class="docs-prose"> <h1>Production Deployment</h1> <p class="text-lg text-muted-foreground mb-8 !mt-0">Pre-deploy checklist, build commands, security hardening, and monitoring setup.</p>  <h1 id="production-deployment">Production Deployment</h1>
+<p>This guide covers everything needed to deploy Headless Kit to production: secret management, build optimization, security hardening, and monitoring.</p>
+<h2 id="pre-deploy-checklist">Pre-Deploy Checklist</h2>
+<p>Before deploying, verify every item:</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Rotate all secrets</strong> (JWT_SECRET, BETTER_AUTH_SECRET, APP_KEY)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Set cookies to Secure</strong> (automatic when <code>NODE_ENV=production</code>)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Configure CORS</strong> to allow only your production domain</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Enable SSL/TLS</strong> on all public endpoints</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Set <code>APP_DEBUG=false</code></strong> on Laravel and Symfony</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Remove test accounts</strong> endpoint or disable it in production</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Review rate limiting</strong> configuration per backend</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Set up database backups</strong> for PostgreSQL</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Configure log aggregation</strong> (see Logging section below)</li>
+</ul>
+<h2 id="build-commands">Build Commands</h2>
+<h3 id="nextjs-bff">Next.js BFF</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">cd</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> apps/web</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> build</span></span></code></pre>
+<p>Next.js produces a standalone output (when configured with <code>output: &#39;standalone&#39;</code> in <code>next.config.ts</code>). The build output in <code>.next/standalone</code> contains everything needed to run the app without <code>node_modules</code>.</p>
+<p>Start the production server:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">cd</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> apps/web/.next/standalone</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> server.js</span></span></code></pre>
+<h3 id="tanstack-start">TanStack Start</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">cd</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> apps/web-tanstack</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> build</span></span></code></pre>
+<h3 id="laravel">Laravel</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">cd</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> apps/api-laravel</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">composer</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> install</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --no-dev</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --optimize-autoloader</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> config:cache</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> route:cache</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> view:cache</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> artisan</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> migrate</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --force</span></span></code></pre>
+<h3 id="symfony">Symfony</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">cd</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> apps/api-sf</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#C0CAF5">APP_ENV</span><span style="color:#D73A49;--shiki-dark:#89DDFF">=</span><span style="color:#032F62;--shiki-dark:#9ECE6A">prod</span><span style="color:#6F42C1;--shiki-dark:#C0CAF5"> composer</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> install</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --no-dev</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --optimize-autoloader</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> bin/console</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> cache:clear</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --env=prod</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">php</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> bin/console</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> doctrine:migrations:migrate</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --no-interaction</span></span></code></pre>
+<h3 id="hono">Hono</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#005CC5;--shiki-dark:#0DB9D7">cd</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> apps/api-hono</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> install</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> --production</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">bun</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> run</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> db:migrate</span></span></code></pre>
+<p>Hono runs directly on Bun without a separate build step.</p>
+<h2 id="recommended-architecture">Recommended Architecture</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Internet</span></span>
+<span class="line"><span>  |</span></span>
+<span class="line"><span>  +-- Reverse Proxy (nginx / Caddy / CloudFlare)</span></span>
+<span class="line"><span>       |</span></span>
+<span class="line"><span>       +-- Next.js BFF (:3300)</span></span>
+<span class="line"><span>       |     |</span></span>
+<span class="line"><span>       |     +-- Laravel API (:8002)   [internal network]</span></span>
+<span class="line"><span>       |     +-- Symfony API (:8001)   [internal network]</span></span>
+<span class="line"><span>       |     +-- Hono API (:3333)      [internal network]</span></span>
+<span class="line"><span>       |</span></span>
+<span class="line"><span>       +-- PostgreSQL (:5432)          [internal network]</span></span>
+<span class="line"><span>       +-- Redis (:6379)               [internal network]</span></span></code></pre>
+<p>Key principles:</p>
+<ul>
+<li>Only the <strong>reverse proxy</strong> and <strong>BFF</strong> are publicly accessible</li>
+<li>Backend APIs are on an <strong>internal network</strong> with no public access</li>
+<li>The database and cache are <strong>never</strong> exposed to the internet</li>
+<li>All public traffic goes through <strong>SSL/TLS</strong></li>
+</ul>
+<h2 id="cookie-security">Cookie Security</h2>
+<p>In production, cookies are configured automatically when <code>NODE_ENV=production</code>:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#73DACA">  httpOnly</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> true</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">        // Tokens invisible to JavaScript (XSS protection)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#73DACA">  secure</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> true</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">          // HTTPS only</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#73DACA">  sameSite</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">lax</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">       // CSRF protection</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#73DACA">  path</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">/</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<p>The <code>SameSite=Lax</code> setting prevents cookies from being sent on cross-origin requests while still allowing top-level navigations (links from other sites).</p>
+<h2 id="cors-configuration">CORS Configuration</h2>
+<p>Each backend should restrict CORS to the BFF origin only:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="ini"><code><span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># Laravel</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">FRONTEND_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">https://your-domain.com</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># Symfony</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">FRONTEND_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">https://your-domain.com</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># Hono</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">FRONTEND_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">https://your-domain.com</span></span></code></pre>
+<p>Since backends are not publicly accessible, CORS is primarily a defense-in-depth measure.</p>
+<h2 id="rate-limiting">Rate Limiting</h2>
+<p>All backends implement rate limiting on sensitive endpoints:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Endpoint</th><th>Limit</th><th>Window</th></tr></thead><tbody><tr><td>Login / Register</td><td>5 requests</td><td>15 minutes</td></tr><tr><td>Password reset</td><td>3 requests</td><td>15 minutes</td></tr><tr><td>2FA verify</td><td>10 requests</td><td>15 minutes</td></tr><tr><td>Token refresh</td><td>30 requests</td><td>1 minute</td></tr><tr><td>API mutations (POST/PUT/DELETE)</td><td>60 requests</td><td>1 minute</td></tr><tr><td>API reads (GET)</td><td>120 requests</td><td>1 minute</td></tr></tbody></table>
+<p>Implementation per backend:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Backend</th><th>Mechanism</th></tr></thead><tbody><tr><td>Laravel</td><td><code>throttle</code> middleware on routes</td></tr><tr><td>Symfony</td><td><code>RateLimiterService</code> with cache backend</td></tr><tr><td>Hono</td><td><code>rateLimitMiddleware()</code> on routes</td></tr></tbody></table>
+<h2 id="security-headers">Security Headers</h2>
+<p>The BFF proxy itself sets <code>x-content-type-options: nosniff</code> and <code>x-frame-options: DENY</code> on all API responses. In addition, the reverse proxy or backend should set these headers on every response:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>X-Content-Type-Options: nosniff</span></span>
+<span class="line"><span>X-Frame-Options: DENY</span></span>
+<span class="line"><span>X-XSS-Protection: 0</span></span>
+<span class="line"><span>Referrer-Policy: strict-origin-when-cross-origin</span></span>
+<span class="line"><span>Content-Security-Policy: default-src &#39;self&#39;</span></span>
+<span class="line"><span>Strict-Transport-Security: max-age=31536000; includeSubDomains</span></span></code></pre>
+<p>All three backends include an <code>X-Request-Id</code> header on every response for tracing.</p>
+<h3 id="bff-rate-limiting">BFF Rate Limiting</h3>
+<p>The BFF proxy includes an in-memory rate limiter for auth endpoints (20 requests / 15 minutes per IP). For multi-instance deployments, replace with a distributed store:</p>
+<ul>
+<li><a href="https://github.com/upstash/ratelimit">Upstash Rate Limit</a> — serverless Redis</li>
+<li><a href="https://github.com/redis/ioredis">ioredis</a> — self-hosted Redis</li>
+</ul>
+<h4 id="redis-adapter-example">Redis adapter example</h4>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">// Replace the in-memory rateLimitMap in route.ts with:</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#7DCFFF">import</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> { </span><span style="color:#24292E;--shiki-dark:#0DB9D7">Ratelimit</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> }</span><span style="color:#D73A49;--shiki-dark:#7DCFFF"> from</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">@upstash/ratelimit</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#7DCFFF">import</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> { </span><span style="color:#24292E;--shiki-dark:#0DB9D7">Redis</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> }</span><span style="color:#D73A49;--shiki-dark:#7DCFFF"> from</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">@upstash/redis</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic">const</span><span style="color:#005CC5;--shiki-dark:#BB9AF7"> ratelimit</span><span style="color:#D73A49;--shiki-dark:#89DDFF"> =</span><span style="color:#D73A49;--shiki-dark:#89DDFF"> new</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7"> Ratelimit</span><span style="color:#24292E;--shiki-dark:#9ABDF5">({</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#73DACA">  redis</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> Redis</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">fromEnv</span><span style="color:#24292E;--shiki-dark:#9ABDF5">()</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#73DACA">  limiter</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> Ratelimit</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">slidingWindow</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#005CC5;--shiki-dark:#FF9E64">20</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">15 m</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#73DACA">  prefix</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">bff:auth</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">})</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic">async</span><span style="color:#D73A49;--shiki-dark:#BB9AF7"> function</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7"> checkRateLimit</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#E36209;--shiki-dark:#E0AF68">ip</span><span style="color:#D73A49;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#0DB9D7"> string</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span><span style="color:#D73A49;--shiki-dark:#89DDFF">:</span><span style="color:#6F42C1;--shiki-dark:#C0CAF5"> Promise</span><span style="color:#24292E;--shiki-dark:#89DDFF">&lt;</span><span style="color:#005CC5;--shiki-dark:#0DB9D7">boolean</span><span style="color:#24292E;--shiki-dark:#89DDFF">&gt;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic">  const</span><span style="color:#24292E;--shiki-dark:#89DDFF"> {</span><span style="color:#005CC5;--shiki-dark:#BB9AF7"> success</span><span style="color:#24292E;--shiki-dark:#89DDFF"> }</span><span style="color:#D73A49;--shiki-dark:#89DDFF"> =</span><span style="color:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic"> await</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> ratelimit</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">limit</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#24292E;--shiki-dark:#C0CAF5">ip</span><span style="color:#24292E;--shiki-dark:#9ABDF5">)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic">  return</span><span style="color:#24292E;--shiki-dark:#C0CAF5"> success</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<h2 id="health-check-endpoints">Health Check Endpoints</h2>
+<p>Set up health checks for your load balancer or orchestrator:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Backend</th><th>Endpoint</th><th>Checks</th></tr></thead><tbody><tr><td>Next.js</td><td><code>GET /api/health</code></td><td>App is running</td></tr><tr><td>Laravel</td><td><code>GET /api/health</code></td><td>App + database connection</td></tr><tr><td>Symfony</td><td><code>GET /api/health</code></td><td>App + database connection</td></tr><tr><td>Hono</td><td><code>GET /api/health</code></td><td>App + database connection</td></tr></tbody></table>
+<h2 id="logging">Logging</h2>
+<h3 id="php-backends-laravel--symfony">PHP Backends (Laravel + Symfony)</h3>
+<p>Both use Monolog for structured logging:</p>
+<p><strong>Laravel</strong> (<code>config/logging.php</code>):</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="php"><code><span class="line"><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">channels</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#D73A49;--shiki-dark:#89DDFF"> =&gt;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> [</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#89DDFF">    &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">stack</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#D73A49;--shiki-dark:#89DDFF"> =&gt;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> [</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#89DDFF">        &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">driver</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#D73A49;--shiki-dark:#89DDFF"> =&gt;</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">stack</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#89DDFF">        &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">channels</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#D73A49;--shiki-dark:#89DDFF"> =&gt;</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> [</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">daily</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">stderr</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#9ABDF5">]</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">    ]</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">]</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span></code></pre>
+<p><strong>Symfony</strong> (<code>config/packages/monolog.yaml</code>):</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#22863A;--shiki-dark:#F7768E">monolog</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span></span>
+<span class="line"><span style="color:#22863A;--shiki-dark:#F7768E">    handlers</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span></span>
+<span class="line"><span style="color:#22863A;--shiki-dark:#F7768E">        main</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span></span>
+<span class="line"><span style="color:#22863A;--shiki-dark:#F7768E">            type</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> stream</span></span>
+<span class="line"><span style="color:#22863A;--shiki-dark:#F7768E">            path</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">%kernel.logs_dir%/%kernel.environment%.log</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#22863A;--shiki-dark:#F7768E">            level</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> info</span></span></code></pre>
+<h3 id="hono-1">Hono</h3>
+<p>Uses the built-in <code>logger()</code> middleware for request logging and <code>console.error</code> for errors:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#7DCFFF">import</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> { </span><span style="color:#24292E;--shiki-dark:#0DB9D7">logger</span><span style="color:#24292E;--shiki-dark:#9ABDF5"> }</span><span style="color:#D73A49;--shiki-dark:#7DCFFF"> from</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">hono/logger</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#C0CAF5">app</span><span style="color:#24292E;--shiki-dark:#89DDFF">.</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7">use</span><span style="color:#24292E;--shiki-dark:#9ABDF5">(</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">*</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#6F42C1;--shiki-dark:#7AA2F7"> logger</span><span style="color:#24292E;--shiki-dark:#9ABDF5">())</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span></code></pre>
+<h3 id="nextjs-bff-1">Next.js BFF</h3>
+<p>Uses Pino for server-side logging with structured JSON output in production:</p>
+<ul>
+<li>Server runtime: Pino with JSON formatting</li>
+<li>Edge runtime: JSON logger (Pino is not available in Edge)</li>
+<li>Client: Console logger (development only)</li>
+</ul>
+<h3 id="log-format">Log Format</h3>
+<p>All backends follow the same structured format:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">timestamp</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">2025-01-15T10:30:00.000Z</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">level</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">INFO</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">message</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">User registered</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">request_id</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">abc-123-def</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#89DDFF">  &quot;</span><span style="color:#005CC5;--shiki-dark:#7AA2F7">user_id</span><span style="color:#005CC5;--shiki-dark:#89DDFF">&quot;</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">usr_456</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<h3 id="what-to-never-log">What to Never Log</h3>
+<ul>
+<li>Passwords (plaintext or hashed)</li>
+<li>Auth tokens (access, refresh, Paseto)</li>
+<li>Credit card numbers</li>
+<li>Full request bodies containing sensitive fields</li>
+</ul>
+<h2 id="environment-variable-validation">Environment Variable Validation</h2>
+<p>All backends validate critical environment variables at startup in production:</p>
+<ul>
+<li><strong>Hono</strong>: Throws if <code>JWT_SECRET</code> is the default value or under 32 characters</li>
+<li><strong>Laravel</strong>: Crashes if <code>APP_KEY</code> is missing; validates <code>BETTER_AUTH_SECRET</code> in service provider</li>
+<li><strong>Symfony</strong>: Crashes at container compilation if required <code>%env()%</code> variables are missing</li>
+</ul>
+<p>A misconfigured deployment fails immediately at startup rather than serving requests with missing security configuration.</p>
+<h2 id="reverse-proxy-configuration">Reverse Proxy Configuration</h2>
+<h3 id="nginx-example">Nginx Example</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="nginx"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">server</span><span style="color:#24292E;--shiki-dark:#A9B1D6"> {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">    listen </span><span style="color:#005CC5;--shiki-dark:#FF9E64">443</span><span style="color:#24292E;--shiki-dark:#A9B1D6"> ssl http2</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">    server_name </span><span style="color:#24292E;--shiki-dark:#A9B1D6">your-domain.com</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">    ssl_certificate </span><span style="color:#24292E;--shiki-dark:#A9B1D6">/etc/ssl/certs/your-domain.crt</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">    ssl_certificate_key </span><span style="color:#24292E;--shiki-dark:#A9B1D6">/etc/ssl/private/your-domain.key</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">    location</span><span style="color:#6F42C1;--shiki-dark:#C0CAF5"> / </span><span style="color:#24292E;--shiki-dark:#A9B1D6">{</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">        proxy_pass </span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://127.0.0.1:3300</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">        proxy_set_header </span><span style="color:#24292E;--shiki-dark:#A9B1D6">Host </span><span style="color:#24292E;--shiki-dark:#89DDFF">$</span><span style="color:#24292E;--shiki-dark:#C0CAF5">host</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">        proxy_set_header </span><span style="color:#24292E;--shiki-dark:#A9B1D6">X-Real-IP </span><span style="color:#24292E;--shiki-dark:#89DDFF">$</span><span style="color:#24292E;--shiki-dark:#C0CAF5">remote_addr</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">        proxy_set_header </span><span style="color:#24292E;--shiki-dark:#A9B1D6">X-Forwarded-For </span><span style="color:#24292E;--shiki-dark:#89DDFF">$</span><span style="color:#24292E;--shiki-dark:#C0CAF5">proxy_add_x_forwarded_for</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#BB9AF7">        proxy_set_header </span><span style="color:#24292E;--shiki-dark:#A9B1D6">X-Forwarded-Proto </span><span style="color:#24292E;--shiki-dark:#89DDFF">$</span><span style="color:#24292E;--shiki-dark:#C0CAF5">scheme</span><span style="color:#24292E;--shiki-dark:#89DDFF">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#A9B1D6">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#A9B1D6">}</span></span></code></pre>
+<p>Only proxy traffic to the BFF (port 3300). Backend APIs should not have public-facing proxy rules.</p>  </article> <nav class="mt-16 flex items-stretch gap-4 border-t border-border pt-6" aria-label="Page navigation"> <a href="/docs/deploy/docker" class="group flex flex-1 flex-col rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Previous</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors">
+← Docker </span> </a> <div class="flex-1"></div> </nav> </div> </main> <!-- Table of Contents --> <aside class="fixed top-14 right-0 hidden h-[calc(100svh-3.5rem)] w-56 overflow-y-auto border-l border-border bg-background/95 p-4 lg:block"> <astro-island uid="1dhESQ" prefix="r3" component-url="/_astro/TableOfContents.CkQmb82v.js" component-export="TableOfContents" renderer-url="/_astro/client.CwSvYkGX.js" props="{&quot;headings&quot;:[1,[[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;pre-deploy-checklist&quot;],&quot;text&quot;:[0,&quot;Pre-Deploy Checklist&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;build-commands&quot;],&quot;text&quot;:[0,&quot;Build Commands&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;nextjs-bff&quot;],&quot;text&quot;:[0,&quot;Next.js BFF&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;tanstack-start&quot;],&quot;text&quot;:[0,&quot;TanStack Start&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;laravel&quot;],&quot;text&quot;:[0,&quot;Laravel&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;symfony&quot;],&quot;text&quot;:[0,&quot;Symfony&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;hono&quot;],&quot;text&quot;:[0,&quot;Hono&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;recommended-architecture&quot;],&quot;text&quot;:[0,&quot;Recommended Architecture&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;cookie-security&quot;],&quot;text&quot;:[0,&quot;Cookie Security&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;cors-configuration&quot;],&quot;text&quot;:[0,&quot;CORS Configuration&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;rate-limiting&quot;],&quot;text&quot;:[0,&quot;Rate Limiting&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;security-headers&quot;],&quot;text&quot;:[0,&quot;Security Headers&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;bff-rate-limiting&quot;],&quot;text&quot;:[0,&quot;BFF Rate Limiting&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;health-check-endpoints&quot;],&quot;text&quot;:[0,&quot;Health Check Endpoints&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;logging&quot;],&quot;text&quot;:[0,&quot;Logging&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;php-backends-laravel--symfony&quot;],&quot;text&quot;:[0,&quot;PHP Backends (Laravel + Symfony)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;hono-1&quot;],&quot;text&quot;:[0,&quot;Hono&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;nextjs-bff-1&quot;],&quot;text&quot;:[0,&quot;Next.js BFF&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;log-format&quot;],&quot;text&quot;:[0,&quot;Log Format&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;what-to-never-log&quot;],&quot;text&quot;:[0,&quot;What to Never Log&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;environment-variable-validation&quot;],&quot;text&quot;:[0,&quot;Environment Variable Validation&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;reverse-proxy-configuration&quot;],&quot;text&quot;:[0,&quot;Reverse Proxy Configuration&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;nginx-example&quot;],&quot;text&quot;:[0,&quot;Nginx Example&quot;]}]]],&quot;locale&quot;:[0,&quot;en&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;TableOfContents&quot;,&quot;value&quot;:true}" await-children><nav aria-label="Table of contents"><p class="mb-3 text-[10px] uppercase tracking-widest text-muted-foreground">On this page</p><ul class="space-y-1"><li><a href="#pre-deploy-checklist" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Pre-Deploy Checklist</a></li><li><a href="#build-commands" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Build Commands</a></li><li><a href="#nextjs-bff" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Next.js BFF</a></li><li><a href="#tanstack-start" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">TanStack Start</a></li><li><a href="#laravel" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Laravel</a></li><li><a href="#symfony" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Symfony</a></li><li><a href="#hono" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Hono</a></li><li><a href="#recommended-architecture" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Recommended Architecture</a></li><li><a href="#cookie-security" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Cookie Security</a></li><li><a href="#cors-configuration" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">CORS Configuration</a></li><li><a href="#rate-limiting" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Rate Limiting</a></li><li><a href="#security-headers" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Security Headers</a></li><li><a href="#bff-rate-limiting" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">BFF Rate Limiting</a></li><li><a href="#health-check-endpoints" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Health Check Endpoints</a></li><li><a href="#logging" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Logging</a></li><li><a href="#php-backends-laravel--symfony" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">PHP Backends (Laravel + Symfony)</a></li><li><a href="#hono-1" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Hono</a></li><li><a href="#nextjs-bff-1" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Next.js BFF</a></li><li><a href="#log-format" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Log Format</a></li><li><a href="#what-to-never-log" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">What to Never Log</a></li><li><a href="#environment-variable-validation" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Environment Variable Validation</a></li><li><a href="#reverse-proxy-configuration" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Reverse Proxy Configuration</a></li><li><a href="#nginx-example" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Nginx Example</a></li></ul></nav><!--astro:end--></astro-island> </aside> </div> <!-- Mobile sidebar overlay --> <script>
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-sidebar]');
+        if (btn) {
+          const sidebar = document.getElementById('docs-sidebar');
+          sidebar.classList.toggle('hidden');
+          sidebar.classList.toggle('block');
+        }
+        // Close on backdrop click
+        if (e.target.id === 'sidebar-backdrop') {
+          document.getElementById('docs-sidebar').classList.add('hidden');
+          document.getElementById('docs-sidebar').classList.remove('block');
+        }
+      });
+    </script> </body> </html>

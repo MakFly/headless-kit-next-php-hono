@@ -1,0 +1,227 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light dark"><!-- Primary Meta --><meta name="description" content="Environment variables, backend switching, and cookie structure for each app."><!-- Open Graph --><meta property="og:type" content="article"><meta property="og:url" content="https://headlesskit.dev/docs/getting-started/configuration/"><meta property="og:title" content="Configuration — Headless Kit Docs"><meta property="og:description" content="Environment variables, backend switching, and cookie structure for each app."><meta property="og:image" content="https://headlesskit.dev/og-image.png"><meta property="og:site_name" content="Headless Kit"><meta property="og:locale" content="en_US"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Configuration — Headless Kit Docs"><meta name="twitter:description" content="Environment variables, backend switching, and cookie structure for each app."><meta name="twitter:image" content="https://headlesskit.dev/og-image.png"><!-- Canonical --><link rel="canonical" href="https://headlesskit.dev/docs/getting-started/configuration/"><!-- Hreflang --><link rel="alternate" hreflang="en" href="https://headlesskit.dev/docs/getting-started/configuration/"><link rel="alternate" hreflang="fr" href="https://headlesskit.dev/fr/docs/getting-started/configuration/"><link rel="alternate" hreflang="x-default" href="https://headlesskit.dev/docs/getting-started/configuration/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Configuration — Headless Kit Docs</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://headlesskit.dev/docs"},{"@type":"ListItem","position":2,"name":"Getting Started","item":"https://headlesskit.dev/docs/getting-started"},{"@type":"ListItem","position":3,"name":"Configuration"}]}</script><script>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script><link rel="stylesheet" href="/_astro/index.BXyRLzR7.css">
+<style>.pagefind-ui[data-astro-cid-t4y4xlal]{--pagefind-ui-scale: .9;--pagefind-ui-primary: hsl(var(--primary));--pagefind-ui-text: hsl(var(--foreground));--pagefind-ui-background: hsl(var(--background));--pagefind-ui-border: hsl(var(--border));--pagefind-ui-border-width: 1px;--pagefind-ui-border-radius: 8px;--pagefind-ui-font: inherit}
+</style></head> <body class="min-h-svh antialiased bg-background text-foreground"> <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+Skip to content
+</a> <nav class="fixed top-0 z-50 w-full border-b border-border backdrop-blur-md bg-background/80" aria-label="Documentation navigation"> <div class="flex h-14 items-center justify-between px-4 md:px-6"> <!-- Left: Logo + mobile menu --> <div class="flex items-center gap-3"> <button data-toggle-sidebar class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted md:hidden" aria-label="Toggle sidebar"> <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"></path> </svg> </button> <a href="/" class="flex items-center gap-2 text-sm font-semibold text-foreground">
+Headless Kit
+</a> <span class="hidden text-border md:inline">|</span> <a href="/docs/getting-started/installation" class="hidden text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground md:inline"> Docs </a> </div> <!-- Right: Links + Theme + Auth --> <div class="flex items-center gap-3"> <a href="https://github.com/headless-kit/headless-kit" target="_blank" rel="noopener noreferrer" class="hidden font-mono text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline"> GitHub </a> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z1Dpcgz" prefix="r4" component-url="/_astro/ThemeToggle.BdSTQQ74.js" component-export="ThemeToggle" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;ThemeToggle&quot;,&quot;value&quot;:true}" await-children><button data-slot="button" data-variant="ghost" data-size="icon" class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 rounded-full text-muted-foreground hover:text-foreground" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon size-4" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button><!--astro:end--></astro-island> <astro-island uid="ZGOCeI" prefix="r5" component-url="/_astro/AuthNavButtons.C9pdFHE9.js" component-export="AuthNavButtons" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;AuthNavButtons&quot;,&quot;value&quot;:true}" await-children><div class="hidden h-8 w-20 animate-pulse rounded-full bg-muted sm:block"></div><!--astro:end--></astro-island> </div> </div> </nav> <div class="flex pt-14"> <!-- Sidebar --> <aside id="docs-sidebar" class="fixed top-14 left-0 z-40 hidden h-[calc(100svh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm md:block"> <div class="border-b border-border p-3"> <div id="search" class="pagefind-ui" data-pagefind-ui data-astro-cid-t4y4xlal></div> <link href="/pagefind/pagefind-ui.css" rel="stylesheet"> <script src="/pagefind/pagefind-ui.js"></script> <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+    })
+  })
+</script>  </div> <nav class="p-4 space-y-1" aria-label="Documentation sidebar"> <details open class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-primary"> <span class="text-[10px] transition-transform group-open:rotate-90 text-primary">
+▶
+</span> Getting Started </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/getting-started/installation" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Installation </a> </li><li> <a href="/docs/getting-started/project-structure" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Project Structure </a> </li><li> <a href="/docs/getting-started/configuration" class="block rounded-md px-3 py-1.5 text-xs transition-colors bg-primary/10 text-primary" aria-current="page"> Configuration </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Architecture </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/architecture/bff-pattern" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> BFF Pattern </a> </li><li> <a href="/docs/architecture/auth-flow" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Auth Flow </a> </li><li> <a href="/docs/architecture/adapters" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Adapters </a> </li><li> <a href="/docs/architecture/vertical-slice" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Vertical Slice </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Backends </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/backends/laravel" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Laravel </a> </li><li> <a href="/docs/backends/symfony" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Symfony </a> </li><li> <a href="/docs/backends/hono" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Hono </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Modules </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/modules/shop" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Shop </a> </li><li> <a href="/docs/modules/admin" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Admin </a> </li><li> <a href="/docs/modules/saas" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> SaaS </a> </li><li> <a href="/docs/modules/support" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Support </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> CLI </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/cli/getting-started" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Getting Started </a> </li><li> <a href="/docs/cli/presets" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Presets </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Guides </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/guides/authentication" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Authentication </a> </li><li> <a href="/docs/guides/tanstack-start" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> TanStack Start </a> </li><li> <a href="/docs/guides/rbac" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> RBAC </a> </li><li> <a href="/docs/guides/two-factor" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Two-Factor Auth </a> </li><li> <a href="/docs/guides/oauth" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> OAuth </a> </li><li> <a href="/docs/guides/custom-adapter" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Custom Adapter </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Deploy </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/deploy/docker" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Docker </a> </li><li> <a href="/docs/deploy/production" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Production </a> </li> </ul> </details> </nav> </aside> <!-- Main content --> <main id="main-content" class="min-w-0 flex-1 md:ml-64 lg:mr-56"> <div class="mx-auto max-w-3xl px-6 py-10 md:px-8"> <nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted-foreground"> <ol class="flex items-center gap-1.5"> <li><a href="/docs" class="hover:text-foreground transition-colors">Docs</a></li> <li class="text-muted-foreground/50">/</li> <li><a href="/docs/getting-started" class="hover:text-foreground transition-colors">Getting Started</a></li> <li class="text-muted-foreground/50">/</li> <li class="text-foreground font-medium">Configuration</li> </ol> </nav> <article class="docs-prose"> <h1>Configuration</h1> <p class="text-lg text-muted-foreground mb-8 !mt-0">Environment variables, backend switching, and cookie structure for each app.</p>  <h1 id="configuration">Configuration</h1>
+<p>Each app in Headless Kit uses environment variables for runtime configuration. Never hardcode URLs, secrets, or backend choices.</p>
+<h2 id="nextjs-bff-appsweb">Next.js BFF (<code>apps/web</code>)</h2>
+<p>Create <code>.env.local</code> in the <code>apps/web</code> directory:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="ini"><code><span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># App URL (used for CORS and redirects)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">NEXT_PUBLIC_APP_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:3300</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># Backend API URLs</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">LARAVEL_API_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:8002</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">SYMFONY_API_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:8001</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">NODE_API_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:3333</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># Active backend: laravel | symfony | node</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">AUTH_BACKEND</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">laravel</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># Cookie names (optional, defaults shown)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">AUTH_COOKIE_NAME</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">auth_token</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">REFRESH_COOKIE_NAME</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">refresh_token</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">TOKEN_EXPIRES_COOKIE_NAME</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">token_expires_at</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># BFF proxy timeout (optional, default: 30000ms)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">PROXY_TIMEOUT_MS</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">30000</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># AI providers (optional)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">AI_PROVIDER</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">anthropic</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">ANTHROPIC_API_KEY</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">sk-...</span></span></code></pre>
+<p>All environment variables should be accessed via <code>src/lib/config/env.ts</code>, never through <code>process.env</code> directly. This module validates and types every variable.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>PROXY_TIMEOUT_MS</code></td><td><code>30000</code></td><td>BFF proxy timeout in milliseconds. Refresh calls use <code>min(PROXY_TIMEOUT_MS, 5000)</code>.</td></tr></tbody></table>
+<h3 id="health-check">Health Check</h3>
+<p>Both BFFs expose <code>GET /api/health</code> returning <code>{ status: &quot;ok&quot;, timestamp, version }</code>. Use this for Docker health checks, Kubernetes liveness probes, and load balancer monitoring.</p>
+<h2 id="tanstack-start-appsweb-tanstack">TanStack Start (<code>apps/web-tanstack</code>)</h2>
+<p>Create <code>.env</code> in the <code>apps/web-tanstack</code> directory:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="ini"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">VITE_APP_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:3301</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># Backend URLs</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">LARAVEL_API_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:8002</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">SYMFONY_API_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:8001</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">NODE_API_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:3333</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># Active backend</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">AUTH_BACKEND</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">laravel</span></span></code></pre>
+<p>The <code>AUTH_BACKEND</code> variable is forwarded to the Vite config so it is available at build time.</p>
+<h2 id="laravel-appsapi-laravel">Laravel (<code>apps/api-laravel</code>)</h2>
+<p>Standard Laravel <code>.env</code> file:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="ini"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">APP_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:8002</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">FRONTEND_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:3300</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">APP_KEY</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">base64:...</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">APP_DEBUG</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">true</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">DB_CONNECTION</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">sqlite</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">DB_DATABASE</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">/absolute/path/to/database.sqlite</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">BETTER_AUTH_SECRET</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">change-me-in-production</span></span></code></pre>
+<h2 id="symfony-appsapi-sf">Symfony (<code>apps/api-sf</code>)</h2>
+<p>Create <code>.env.local</code> to override defaults:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="ini"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">DATABASE_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">sqlite:///%kernel.project_dir%/var/data_dev.db</span><span style="color:#032F62;--shiki-dark:#89DDFF">&quot;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">BETTER_AUTH_SECRET</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">change-me-in-production</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">FRONTEND_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:3300</span></span></code></pre>
+<p>Symfony uses the <code>%env()%</code> processor which crashes at container compilation if a required variable is missing. This is the intended behavior for production safety.</p>
+<h2 id="hono-appsapi-hono">Hono (<code>apps/api-hono</code>)</h2>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="ini"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">PORT</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">3333</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">JWT_SECRET</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">change-me-in-production</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">FRONTEND_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">http://localhost:3301</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">DATABASE_URL</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">file:./dev.db</span></span></code></pre>
+<p>In production, <code>JWT_SECRET</code> must be at least 32 characters. The app throws at startup if the secret is too short or uses the default placeholder.</p>
+<h2 id="backend-switching">Backend Switching</h2>
+<p>Headless Kit supports switching between backends at two levels.</p>
+<h3 id="via-environment-variable">Via Environment Variable</h3>
+<p>Set <code>AUTH_BACKEND</code> in your frontend <code>.env</code> file:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="ini"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#89DDFF">AUTH_BACKEND</span><span style="color:#24292E;--shiki-dark:#89DDFF">=</span><span style="color:#24292E;--shiki-dark:#A9B1D6">laravel   </span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic"># or symfony, or node (for Hono)</span></span></code></pre>
+<p>This is the default mechanism. The adapter factory reads this value and returns the matching adapter singleton.</p>
+<h3 id="via-cookie-runtime-switching">Via Cookie (Runtime Switching)</h3>
+<p>The Next.js BFF also reads an <code>auth_backend</code> cookie to allow runtime backend switching. This is useful for demos and development where you want to test multiple backends without restarting.</p>
+<p>The cookie takes precedence over the environment variable. If neither is set, the default is <code>laravel</code>.</p>
+<p>Backend resolution order:</p>
+<ol>
+<li><code>auth_backend</code> cookie value</li>
+<li><code>AUTH_BACKEND</code> environment variable</li>
+<li>Fallback to <code>laravel</code></li>
+</ol>
+<h2 id="cookie-structure">Cookie Structure</h2>
+<p>Authentication tokens are stored in HttpOnly cookies. Cookie names include the backend suffix to avoid collisions when switching backends:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Cookie</th><th>Purpose</th><th>HttpOnly</th><th>Secure (prod)</th></tr></thead><tbody><tr><td><code>auth_token</code></td><td>Access token (JWT or Paseto)</td><td>Yes</td><td>Yes</td></tr><tr><td><code>refresh_token</code></td><td>Refresh token</td><td>Yes</td><td>Yes</td></tr><tr><td><code>token_expires_at</code></td><td>Token expiry timestamp</td><td>No</td><td>Yes</td></tr><tr><td><code>auth_backend</code></td><td>Active backend identifier</td><td>No</td><td>No</td></tr></tbody></table>
+<p>The <code>token_expires_at</code> cookie is not HttpOnly because the Edge middleware reads it to decide whether to trigger proactive token refresh. It contains only a Unix timestamp, not sensitive data.</p>
+<h3 id="cookie-security-settings">Cookie Security Settings</h3>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">{</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#73DACA">  httpOnly</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> true</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">       // Tokens inaccessible to JavaScript</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#73DACA">  secure</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> true</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">         // HTTPS only in production</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#73DACA">  sameSite</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">lax</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">      // CSRF protection</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#73DACA">  path</span><span style="color:#24292E;--shiki-dark:#89DDFF">:</span><span style="color:#032F62;--shiki-dark:#89DDFF"> &#39;</span><span style="color:#032F62;--shiki-dark:#9ECE6A">/</span><span style="color:#032F62;--shiki-dark:#89DDFF">&#39;</span><span style="color:#24292E;--shiki-dark:#89DDFF">,</span><span style="color:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic">            // Available across all routes</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#9ABDF5">}</span></span></code></pre>
+<h2 id="secret-rotation">Secret Rotation</h2>
+<p>When deploying to production, generate unique secrets for each environment:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Secret</th><th>Used by</th><th>Minimum length</th></tr></thead><tbody><tr><td><code>JWT_SECRET</code></td><td>Hono</td><td>32 characters</td></tr><tr><td><code>BETTER_AUTH_SECRET</code></td><td>Symfony, Laravel</td><td>32 characters</td></tr><tr><td><code>APP_KEY</code></td><td>Laravel</td><td>Generated via <code>php artisan key:generate</code></td></tr></tbody></table>
+<p>The CLI generates random secrets automatically during scaffolding. For manual setup, use:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#C0CAF5">openssl</span><span style="color:#032F62;--shiki-dark:#9ECE6A"> rand</span><span style="color:#005CC5;--shiki-dark:#E0AF68"> -base64</span><span style="color:#005CC5;--shiki-dark:#FF9E64"> 32</span></span></code></pre>
+<h2 id="production-validation">Production Validation</h2>
+<p>All backends validate critical environment variables at boot:</p>
+<ul>
+<li><strong>Hono</strong>: Throws if <code>JWT_SECRET</code> is the default value or under 32 characters in production</li>
+<li><strong>Laravel</strong>: Throws if <code>APP_KEY</code> is missing (framework enforced) and validates <code>BETTER_AUTH_SECRET</code> in <code>AppServiceProvider</code></li>
+<li><strong>Symfony</strong>: Crashes at container compilation if <code>BETTER_AUTH_SECRET</code> is undefined via <code>%env()%</code> processor</li>
+</ul>
+<p>This means a misconfigured production deployment fails fast at startup instead of silently accepting requests without proper security.</p>  </article> <nav class="mt-16 flex items-stretch gap-4 border-t border-border pt-6" aria-label="Page navigation"> <a href="/docs/getting-started/project-structure" class="group flex flex-1 flex-col rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Previous</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors">
+← Project Structure </span> </a> <a href="/docs/architecture/bff-pattern" class="group flex flex-1 flex-col items-end rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Next</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors"> BFF Pattern →
+</span> </a> </nav> </div> </main> <!-- Table of Contents --> <aside class="fixed top-14 right-0 hidden h-[calc(100svh-3.5rem)] w-56 overflow-y-auto border-l border-border bg-background/95 p-4 lg:block"> <astro-island uid="ZTgsLj" prefix="r3" component-url="/_astro/TableOfContents.CkQmb82v.js" component-export="TableOfContents" renderer-url="/_astro/client.CwSvYkGX.js" props="{&quot;headings&quot;:[1,[[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;nextjs-bff-appsweb&quot;],&quot;text&quot;:[0,&quot;Next.js BFF (apps/web)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;health-check&quot;],&quot;text&quot;:[0,&quot;Health Check&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;tanstack-start-appsweb-tanstack&quot;],&quot;text&quot;:[0,&quot;TanStack Start (apps/web-tanstack)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;laravel-appsapi-laravel&quot;],&quot;text&quot;:[0,&quot;Laravel (apps/api-laravel)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;symfony-appsapi-sf&quot;],&quot;text&quot;:[0,&quot;Symfony (apps/api-sf)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;hono-appsapi-hono&quot;],&quot;text&quot;:[0,&quot;Hono (apps/api-hono)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;backend-switching&quot;],&quot;text&quot;:[0,&quot;Backend Switching&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;via-environment-variable&quot;],&quot;text&quot;:[0,&quot;Via Environment Variable&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;via-cookie-runtime-switching&quot;],&quot;text&quot;:[0,&quot;Via Cookie (Runtime Switching)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;cookie-structure&quot;],&quot;text&quot;:[0,&quot;Cookie Structure&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;cookie-security-settings&quot;],&quot;text&quot;:[0,&quot;Cookie Security Settings&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;secret-rotation&quot;],&quot;text&quot;:[0,&quot;Secret Rotation&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;production-validation&quot;],&quot;text&quot;:[0,&quot;Production Validation&quot;]}]]],&quot;locale&quot;:[0,&quot;en&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;TableOfContents&quot;,&quot;value&quot;:true}" await-children><nav aria-label="Table of contents"><p class="mb-3 text-[10px] uppercase tracking-widest text-muted-foreground">On this page</p><ul class="space-y-1"><li><a href="#nextjs-bff-appsweb" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Next.js BFF (apps/web)</a></li><li><a href="#health-check" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Health Check</a></li><li><a href="#tanstack-start-appsweb-tanstack" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">TanStack Start (apps/web-tanstack)</a></li><li><a href="#laravel-appsapi-laravel" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Laravel (apps/api-laravel)</a></li><li><a href="#symfony-appsapi-sf" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Symfony (apps/api-sf)</a></li><li><a href="#hono-appsapi-hono" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Hono (apps/api-hono)</a></li><li><a href="#backend-switching" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Backend Switching</a></li><li><a href="#via-environment-variable" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Via Environment Variable</a></li><li><a href="#via-cookie-runtime-switching" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Via Cookie (Runtime Switching)</a></li><li><a href="#cookie-structure" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Cookie Structure</a></li><li><a href="#cookie-security-settings" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Cookie Security Settings</a></li><li><a href="#secret-rotation" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Secret Rotation</a></li><li><a href="#production-validation" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Production Validation</a></li></ul></nav><!--astro:end--></astro-island> </aside> </div> <!-- Mobile sidebar overlay --> <script>
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-sidebar]');
+        if (btn) {
+          const sidebar = document.getElementById('docs-sidebar');
+          sidebar.classList.toggle('hidden');
+          sidebar.classList.toggle('block');
+        }
+        // Close on backdrop click
+        if (e.target.id === 'sidebar-backdrop') {
+          document.getElementById('docs-sidebar').classList.add('hidden');
+          document.getElementById('docs-sidebar').classList.remove('block');
+        }
+      });
+    </script> </body> </html>

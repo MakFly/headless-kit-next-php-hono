@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light dark"><!-- Primary Meta --><meta name="description" content="Four UI presets that determine which modules, pages, and components are scaffolded."><!-- Open Graph --><meta property="og:type" content="article"><meta property="og:url" content="https://headlesskit.dev/docs/cli/presets/"><meta property="og:title" content="Presets — Headless Kit Docs"><meta property="og:description" content="Four UI presets that determine which modules, pages, and components are scaffolded."><meta property="og:image" content="https://headlesskit.dev/og-image.png"><meta property="og:site_name" content="Headless Kit"><meta property="og:locale" content="en_US"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Presets — Headless Kit Docs"><meta name="twitter:description" content="Four UI presets that determine which modules, pages, and components are scaffolded."><meta name="twitter:image" content="https://headlesskit.dev/og-image.png"><!-- Canonical --><link rel="canonical" href="https://headlesskit.dev/docs/cli/presets/"><!-- Hreflang --><link rel="alternate" hreflang="en" href="https://headlesskit.dev/docs/cli/presets/"><link rel="alternate" hreflang="fr" href="https://headlesskit.dev/fr/docs/cli/presets/"><link rel="alternate" hreflang="x-default" href="https://headlesskit.dev/docs/cli/presets/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Presets — Headless Kit Docs</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://headlesskit.dev/docs"},{"@type":"ListItem","position":2,"name":"CLI","item":"https://headlesskit.dev/docs/cli"},{"@type":"ListItem","position":3,"name":"Presets"}]}</script><script>
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    </script><link rel="stylesheet" href="/_astro/index.BXyRLzR7.css">
+<style>.pagefind-ui[data-astro-cid-t4y4xlal]{--pagefind-ui-scale: .9;--pagefind-ui-primary: hsl(var(--primary));--pagefind-ui-text: hsl(var(--foreground));--pagefind-ui-background: hsl(var(--background));--pagefind-ui-border: hsl(var(--border));--pagefind-ui-border-width: 1px;--pagefind-ui-border-radius: 8px;--pagefind-ui-font: inherit}
+</style></head> <body class="min-h-svh antialiased bg-background text-foreground"> <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+Skip to content
+</a> <nav class="fixed top-0 z-50 w-full border-b border-border backdrop-blur-md bg-background/80" aria-label="Documentation navigation"> <div class="flex h-14 items-center justify-between px-4 md:px-6"> <!-- Left: Logo + mobile menu --> <div class="flex items-center gap-3"> <button data-toggle-sidebar class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted md:hidden" aria-label="Toggle sidebar"> <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"></path> </svg> </button> <a href="/" class="flex items-center gap-2 text-sm font-semibold text-foreground">
+Headless Kit
+</a> <span class="hidden text-border md:inline">|</span> <a href="/docs/getting-started/installation" class="hidden text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground md:inline"> Docs </a> </div> <!-- Right: Links + Theme + Auth --> <div class="flex items-center gap-3"> <a href="https://github.com/headless-kit/headless-kit" target="_blank" rel="noopener noreferrer" class="hidden font-mono text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline"> GitHub </a> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z1Dpcgz" prefix="r4" component-url="/_astro/ThemeToggle.BdSTQQ74.js" component-export="ThemeToggle" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;ThemeToggle&quot;,&quot;value&quot;:true}" await-children><button data-slot="button" data-variant="ghost" data-size="icon" class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 rounded-full text-muted-foreground hover:text-foreground" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon size-4" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button><!--astro:end--></astro-island> <astro-island uid="ZGOCeI" prefix="r5" component-url="/_astro/AuthNavButtons.C9pdFHE9.js" component-export="AuthNavButtons" renderer-url="/_astro/client.CwSvYkGX.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;AuthNavButtons&quot;,&quot;value&quot;:true}" await-children><div class="hidden h-8 w-20 animate-pulse rounded-full bg-muted sm:block"></div><!--astro:end--></astro-island> </div> </div> </nav> <div class="flex pt-14"> <!-- Sidebar --> <aside id="docs-sidebar" class="fixed top-14 left-0 z-40 hidden h-[calc(100svh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm md:block"> <div class="border-b border-border p-3"> <div id="search" class="pagefind-ui" data-pagefind-ui data-astro-cid-t4y4xlal></div> <link href="/pagefind/pagefind-ui.css" rel="stylesheet"> <script src="/pagefind/pagefind-ui.js"></script> <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+    })
+  })
+</script>  </div> <nav class="p-4 space-y-1" aria-label="Documentation sidebar"> <details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Getting Started </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/getting-started/installation" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Installation </a> </li><li> <a href="/docs/getting-started/project-structure" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Project Structure </a> </li><li> <a href="/docs/getting-started/configuration" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Configuration </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Architecture </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/architecture/bff-pattern" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> BFF Pattern </a> </li><li> <a href="/docs/architecture/auth-flow" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Auth Flow </a> </li><li> <a href="/docs/architecture/adapters" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Adapters </a> </li><li> <a href="/docs/architecture/vertical-slice" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Vertical Slice </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Backends </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/backends/laravel" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Laravel </a> </li><li> <a href="/docs/backends/symfony" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Symfony </a> </li><li> <a href="/docs/backends/hono" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Hono </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Modules </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/modules/shop" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Shop </a> </li><li> <a href="/docs/modules/admin" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Admin </a> </li><li> <a href="/docs/modules/saas" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> SaaS </a> </li><li> <a href="/docs/modules/support" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Support </a> </li> </ul> </details><details open class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-primary"> <span class="text-[10px] transition-transform group-open:rotate-90 text-primary">
+▶
+</span> CLI </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/cli/getting-started" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Getting Started </a> </li><li> <a href="/docs/cli/presets" class="block rounded-md px-3 py-1.5 text-xs transition-colors bg-primary/10 text-primary" aria-current="page"> Presets </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Guides </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/guides/authentication" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Authentication </a> </li><li> <a href="/docs/guides/tanstack-start" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> TanStack Start </a> </li><li> <a href="/docs/guides/rbac" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> RBAC </a> </li><li> <a href="/docs/guides/two-factor" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Two-Factor Auth </a> </li><li> <a href="/docs/guides/oauth" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> OAuth </a> </li><li> <a href="/docs/guides/custom-adapter" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Custom Adapter </a> </li> </ul> </details><details class="group"> <summary class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs uppercase tracking-widest transition-colors hover:bg-muted select-none list-none text-muted-foreground"> <span class="text-[10px] transition-transform group-open:rotate-90 text-muted-foreground">
+▶
+</span> Deploy </summary> <ul class="mt-1 space-y-0.5 pl-4"> <li> <a href="/docs/deploy/docker" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Docker </a> </li><li> <a href="/docs/deploy/production" class="block rounded-md px-3 py-1.5 text-xs transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"> Production </a> </li> </ul> </details> </nav> </aside> <!-- Main content --> <main id="main-content" class="min-w-0 flex-1 md:ml-64 lg:mr-56"> <div class="mx-auto max-w-3xl px-6 py-10 md:px-8"> <nav aria-label="Breadcrumb" class="mb-4 text-sm text-muted-foreground"> <ol class="flex items-center gap-1.5"> <li><a href="/docs" class="hover:text-foreground transition-colors">Docs</a></li> <li class="text-muted-foreground/50">/</li> <li><a href="/docs/cli" class="hover:text-foreground transition-colors">CLI</a></li> <li class="text-muted-foreground/50">/</li> <li class="text-foreground font-medium">Presets</li> </ol> </nav> <article class="docs-prose"> <h1>Presets</h1> <p class="text-lg text-muted-foreground mb-8 !mt-0">Four UI presets that determine which modules, pages, and components are scaffolded.</p>  <h1 id="presets">Presets</h1>
+<p>Presets are pre-configured combinations of modules and UI templates. They determine what pages, components, and backend features are included when you scaffold a new project.</p>
+<h2 id="available-presets">Available Presets</h2>
+<h3 id="saas-recommended">SaaS (Recommended)</h3>
+<p>The most complete preset, designed for multi-tenant SaaS applications.</p>
+<p><strong>Includes:</strong></p>
+<ul>
+<li>Landing page with marketing sections</li>
+<li>Admin dashboard with sidebar navigation</li>
+<li>SaaS module (organizations, billing, team management)</li>
+<li>Admin module (users, roles, permissions)</li>
+<li>Support module (tickets, agent queue)</li>
+<li>Auth pages for each section (dashboard, saas, support)</li>
+</ul>
+<p><strong>Best for:</strong> B2B SaaS products, multi-tenant platforms, subscription-based services.</p>
+<h3 id="ecommerce">Ecommerce</h3>
+<p>Full e-commerce storefront with admin panel.</p>
+<p><strong>Includes:</strong></p>
+<ul>
+<li>Shop storefront (product listing, product detail, categories)</li>
+<li>Shopping cart and checkout flow</li>
+<li>Order management</li>
+<li>Shop admin panel (product management, order management)</li>
+<li>Admin module (users, roles, permissions)</li>
+<li>Auth pages for shop and dashboard sections</li>
+</ul>
+<p><strong>Best for:</strong> Online stores, marketplaces, product catalogs with checkout.</p>
+<h3 id="admin">Admin</h3>
+<p>Focused admin dashboard without public-facing pages.</p>
+<p><strong>Includes:</strong></p>
+<ul>
+<li>Admin dashboard with sidebar navigation</li>
+<li>User management with RBAC (roles and permissions)</li>
+<li>Data tables with sorting, filtering, and pagination</li>
+<li>Auth pages (login, register, forgot password)</li>
+<li>Settings page</li>
+</ul>
+<p><strong>Best for:</strong> Internal tools, back-office applications, admin panels for existing products.</p>
+<h3 id="landing">Landing</h3>
+<p>Marketing-focused starter with styled authentication.</p>
+<p><strong>Includes:</strong></p>
+<ul>
+<li>Landing page with hero, features, and CTA sections</li>
+<li>Styled auth pages (login, register)</li>
+<li>Minimal dashboard (post-login redirect target)</li>
+</ul>
+<p><strong>Best for:</strong> Marketing sites, waitlist pages, products where the landing page is the priority.</p>
+<h3 id="minimal">Minimal</h3>
+<p>Bare infrastructure with no UI kit.</p>
+<p><strong>Includes:</strong></p>
+<ul>
+<li>BFF proxy route handler</li>
+<li>Backend adapter configuration</li>
+<li>Auth endpoints (backend only)</li>
+<li>No pre-built UI components or pages</li>
+</ul>
+<p><strong>Best for:</strong> Projects where you want the BFF architecture and auth infrastructure but will build the UI from scratch.</p>
+<h2 id="module-dependencies">Module Dependencies</h2>
+<p>Modules have dependency relationships that the CLI resolves automatically:</p>
+<pre class="astro-code astro-code-themes github-light tokyo-night" style="background-color:#fff;--shiki-dark-bg:#1a1b26;color:#24292e;--shiki-dark:#a9b1d6;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>multi-tenant (standalone)</span></span>
+<span class="line"><span>├── billing (requires multi-tenant)</span></span>
+<span class="line"><span>├── team (requires multi-tenant)</span></span>
+<span class="line"><span>│   └── org-rbac (requires multi-tenant + team)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>support-chat (standalone)</span></span>
+<span class="line"><span>ai-assistant (standalone)</span></span>
+<span class="line"><span>api-platform (standalone, Symfony only)</span></span></code></pre>
+<p>If you select a module with dependencies, the CLI includes the required modules automatically. For example, selecting “Org-level RBAC” automatically adds “Multi-tenant orgs” and “Team management”.</p>
+<h2 id="module-details">Module Details</h2>
+<h3 id="multi-tenant-orgs">Multi-tenant Orgs</h3>
+<p>Organization management with user switching. Users can belong to multiple organizations and switch between them. Each organization has its own data scope.</p>
+<ul>
+<li>Backend: Organization CRUD, membership management, context switching</li>
+<li>Frontend: Org switcher component, org settings page</li>
+</ul>
+<h3 id="billing--plans">Billing &amp; Plans</h3>
+<p>Subscription management with plan selection and billing history. Depends on multi-tenant since billing is per-organization.</p>
+<ul>
+<li>Backend: Plans, subscriptions, invoices, usage tracking</li>
+<li>Frontend: Pricing page, plan selector, billing dashboard</li>
+</ul>
+<h3 id="team-management">Team Management</h3>
+<p>Invite team members, assign roles, manage membership. Depends on multi-tenant for organization context.</p>
+<ul>
+<li>Backend: Invitations, member CRUD, role assignment</li>
+<li>Frontend: Team members list, invite dialog, role selector</li>
+</ul>
+<h3 id="org-level-rbac">Org-level RBAC</h3>
+<p>Fine-grained role-based access control within organizations. Extends team management with custom roles and permissions per org.</p>
+<ul>
+<li>Backend: Custom roles, permission definitions, role-permission mapping</li>
+<li>Frontend: Role management UI, permission matrix</li>
+</ul>
+<h3 id="support-chat">Support Chat</h3>
+<p>Customer support system with conversations and an agent queue.</p>
+<ul>
+<li>Backend: Tickets, conversations, message history, agent assignment</li>
+<li>Frontend: Customer ticket view, agent dashboard, real-time conversation UI</li>
+</ul>
+<h3 id="ai-assistant">AI Assistant</h3>
+<p>AI-powered chat interface using the Vercel AI SDK and assistant-ui components.</p>
+<ul>
+<li>Backend: Chat endpoint (streaming)</li>
+<li>Frontend: Chat interface with provider selection (Anthropic, OpenAI, Google, Mistral)</li>
+<li>Dependencies: <code>ai</code>, <code>@ai-sdk/*</code>, <code>@assistant-ui/react</code></li>
+</ul>
+<h3 id="api-platform-crud-symfony-only">API Platform CRUD (Symfony Only)</h3>
+<p>Replaces hand-written CRUD controllers with API Platform auto-generated endpoints. Only available when Symfony is the selected backend.</p>
+<ul>
+<li>Backend: API Platform resource configuration, serialization groups</li>
+<li>Frontend: No changes (API contract remains the same)</li>
+</ul>
+<h2 id="customization-after-scaffolding">Customization After Scaffolding</h2>
+<p>Presets are a starting point. After scaffolding, you can:</p>
+<ul>
+<li><strong>Add modules</strong>: Copy module templates from the CLI package into your project</li>
+<li><strong>Remove sections</strong>: Delete route groups and their corresponding components</li>
+<li><strong>Modify layouts</strong>: Edit the sidebar, header, and navigation components</li>
+<li><strong>Change styling</strong>: Update the theme in <code>src/styles/theme.css</code></li>
+</ul>
+<p>The generated code is fully yours. There is no runtime dependency on the CLI or preset system.</p>  </article> <nav class="mt-16 flex items-stretch gap-4 border-t border-border pt-6" aria-label="Page navigation"> <a href="/docs/cli/getting-started" class="group flex flex-1 flex-col rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Previous</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors">
+← Getting Started </span> </a> <a href="/docs/guides/authentication" class="group flex flex-1 flex-col items-end rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"> <span class="text-[10px] uppercase tracking-widest text-muted-foreground">Next</span> <span class="mt-1 text-sm text-foreground group-hover:text-primary transition-colors"> Authentication →
+</span> </a> </nav> </div> </main> <!-- Table of Contents --> <aside class="fixed top-14 right-0 hidden h-[calc(100svh-3.5rem)] w-56 overflow-y-auto border-l border-border bg-background/95 p-4 lg:block"> <astro-island uid="2kGR4O" prefix="r3" component-url="/_astro/TableOfContents.CkQmb82v.js" component-export="TableOfContents" renderer-url="/_astro/client.CwSvYkGX.js" props="{&quot;headings&quot;:[1,[[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;available-presets&quot;],&quot;text&quot;:[0,&quot;Available Presets&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;saas-recommended&quot;],&quot;text&quot;:[0,&quot;SaaS (Recommended)&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;ecommerce&quot;],&quot;text&quot;:[0,&quot;Ecommerce&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;admin&quot;],&quot;text&quot;:[0,&quot;Admin&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;landing&quot;],&quot;text&quot;:[0,&quot;Landing&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;minimal&quot;],&quot;text&quot;:[0,&quot;Minimal&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;module-dependencies&quot;],&quot;text&quot;:[0,&quot;Module Dependencies&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;module-details&quot;],&quot;text&quot;:[0,&quot;Module Details&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;multi-tenant-orgs&quot;],&quot;text&quot;:[0,&quot;Multi-tenant Orgs&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;billing--plans&quot;],&quot;text&quot;:[0,&quot;Billing &amp; Plans&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;team-management&quot;],&quot;text&quot;:[0,&quot;Team Management&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;org-level-rbac&quot;],&quot;text&quot;:[0,&quot;Org-level RBAC&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;support-chat&quot;],&quot;text&quot;:[0,&quot;Support Chat&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;ai-assistant&quot;],&quot;text&quot;:[0,&quot;AI Assistant&quot;]}],[0,{&quot;depth&quot;:[0,3],&quot;slug&quot;:[0,&quot;api-platform-crud-symfony-only&quot;],&quot;text&quot;:[0,&quot;API Platform CRUD (Symfony Only)&quot;]}],[0,{&quot;depth&quot;:[0,2],&quot;slug&quot;:[0,&quot;customization-after-scaffolding&quot;],&quot;text&quot;:[0,&quot;Customization After Scaffolding&quot;]}]]],&quot;locale&quot;:[0,&quot;en&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;TableOfContents&quot;,&quot;value&quot;:true}" await-children><nav aria-label="Table of contents"><p class="mb-3 text-[10px] uppercase tracking-widest text-muted-foreground">On this page</p><ul class="space-y-1"><li><a href="#available-presets" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Available Presets</a></li><li><a href="#saas-recommended" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">SaaS (Recommended)</a></li><li><a href="#ecommerce" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Ecommerce</a></li><li><a href="#admin" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Admin</a></li><li><a href="#landing" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Landing</a></li><li><a href="#minimal" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Minimal</a></li><li><a href="#module-dependencies" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Module Dependencies</a></li><li><a href="#module-details" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Module Details</a></li><li><a href="#multi-tenant-orgs" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Multi-tenant Orgs</a></li><li><a href="#billing--plans" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Billing &amp; Plans</a></li><li><a href="#team-management" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Team Management</a></li><li><a href="#org-level-rbac" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Org-level RBAC</a></li><li><a href="#support-chat" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">Support Chat</a></li><li><a href="#ai-assistant" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">AI Assistant</a></li><li><a href="#api-platform-crud-symfony-only" class="block text-xs leading-relaxed transition-colors pl-3 text-muted-foreground hover:text-foreground">API Platform CRUD (Symfony Only)</a></li><li><a href="#customization-after-scaffolding" class="block text-xs leading-relaxed transition-colors  text-muted-foreground hover:text-foreground">Customization After Scaffolding</a></li></ul></nav><!--astro:end--></astro-island> </aside> </div> <!-- Mobile sidebar overlay --> <script>
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-sidebar]');
+        if (btn) {
+          const sidebar = document.getElementById('docs-sidebar');
+          sidebar.classList.toggle('hidden');
+          sidebar.classList.toggle('block');
+        }
+        // Close on backdrop click
+        if (e.target.id === 'sidebar-backdrop') {
+          document.getElementById('docs-sidebar').classList.add('hidden');
+          document.getElementById('docs-sidebar').classList.remove('block');
+        }
+      });
+    </script> </body> </html>

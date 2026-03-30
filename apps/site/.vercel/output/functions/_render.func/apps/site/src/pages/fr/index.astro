@@ -1,0 +1,35 @@
+---
+export const prerender = false
+
+import { getLocale } from "@/i18n"
+import Layout from "@/layouts/main.astro"
+import Navbar from "@/components/landing/Navbar.astro"
+import Hero from "@/components/landing/Hero.astro"
+import SocialProof from "@/components/landing/SocialProof.astro"
+import FeaturesGrid from "@/components/landing/FeaturesGrid.astro"
+import ModulesShowcase from "@/components/landing/ModulesShowcase.astro"
+import ArchitectureDiagram from "@/components/landing/ArchitectureDiagram.astro"
+import QuickStart from "@/components/landing/QuickStart.astro"
+import Pricing from "@/components/landing/Pricing.astro"
+import FAQ from "@/components/landing/FAQ.astro"
+import CTABanner from "@/components/landing/CTABanner.astro"
+import Footer from "@/components/landing/Footer.astro"
+
+const locale = getLocale(Astro.currentLocale)
+---
+
+<Layout title="Accueil" description="Kit de démarrage headless multi-backend avec BFF Next.js">
+  <Navbar />
+  <main>
+    <Hero />
+    <SocialProof />
+    <FeaturesGrid />
+    <ModulesShowcase />
+    <ArchitectureDiagram />
+    <QuickStart />
+    <Pricing />
+    <FAQ />
+    <CTABanner />
+  </main>
+  <Footer />
+</Layout>

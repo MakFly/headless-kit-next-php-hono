@@ -1,3 +1,11 @@
+---
+paths:
+  - "apps/api-sf/**/*"
+  - "apps/api-laravel/**/*"
+  - "apps/api-hono/**/*"
+  - "apps/web/src/lib/actions/**/*"
+---
+
 # API Security Checklist
 
 ## Object-Level Authorization (OWASP API1)

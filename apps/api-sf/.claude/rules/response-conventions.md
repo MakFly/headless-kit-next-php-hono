@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-sf/**/*"
+---
+
 # Response Conventions
 
 ## Controller responses

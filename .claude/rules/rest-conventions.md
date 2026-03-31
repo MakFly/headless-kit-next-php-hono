@@ -1,3 +1,12 @@
+---
+paths:
+  - "apps/api-sf/**/*"
+  - "apps/api-laravel/**/*"
+  - "apps/api-hono/**/*"
+  - "apps/web/src/lib/adapters/**/*"
+  - "apps/web-tanstack/**/*"
+---
+
 # REST API Conventions
 
 ## URL Design

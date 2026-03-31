@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/web/**/*"
+---
+
 # Route Groups & Layout Structure
 
 ## 4 route groups

@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/web/**/*"
+---
+
 # Server Actions : Utilisation obligatoire du BFF Client
 
 ## Règle

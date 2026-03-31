@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-sf/**/*"
+---
+
 # Security & Firewalls
 
 ## Token type

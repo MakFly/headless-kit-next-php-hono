@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-laravel/**/*"
+---
+
 # API Platform + BetterAuth Docs Rules
 
 - Keep BetterAuth runtime routes as classic Laravel routes (`/auth/*`).

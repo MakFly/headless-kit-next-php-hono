@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/web/**/*"
+---
+
 # Stratégie Data Fetching : Server Actions vs TanStack Query
 
 ## Règle par défaut : Server Actions seuls

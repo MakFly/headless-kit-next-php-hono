@@ -152,3 +152,13 @@ cd apps/api-hono && bun test
 # TanStack
 cd apps/web-tanstack && bun run test
 ```
+
+## Skills (racine)
+
+Sous `.claude/skills/` : chaque skill peut inclure un dossier `references/` — suivre les `@…` dans le `SKILL.md`. Utiles : `sync-templates`, `sync-types`, `dev-all`, `test-all`, `add-auth-endpoint`, `add-crud-endpoint`, `verify-monorepo`.
+
+## Rules transverses (complément)
+
+- **BFF Next vs TanStack** : `.claude/rules/bff-dual-frontend.md`
+- **Enveloppe API multi-backend** : `.claude/rules/api-envelope-contract.md`
+- **Package `@headless/types`** : `.claude/rules/shared-types-package.md`

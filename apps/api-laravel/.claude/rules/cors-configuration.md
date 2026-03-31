@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-laravel/**/*"
+---
+
 # CORS Configuration
 
 ## Location

@@ -239,3 +239,16 @@ All responses (both invokable controllers and API Platform) use the same envelop
 Collections also include: `"meta": { "page": 1, "per_page": 20, "total": 100, "last_page": 5 }`
 
 Error: `{ "success": false, "error": { "code": "...", "message": "..." }, "status": 500 }`
+
+## Skills
+
+Available in `.claude/skills/` (each skill includes a `references/` folder — use `@…` in `SKILL.md` for patterns and paths to `ApiResponseService`, entities, config):
+
+| Skill | Usage |
+|-------|-------|
+| `sf-feature` | New vertical slice under `src/Feature/` |
+| `sf-endpoint` | Single invokable controller |
+| `sf-api-platform-resource` | CRUD via API Platform on an entity |
+| `sf-entity` | Doctrine entity + optional `#[ApiResource]` |
+| `sf-migration` | Doctrine migrations |
+| `sf-test` | Functional `WebTestCase` tests |

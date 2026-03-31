@@ -7,34 +7,14 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 
 # Scaffold New Section
 
-Create a new route group section with complete auth + app layout.
+Add a major vertical (new route group) with auth + `(app)` shell + `proxy.ts` rules + sidebar.
 
-## Use when
+## References (load when implementing)
 
-- Adding a new major section to the app (like a 5th section alongside dashboard/shop/saas/support)
-
-## Default workflow
-
-1. Create route group directory: `src/app/($ARGUMENTS)/$ARGUMENTS/`
-2. Create auth pages:
-   - `auth/layout.tsx` — auth layout (centered, no sidebar)
-   - `auth/login/page.tsx` — login page for this section
-   - `auth/register/page.tsx` — register page
-3. Create app layout:
-   - `(app)/layout.tsx` — sidebar + header layout
-   - `(app)/page.tsx` — section homepage
-4. Update `src/proxy.ts` — add auth protection rules for `/$ARGUMENTS`
-
-## Guardrails
-
-- Reuse existing auth components from `src/components/auth/`
-- Auth pages redirect to `/$ARGUMENTS` after login (not `/dashboard`)
-- Add the section to the sidebar navigation in `src/components/app-sidebar.tsx`
-
-## Output contract
-
-- Route group with auth + app layouts
-- Middleware protection in proxy.ts
-- Section accessible at `/$ARGUMENTS`
+- @references/scaffold.md — step list and guardrails
+- @../../../src/proxy.ts — extend protected / auth routes
+- @../../../src/components/app-sidebar.tsx — navigation
+- @../../../src/components/auth/ — reuse forms/layouts
+- @../../rules/route-groups-layout.md
 
 Section: $ARGUMENTS

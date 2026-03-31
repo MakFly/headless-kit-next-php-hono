@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-laravel/**/*"
+---
+
 # Response Format
 
 ## Always use ApiResponse

@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/**/*"
+---
+
 # Environment Variable Validation
 
 ## Rule

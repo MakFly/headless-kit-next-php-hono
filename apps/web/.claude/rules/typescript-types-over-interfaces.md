@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/web/**/*"
+---
+
 # TypeScript : Préférer `type` à `interface`
 
 ## Règle

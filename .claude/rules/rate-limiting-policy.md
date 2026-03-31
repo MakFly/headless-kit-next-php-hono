@@ -1,3 +1,10 @@
+---
+paths:
+  - "apps/api-sf/**/*"
+  - "apps/api-laravel/**/*"
+  - "apps/api-hono/**/*"
+---
+
 # Rate Limiting Policy
 
 ## Standard Limits

@@ -1,3 +1,9 @@
+---
+paths:
+  - "apps/web/**/*"
+  - "apps/web-tanstack/**/*"
+---
+
 # BFF Pattern Rules
 
 ## Architecture

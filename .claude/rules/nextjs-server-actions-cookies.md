@@ -1,7 +1,10 @@
 ---
 paths:
+  - "apps/web/src/lib/actions/**/*.ts"
   - "apps/web/src/lib/api/**/*.ts"
   - "apps/web/src/app/api/**/*.ts"
+  - "apps/web/src/app/**/*.tsx"
+  - "apps/web/src/app/**/*.ts"
 ---
 
 # Next.js Server Actions et Cookies - Règle critique

@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-hono/**/*"
+---
+
 # CORS Configuration
 
 ## Location

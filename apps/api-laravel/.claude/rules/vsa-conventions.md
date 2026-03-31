@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-laravel/**/*"
+---
+
 # Vertical Slice Architecture Conventions
 
 ## Feature structure

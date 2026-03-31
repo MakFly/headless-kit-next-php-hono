@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-laravel/**/*"
+---
+
 # Eloquent ORM Patterns
 
 ## Model Namespace

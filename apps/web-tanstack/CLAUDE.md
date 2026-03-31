@@ -42,3 +42,7 @@ useEffect(() => {
 - **Sidebar, Header, Layout** : Toujours utiliser `Route.useRouteContext()` pour afficher les données utilisateur
 - **Actions (login, logout, form submissions)** : Utiliser Zustand (`useAuthStore`)
 - **Avant de rendre un composant qui dépend du user** : S'assurer que les données viennent du contexte route, pas directement du store
+
+## Skills
+
+Sous `.claude/skills/` : `ts-component`, `ts-page`, `ts-server-fn`, `ts-service`. Chaque skill a un dossier `references/` — suivre les imports `@…` dans le `SKILL.md` pour le détail et les pointeurs vers le code.

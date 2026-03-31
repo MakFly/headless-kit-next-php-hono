@@ -225,3 +225,7 @@ All tests use `RefreshDatabase` trait and PHPUnit assertions.
 `api-platform/laravel` is used exclusively as an OpenAPI documentation source.
 BetterAuth routes remain as classic Laravel routes — never migrate them to API Platform resources.
 See `.claude/rules/api-platform-betterauth-docs.md` for details.
+
+## Skills
+
+Sous `.claude/skills/` : `lara-action`, `lara-feature`, `lara-migration`, `lara-model`, `lara-test`. Chaque skill a un dossier `references/` — suivre les imports `@…` dans le `SKILL.md` (détail + chemins vers `routes/api.php`, `ApiResponse`, etc.).

@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-hono/**/*"
+---
+
 # Middleware Chain
 
 ## Global middleware (src/index.ts)

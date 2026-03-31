@@ -1,46 +1,24 @@
 ---
 name: sync-templates
-description: Sync monorepo apps/ to CLI templates. Use after making changes to any backend or frontend app to keep templates up to date.
+description: Sync apps/ → create-headless-app templates after app changes. Run check, apply, rebuild CLI.
+disable-model-invocation: true
 ---
 
 # Sync Templates
 
-Syncs source code from `apps/` to `packages/create-headless-app/templates/`.
+Copier `apps/` → `packages/create-headless-app/templates/` via le script bash (substitutions `{{…}}`).
 
-## Step 1 — Check drift
+## Flux
 
-```bash
-bash scripts/sync-templates.sh --check
-```
+1. `bash scripts/sync-templates.sh --check`
+2. `bash scripts/sync-templates.sh --apply`
+3. `cd packages/create-headless-app && bun run build && bun test`
 
-This shows which files have drifted between the monorepo and the CLI templates.
+## References (load when implementing)
 
-## Step 2 — Apply sync
-
-```bash
-bash scripts/sync-templates.sh --apply
-```
-
-This copies changed files from `apps/` to `templates/`, applying template variable substitutions where needed (`{{PROJECT_NAME}}`, `{{API_PORT}}`, etc.).
-
-## Step 3 — Rebuild CLI and test
-
-```bash
-cd packages/create-headless-app && bun run build && bun test
-```
-
-## Step 4 — Review and commit
-
-Review the diff to make sure no monorepo-specific code leaked into templates:
-- No `@headless/` imports
-- No `workspace:*` references
-- No hardcoded ports (should be `{{FRONTEND_PORT}}`, `{{API_PORT}}`)
-- No `CLAUDE.md` or `.claude/` dirs
+- @references/checklist.md — review post-sync, exclusions
+- @../../../scripts/sync-templates.sh — `EXCLUDE_PATTERNS` et règles 1–5
 
 ## When to run
 
-Run this after:
-- Fixing bugs in any backend or frontend app
-- Adding new features to an existing module
-- Updating dependencies
-- Security patches
+Après correctifs ou évolutions dans une app sous `apps/`, mise à jour deps, ou correctifs sécu — avant release du CLI.

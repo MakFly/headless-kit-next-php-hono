@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-laravel/**/*"
+---
+
 # Middleware Aliases
 
 ## Available aliases (defined in bootstrap/app.php)

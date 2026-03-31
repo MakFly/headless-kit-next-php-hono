@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-sf/**/*"
+---
+
 # API Platform vs Invokable Controllers
 
 ## Decision matrix

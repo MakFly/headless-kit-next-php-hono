@@ -1,3 +1,8 @@
+---
+paths:
+  - "apps/api-hono/**/*"
+---
+
 # Five-File Feature Convention
 
 Every feature in `src/features/{name}/` has exactly 5 files:

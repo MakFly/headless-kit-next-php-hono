@@ -142,7 +142,7 @@ bun run build                   # Build to dist/
 
 ## Skills
 
-Available in `.claude/skills/`:
+Available in `.claude/skills/` (each skill includes a `references/` folder — use the `@…` links in `SKILL.md` to load patterns and source paths):
 
 | Skill | Usage |
 |-------|-------|

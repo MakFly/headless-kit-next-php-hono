@@ -251,24 +251,27 @@ for (const { backend, apiPort, dbVar } of backends) {
     // Docker files
     // -----------------------------------------------------------------------
 
-    test('generates docker-compose.yml with web and api services', async () => {
-      const composePath = path.join(projectDir, 'docker-compose.yml');
-      expect(await fileExists(composePath)).toBe(true);
-      const compose = await readFile(composePath);
-      expect(compose).toContain('services:');
-      expect(compose).toContain('web:');
-      expect(compose).toContain('api:');
+    test('generates root compose.yml + compose.prod.yml with include of apps/api', async () => {
+      const dev = path.join(projectDir, 'compose.yml');
+      const prod = path.join(projectDir, 'compose.prod.yml');
+      expect(await fileExists(dev)).toBe(true);
+      expect(await fileExists(prod)).toBe(true);
+      const devContent = await readFile(dev);
+      expect(devContent).toContain('include:');
+      expect(devContent).toContain('./apps/api/compose.yml');
+    });
+
+    test('generates apps/api/{Dockerfile,compose.yml,compose.prod.yml,.dockerignore}', async () => {
+      expect(await fileExists(path.join(projectDir, 'apps/api/Dockerfile'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/api/compose.yml'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/api/compose.prod.yml'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/api/.dockerignore'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/api/docker/entrypoint.sh'))).toBe(true);
     });
 
     test('generates apps/web/Dockerfile', async () => {
       expect(
         await fileExists(path.join(projectDir, 'apps/web/Dockerfile')),
-      ).toBe(true);
-    });
-
-    test('generates apps/api/Dockerfile', async () => {
-      expect(
-        await fileExists(path.join(projectDir, 'apps/api/Dockerfile')),
       ).toBe(true);
     });
 
@@ -296,8 +299,8 @@ for (const { backend, apiPort, dbVar } of backends) {
       expect(violations).toEqual([]);
     });
 
-    test('docker-compose.yml has no unreplaced template variables', async () => {
-      const compose = await readFile(path.join(projectDir, 'docker-compose.yml'));
+    test('apps/api/compose.yml has no unreplaced template variables', async () => {
+      const compose = await readFile(path.join(projectDir, 'apps/api/compose.yml'));
       expect(compose).not.toMatch(/\{\{[A-Z_]+\}\}/);
     });
 
@@ -473,13 +476,14 @@ for (const { backend, apiPort, dbVar } of backends) {
     // Docker files
     // -----------------------------------------------------------------------
 
-    test('generates docker-compose.yml with web and api services', async () => {
-      const composePath = path.join(projectDir, 'docker-compose.yml');
-      expect(await fileExists(composePath)).toBe(true);
-      const compose = await readFile(composePath);
-      expect(compose).toContain('services:');
-      expect(compose).toContain('web:');
-      expect(compose).toContain('api:');
+    test('generates root compose.yml + compose.prod.yml with include of apps/api', async () => {
+      const dev = path.join(projectDir, 'compose.yml');
+      const prod = path.join(projectDir, 'compose.prod.yml');
+      expect(await fileExists(dev)).toBe(true);
+      expect(await fileExists(prod)).toBe(true);
+      const devContent = await readFile(dev);
+      expect(devContent).toContain('include:');
+      expect(devContent).toContain('./apps/api/compose.yml');
     });
 
     test('generates apps/web/Dockerfile for TanStack', async () => {
@@ -489,10 +493,12 @@ for (const { backend, apiPort, dbVar } of backends) {
       expect(content).toContain('3003');
     });
 
-    test('generates apps/api/Dockerfile', async () => {
-      expect(
-        await fileExists(path.join(projectDir, 'apps/api/Dockerfile')),
-      ).toBe(true);
+    test('generates apps/api/{Dockerfile,compose.yml,compose.prod.yml,.dockerignore}', async () => {
+      expect(await fileExists(path.join(projectDir, 'apps/api/Dockerfile'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/api/compose.yml'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/api/compose.prod.yml'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/api/.dockerignore'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/api/docker/entrypoint.sh'))).toBe(true);
     });
 
     // -----------------------------------------------------------------------
@@ -519,8 +525,8 @@ for (const { backend, apiPort, dbVar } of backends) {
       expect(violations).toEqual([]);
     });
 
-    test('docker-compose.yml has no unreplaced template variables', async () => {
-      const compose = await readFile(path.join(projectDir, 'docker-compose.yml'));
+    test('apps/api/compose.yml has no unreplaced template variables', async () => {
+      const compose = await readFile(path.join(projectDir, 'apps/api/compose.yml'));
       expect(compose).not.toMatch(/\{\{[A-Z_]+\}\}/);
     });
   });

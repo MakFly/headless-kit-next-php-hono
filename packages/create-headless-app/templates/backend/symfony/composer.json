@@ -23,6 +23,7 @@
         "symfony/serializer": "8.0.*",
         "api-platform/core": "^4.1",
         "symfony/expression-language": "8.0.*",
+        "symfony/translation": "8.0.*",
         "symfony/yaml": "8.0.*"
     },
     "config": {

@@ -1,0 +1,38 @@
+services:
+  api-laravel:
+    profiles: ["laravel", "backend", "all"]
+    image: headless-kit/api-laravel:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: headless-api-laravel
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY:?APP_KEY is required in production}
+      APP_URL: ${APP_URL:?APP_URL is required}
+      FRONTEND_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /app/data/laravel.db
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      LOG_CHANNEL: stderr
+      SERVER_NAME: ":8002"
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+    ports:
+      - "8002:8002"
+    volumes:
+      - laravel_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+volumes:
+  laravel_data:
+    name: headless_laravel_data

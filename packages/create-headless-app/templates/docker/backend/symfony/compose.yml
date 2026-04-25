@@ -1,0 +1,39 @@
+services:
+  api:
+    profiles: ["api", "backend", "all"]
+    image: {{PROJECT_NAME}}/api:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    container_name: {{PROJECT_NAME}}-api
+    working_dir: /app
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: "1"
+      APP_SECRET: ${APP_SECRET:-{{APP_SECRET}}}
+      DATABASE_URL: sqlite:////app/data/{{PROJECT_NAME}}.db
+      DB_PATH: /app/data/{{PROJECT_NAME}}.db
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-{{BETTER_AUTH_SECRET}}}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:{{FRONTEND_PORT}}}
+      MAILER_DSN: null://null
+      SERVER_NAME: ":8001"
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+      - api_vendor:/app/vendor
+      - ./data:/app/data
+    command: ["frankenphp", "php-server", "--root", "/app/public", "--listen", ":8001", "--watch"]
+    entrypoint: ["/usr/local/bin/entrypoint"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    restart: unless-stopped
+
+volumes:
+  api_vendor:
+    name: {{PROJECT_NAME}}_api_vendor

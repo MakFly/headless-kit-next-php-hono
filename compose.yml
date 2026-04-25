@@ -1,0 +1,19 @@
+# Headless Kit — Dev orchestration (SQLite by default).
+#
+# Usage:
+#   docker compose --profile hono up                   # one backend
+#   docker compose --profile hono --profile web up     # backend + frontend
+#   docker compose --profile all up                    # everything
+#
+# Profiles:
+#   - per stack:    hono | laravel | symfony | web | tanstack
+#   - per category: backend | frontend
+#   - global:       all
+#
+# Each app owns its own compose file under apps/<app>/compose.yml.
+# Add a backend → drop a compose.yml under apps/<name>/ + reference it here.
+
+include:
+  - path: ./apps/api-hono/compose.yml
+  - path: ./apps/api-laravel/compose.yml
+  - path: ./apps/api-sf/compose.yml

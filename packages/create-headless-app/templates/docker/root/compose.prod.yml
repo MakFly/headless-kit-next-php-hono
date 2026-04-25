@@ -1,0 +1,9 @@
+# {{PROJECT_NAME}} — Prod orchestration.
+#
+# Usage:
+#   docker compose -f compose.prod.yml --profile all up -d
+#
+# Secrets must be provided via .env or host environment (see compose files for `${VAR:?}`).
+
+include:
+  - path: ./apps/api/compose.prod.yml

@@ -1,0 +1,34 @@
+services:
+  api:
+    profiles: ["api", "backend", "all"]
+    image: {{PROJECT_NAME}}/api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: {{PROJECT_NAME}}-api
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: ${APP_SECRET:?APP_SECRET is required in production}
+      DATABASE_URL: sqlite:////app/data/{{PROJECT_NAME}}.db
+      DB_PATH: /app/data/{{PROJECT_NAME}}.db
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+      FRONTEND_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
+      MAILER_DSN: ${MAILER_DSN:-null://null}
+      SERVER_NAME: ":8001"
+    ports:
+      - "8001:8001"
+    volumes:
+      - api_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+volumes:
+  api_data:
+    name: {{PROJECT_NAME}}_api_data

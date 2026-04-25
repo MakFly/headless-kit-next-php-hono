@@ -1,0 +1,13 @@
+# Headless Kit — Prod orchestration (SQLite by default, named volumes).
+#
+# Usage:
+#   docker compose -f compose.prod.yml --profile all up -d
+#   docker compose -f compose.prod.yml --profile hono up -d
+#
+# All services declare profiles, so nothing starts unless explicitly selected.
+# Override secrets via .env or environment of the host running compose.
+
+include:
+  - path: ./apps/api-hono/compose.prod.yml
+  - path: ./apps/api-laravel/compose.prod.yml
+  - path: ./apps/api-sf/compose.prod.yml

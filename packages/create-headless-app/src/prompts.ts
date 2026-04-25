@@ -10,6 +10,7 @@ export type ProjectOptions = {
   modules: ModuleId[];
   database: 'sqlite' | 'postgresql';
   preset: PresetType;
+  docker: boolean;
 };
 
 export async function runPrompts(): Promise<ProjectOptions | null> {
@@ -120,6 +121,11 @@ export async function runPrompts(): Promise<ProjectOptions | null> {
               hint: 'Production-ready',
             },
           ],
+        }),
+      docker: () =>
+        p.confirm({
+          message: 'Include Docker (Dockerfile + compose.yml + compose.prod.yml)?',
+          initialValue: true,
         }),
     },
     {

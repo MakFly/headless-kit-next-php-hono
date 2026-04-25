@@ -11,3 +11,24 @@ Route::get('/', function () {
         'framework' => 'Laravel',
     ]);
 });
+
+Route::get('/health', function () {
+    $db = 'ok';
+    try {
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+    } catch (\Throwable $e) {
+        $db = 'down';
+    }
+
+    $status = $db === 'ok' ? 200 : 503;
+
+    return response()->json([
+        'success' => $status === 200,
+        'data' => [
+            'status' => $status === 200 ? 'ok' : 'degraded',
+            'service' => 'api-laravel',
+            'db' => $db,
+        ],
+        'status' => $status,
+    ], $status);
+});

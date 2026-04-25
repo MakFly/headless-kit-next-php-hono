@@ -1,0 +1,39 @@
+services:
+  api-sf:
+    profiles: ["symfony", "backend", "all"]
+    image: headless-kit/api-sf:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    container_name: headless-api-sf
+    working_dir: /app
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: "1"
+      APP_SECRET: ${APP_SECRET:-dev-secret-change-me-in-production}
+      DATABASE_URL: sqlite:////app/data/symfony.db
+      DB_PATH: /app/data/symfony.db
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me-in-production-min-32-chars}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3300}
+      MAILER_DSN: null://null
+      SERVER_NAME: ":8001"
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+      - sf_vendor:/app/vendor
+      - ./data:/app/data
+    command: ["frankenphp", "php-server", "--root", "/app/public", "--listen", ":8001", "--watch"]
+    entrypoint: ["/usr/local/bin/entrypoint"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    restart: unless-stopped
+
+volumes:
+  sf_vendor:
+    name: headless_sf_vendor

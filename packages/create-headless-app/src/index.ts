@@ -54,6 +54,13 @@ async function main() {
   }
   console.log(`  bun run dev`);
   console.log('');
+  if (options.docker) {
+    console.log(`  ${pc.dim('# Or run with Docker (SQLite by default):')}`);
+    console.log(`  docker compose --profile api up --build`);
+    console.log(`  ${pc.dim('# Production:')}`);
+    console.log(`  docker compose -f compose.prod.yml --profile all up -d --build`);
+    console.log('');
+  }
   console.log(
     pc.dim(`  Preset:   ${options.preset}`),
   );

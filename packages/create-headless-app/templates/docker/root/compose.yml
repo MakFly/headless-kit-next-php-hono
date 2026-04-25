@@ -1,0 +1,14 @@
+# {{PROJECT_NAME}} — Dev orchestration (SQLite by default).
+#
+# Usage:
+#   docker compose --profile api up        # backend only
+#   docker compose --profile all up        # everything available
+#
+# Profiles:
+#   - per role: api | web
+#   - groups:   backend | frontend | all
+#
+# Each app owns its own compose file under apps/<app>/compose.yml.
+
+include:
+  - path: ./apps/api/compose.yml

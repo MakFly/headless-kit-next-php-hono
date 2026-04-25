@@ -5,6 +5,7 @@ import type { ProjectOptions } from './prompts.js';
 import { generateEnvFiles } from './generators/env.js';
 import { generatePackageJson } from './generators/package-json.js';
 import { generateDockerCompose } from './generators/docker-compose.js';
+import { generateMakefile } from './generators/makefile.js';
 import { generateSecret } from './utils.js';
 import { getModuleTemplatePaths, type ModuleId } from './modules.js';
 
@@ -190,6 +191,7 @@ export async function scaffold(options: ProjectOptions): Promise<void> {
   await generateEnvFiles(projectDir, options, vars);
   await generatePackageJson(projectDir, options);
   await generateDockerCompose(projectDir, options);
+  await generateMakefile(projectDir, options);
 
   // Replace variables in all files (runs after all files are in place)
   await replaceVariables(projectDir, vars);

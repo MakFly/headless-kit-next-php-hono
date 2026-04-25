@@ -22,7 +22,8 @@ TMP_DIR   := /tmp/headless-test
         api-reset api-sf-reset api-hono-reset \
         qa qa-hono qa-laravel qa-sf qa-lint \
         cli-build cli-test cli-try cli-try-all cli-clean \
-        cli-try-admin cli-try-landing cli-try-saas cli-try-ecommerce cli-try-none
+        cli-try-admin cli-try-landing cli-try-saas cli-try-ecommerce cli-try-none \
+        cli-install cli-uninstall cli-run
 
 # ============================================================================
 # Help
@@ -79,6 +80,9 @@ help:
 	@echo "  $(C_GREEN)cli-try-none$(C_RESET)         Minimal + Next.js + Hono"
 	@echo "  $(C_GREEN)cli-try-all$(C_RESET)          ALL 10 combos"
 	@echo "  $(C_GREEN)cli-clean$(C_RESET)            Remove $(C_DIM)$(TMP_DIR)$(C_RESET)"
+	@echo "  $(C_GREEN)cli-install$(C_RESET)          Install CLI globally $(C_DIM)(bun link → create-headless-app)$(C_RESET)"
+	@echo "  $(C_GREEN)cli-uninstall$(C_RESET)        Remove the global link"
+	@echo "  $(C_GREEN)cli-run$(C_RESET)              Run CLI in CWD $(C_DIM)(end-user simulation)$(C_RESET)"
 	@echo ""
 	@echo "  $(C_BOLD)$(C_YELLOW)Quick start:$(C_RESET)"
 	@echo "    make install            $(C_DIM)# une seule fois$(C_RESET)"
@@ -284,6 +288,24 @@ cli-clean:
 	@echo "  $(C_YELLOW)►$(C_RESET) Cleaning $(TMP_DIR)..."
 	@rm -rf $(TMP_DIR)
 	@echo "  $(C_GREEN)✓$(C_RESET) Test output cleaned"
+
+cli-install: cli-build
+	@echo "  $(C_CYAN)►$(C_RESET) Linking $(C_BOLD)create-headless-app$(C_RESET) globally..."
+	@cd $(CLI_DIR) && bun link
+	@bun link create-headless-app
+	@echo ""
+	@echo "  $(C_GREEN)✓$(C_RESET) Installed. Run anywhere with: $(C_BOLD)create-headless-app$(C_RESET)"
+	@echo "  $(C_DIM)Uninstall with: make cli-uninstall$(C_RESET)"
+
+cli-uninstall:
+	@echo "  $(C_YELLOW)►$(C_RESET) Unlinking create-headless-app..."
+	@bun unlink create-headless-app 2>/dev/null || true
+	@cd $(CLI_DIR) && bun unlink 2>/dev/null || true
+	@echo "  $(C_GREEN)✓$(C_RESET) Unlinked"
+
+cli-run: cli-build
+	@echo "  $(C_CYAN)►$(C_RESET) Launching CLI in $(C_BOLD)$(CURDIR)$(C_RESET)"
+	@bun $(CURDIR)/$(CLI_DIR)/src/index.ts
 
 # ============================================================================
 # Internal

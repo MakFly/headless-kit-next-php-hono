@@ -51,6 +51,15 @@ async function readFile(filePath: string): Promise<string> {
   return fs.readFile(filePath, 'utf-8');
 }
 
+/**
+ * Strip CSS block comments before pattern-matching. Otherwise rule descriptions
+ * inside header comments (e.g. "no oklch() outside theme.css") would trip
+ * convention assertions.
+ */
+function stripCssComments(content: string): string {
+  return content.replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
 async function walkFiles(dir: string): Promise<string[]> {
   const files: string[] = [];
   const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -168,10 +177,24 @@ for (const { backend, apiPort, dbVar } of backends) {
       expect(content).toContain('middleware');
     });
 
-    test('generates globals.css', async () => {
-      expect(
-        await fileExists(path.join(projectDir, 'apps/web/src/app/globals.css')),
-      ).toBe(true);
+    test('generates globals.css + 4-file CSS split (theme/utilities/animations)', async () => {
+      expect(await fileExists(path.join(projectDir, 'apps/web/src/app/globals.css'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/web/src/styles/theme.css'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/web/src/styles/utilities.css'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/web/src/styles/animations.css'))).toBe(true);
+
+      // Convention: globals.css must import the 3 satellite files.
+      const entry = await readFile(path.join(projectDir, 'apps/web/src/app/globals.css'));
+      expect(entry).toMatch(/@import\s+['"]\.\.\/styles\/theme\.css['"]/);
+      expect(entry).toMatch(/@import\s+['"]\.\.\/styles\/utilities\.css['"]/);
+      expect(entry).toMatch(/@import\s+['"]\.\.\/styles\/animations\.css['"]/);
+
+      // Convention: oklch() only allowed in theme.css.
+      const utilities = await readFile(path.join(projectDir, 'apps/web/src/styles/utilities.css'));
+      const animations = await readFile(path.join(projectDir, 'apps/web/src/styles/animations.css'));
+      expect(stripCssComments(entry)).not.toMatch(/oklch\(/);
+      expect(stripCssComments(utilities)).not.toMatch(/oklch\(/);
+      expect(stripCssComments(animations)).not.toMatch(/oklch\(/);
     });
 
     test('generates dashboard page', async () => {
@@ -418,10 +441,24 @@ for (const { backend, apiPort, dbVar } of backends) {
       ).toBe(true);
     });
 
-    test('generates styles.css', async () => {
-      expect(
-        await fileExists(path.join(projectDir, 'apps/web/src/styles.css')),
-      ).toBe(true);
+    test('generates styles.css + 4-file CSS split (theme/utilities/animations)', async () => {
+      expect(await fileExists(path.join(projectDir, 'apps/web/src/styles.css'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/web/src/styles/theme.css'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/web/src/styles/utilities.css'))).toBe(true);
+      expect(await fileExists(path.join(projectDir, 'apps/web/src/styles/animations.css'))).toBe(true);
+
+      // Convention: styles.css must import the 3 satellite files.
+      const entry = await readFile(path.join(projectDir, 'apps/web/src/styles.css'));
+      expect(entry).toMatch(/@import\s+['"]\.\/styles\/theme\.css['"]/);
+      expect(entry).toMatch(/@import\s+['"]\.\/styles\/utilities\.css['"]/);
+      expect(entry).toMatch(/@import\s+['"]\.\/styles\/animations\.css['"]/);
+
+      // Convention: oklch() only allowed in theme.css.
+      const utilities = await readFile(path.join(projectDir, 'apps/web/src/styles/utilities.css'));
+      const animations = await readFile(path.join(projectDir, 'apps/web/src/styles/animations.css'));
+      expect(stripCssComments(entry)).not.toMatch(/oklch\(/);
+      expect(stripCssComments(utilities)).not.toMatch(/oklch\(/);
+      expect(stripCssComments(animations)).not.toMatch(/oklch\(/);
     });
 
     test('generates auth store', async () => {

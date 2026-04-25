@@ -1,0 +1,17 @@
+/*
+ * Keyframes + animation utilities.
+ * Convention: see .claude/rules/css-architecture.md.
+ */
+
+@layer utilities {
+  /* Add .animate-* utilities here. Example:
+   * .animate-fade-in { animation: fade-in 200ms ease-out; }
+   */
+}
+
+/* @keyframes go below the @layer block. Example:
+ * @keyframes fade-in {
+ *   from { opacity: 0 }
+ *   to   { opacity: 1 }
+ * }
+ */

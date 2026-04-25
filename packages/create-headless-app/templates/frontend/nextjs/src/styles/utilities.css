@@ -1,0 +1,14 @@
+/*
+ * Custom utilities. All colors come from theme.css via var(--token).
+ * Convention: see .claude/rules/css-architecture.md.
+ */
+
+@layer utilities {
+  /* Add .your-utility classes here. Example:
+   * .scrollbar-none {
+   *   scrollbar-width: none;
+   *   -ms-overflow-style: none;
+   * }
+   * .scrollbar-none::-webkit-scrollbar { display: none }
+   */
+}

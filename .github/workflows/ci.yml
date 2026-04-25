@@ -37,6 +37,9 @@ jobs:
       - name: Lint (Turborepo)
         run: bun run lint
 
+      - name: Check CSS conventions (live apps)
+        run: bun run check:css
+
   test-cli:
     name: Test — create-headless-app
     runs-on: ubuntu-latest

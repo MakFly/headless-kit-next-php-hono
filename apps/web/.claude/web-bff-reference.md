@@ -230,13 +230,18 @@ bun run lint        # ESLint
 
 ## CSS Architecture (Tailwind v4)
 
+4 fichiers, jamais plus dans l'entry :
+
 | File | Purpose |
 |------|---------|
-| `src/app/globals.css` | Entry point — Tailwind imports, `@theme inline` mappings, `@custom-variant dark`, base layer resets |
-| `src/styles/theme.css` | Design tokens — `:root` (light) and `.dark` CSS custom properties in oklch |
-| `src/styles/utilities.css` | Custom utilities — `.scrollbar-none`, `.auth-panel-bg`, `.auth-glow` |
+| `src/app/globals.css` | Entry — `@import` tailwind/theme/utilities/animations, `@theme inline`, `@layer base` (resets 2-5 lignes) |
+| `src/styles/theme.css` | Design tokens — `:root` / `.dark` CSS custom properties (oklch) |
+| `src/styles/utilities.css` | `@layer utilities` qui réfèrent toujours `var(--token)` |
+| `src/styles/animations.css` | `@keyframes` + `.animate-*` utilities |
 
-**Convention :** ne jamais ajouter de tokens/couleurs dans `globals.css` — les mettre dans `theme.css`. Les classes utilitaires custom vont dans `utilities.css`.
+Convention complète + tableau « j'ajoute quoi où » + anti-patterns : `.claude/rules/css-architecture.md`.
+
+Linter local : `bun run check:css` (CI le lance aussi).
 
 ## Key Rules
 

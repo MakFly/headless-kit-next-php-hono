@@ -2,13 +2,18 @@
 
 ## CSS Architecture (Tailwind v4)
 
+4 fichiers, jamais plus dans l'entry :
+
 | File | Purpose |
 |------|---------|
-| `src/styles.css` | Entry point — Tailwind/font imports, `@theme inline` mappings, `@custom-variant dark`, base layer resets |
-| `src/styles/theme.css` | Design tokens — `:root` (light), `.dark`, `:root:not(.dark)` CSS custom properties in oklch. Neon accent variables. |
-| `src/styles/utilities.css` | Custom utilities — `.animate-spin-slow`, `.font-mono`, `.grain`, `.text-neon`, `.glow-neon`, keyframes |
+| `src/styles.css` | Entry — `@import` tailwind/fonts/theme/utilities/animations, `@theme inline`, `@layer base` (resets 2-5 lignes) |
+| `src/styles/theme.css` | Design tokens — `:root` / `.dark` / `:root:not(.dark)` CSS vars (oklch + neon) |
+| `src/styles/utilities.css` | `@layer utilities` qui réfèrent toujours `var(--token)` |
+| `src/styles/animations.css` | `@keyframes` + `.animate-*` utilities |
 
-**Convention :** ne jamais ajouter de tokens/couleurs dans `styles.css` — les mettre dans `theme.css`. Les classes utilitaires custom vont dans `utilities.css`.
+Convention complète + tableau « j'ajoute quoi où » + anti-patterns : `.claude/rules/css-architecture.md`.
+
+Linter local : `bun run check:css` (CI le lance aussi).
 
 ## Authentification & État
 

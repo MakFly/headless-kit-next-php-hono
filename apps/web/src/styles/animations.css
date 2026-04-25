@@ -1,0 +1,19 @@
+/*
+ * Keyframes + animation utilities.
+ * Convention: every @keyframes lives here, plus the .animate-* utility that
+ * uses it. Empty placeholders are fine — the file exists to prevent
+ * keyframes from leaking into utilities.css.
+ */
+
+@layer utilities {
+  /* Add .animate-* utilities here. Example:
+   * .animate-fade-in { animation: fade-in 200ms ease-out; }
+   */
+}
+
+/* @keyframes go below the @layer block. Example:
+ * @keyframes fade-in {
+ *   from { opacity: 0 }
+ *   to   { opacity: 1 }
+ * }
+ */

@@ -1,12 +1,9 @@
 /*
- * Custom utilities — non-Tailwind classes
- * Convention: add custom utility classes here, never in styles.css
+ * Custom @layer utilities. All colors must come from theme.css via var(--token).
+ * Convention: never hardcode oklch here; never put @keyframes here (use animations.css).
  */
 
 @layer utilities {
-  .animate-spin-slow {
-    animation: spin 3s linear infinite;
-  }
   .font-mono {
     font-family: var(--font-mono);
   }
@@ -20,14 +17,5 @@
   }
   .glow-neon {
     box-shadow: 0 0 24px var(--neon-glow);
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }

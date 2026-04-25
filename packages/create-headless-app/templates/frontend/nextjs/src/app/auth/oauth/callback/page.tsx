@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { Suspense, useEffect, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { storeOAuthTokensAction } from "@/lib/actions/auth/store-oauth-tokens"
 import { useAuthStore } from "@/stores/auth-store"
 
-export default function OAuthCallbackPage() {
+function OAuthCallbackInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { setUser } = useAuthStore()
@@ -57,5 +57,19 @@ export default function OAuthCallbackPage() {
         <p className="text-sm text-muted-foreground">Completing sign in…</p>
       </div>
     </div>
+  )
+}
+
+export default function OAuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <OAuthCallbackInner />
+    </Suspense>
   )
 }

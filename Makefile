@@ -23,7 +23,8 @@ TMP_DIR   := /tmp/headless-test
         qa qa-hono qa-laravel qa-sf qa-lint \
         cli-build cli-test cli-try cli-try-all cli-clean \
         cli-try-admin cli-try-landing cli-try-saas cli-try-ecommerce cli-try-none \
-        cli-install cli-uninstall cli-run
+        cli-install cli-uninstall cli-run \
+        test-matrix-smoke
 
 # ============================================================================
 # Help
@@ -83,6 +84,9 @@ help:
 	@echo "  $(C_GREEN)cli-install$(C_RESET)          Install CLI globally $(C_DIM)(bun link → create-headless-app)$(C_RESET)"
 	@echo "  $(C_GREEN)cli-uninstall$(C_RESET)        Remove the global link"
 	@echo "  $(C_GREEN)cli-run$(C_RESET)              Run CLI in CWD $(C_DIM)(end-user simulation)$(C_RESET)"
+	@echo ""
+	@echo "  $(C_BOLD)Matrix tests$(C_RESET)"
+	@echo "  $(C_GREEN)test-matrix-smoke$(C_RESET)    Scaffold 30 combos + structure checks $(C_DIM)(~2 min)$(C_RESET)"
 	@echo ""
 	@echo "  $(C_BOLD)$(C_YELLOW)Quick start:$(C_RESET)"
 	@echo "    make install            $(C_DIM)# une seule fois$(C_RESET)"
@@ -306,6 +310,13 @@ cli-uninstall:
 cli-run: cli-build
 	@echo "  $(C_CYAN)►$(C_RESET) Launching CLI in $(C_BOLD)$(CURDIR)$(C_RESET)"
 	@bun $(CURDIR)/$(CLI_DIR)/src/index.ts
+
+# ============================================================================
+# Matrix tests — scaffold every combo and verify
+# ============================================================================
+
+test-matrix-smoke:
+	@bash $(CURDIR)/scripts/test-all-scaffolds.sh wave1
 
 # ============================================================================
 # Internal

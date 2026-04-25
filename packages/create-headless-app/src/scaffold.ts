@@ -365,7 +365,7 @@ export function getAdapterConfig(): Partial<AdapterConfig> {
 
 let adapterInstance: AuthAdapter | null = null
 
-export function getAuthAdapter(): AuthAdapter {
+export function getAuthAdapter(_backend?: BackendType): AuthAdapter {
   if (adapterInstance) return adapterInstance
   adapterInstance = new ${adapterClass}(getAdapterConfig())
   return adapterInstance
@@ -417,7 +417,7 @@ export function getAdapterConfig(): Partial<AdapterConfig> {
 
 const cachedAdapter: { instance?: AuthAdapter } = {};
 
-export function getAuthAdapter(): AuthAdapter {
+export function getAuthAdapter(_backend?: BackendType): AuthAdapter {
   if (cachedAdapter.instance) return cachedAdapter.instance;
   cachedAdapter.instance = new ${adapterClass}(getAdapterConfig());
   return cachedAdapter.instance;
@@ -451,15 +451,15 @@ export function resetAdapter(): void {
         : selectedBackend === 'symfony' ? 'getSymfonyConfig'
         : 'getNodeConfig';
 
-      // Simple approach: replace the switch body
+      // Simple approach: replace the switch body. Keep an optional ignored
+      // BackendType arg so existing call sites (route.ts) keep compiling.
       content = content.replace(
         /export function getProxyConfig\([^)]*\): ProxyConfig \{[\s\S]*?\n\}/,
-        `export function getProxyConfig(): ProxyConfig {\n  return ${configFn}();\n}`,
+        `export function getProxyConfig(_backend?: BackendType): ProxyConfig {\n  return ${configFn}();\n}`,
       );
 
-      // Remove imports of getBackendType if present
+      // Remove imports of getBackendType if present (BackendType type kept)
       content = content.replace(/import \{ getBackendType \} from '\.\/index';\n?/, '');
-      content = content.replace(/import type \{ BackendType \} from '\.\/types';\n?/, '');
 
       await fs.writeFile(proxyPath, content, 'utf-8');
     } catch {

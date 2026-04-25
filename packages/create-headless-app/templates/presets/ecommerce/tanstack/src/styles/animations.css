@@ -1,0 +1,19 @@
+/*
+ * Keyframes + animation utilities.
+ * Convention: see .claude/rules/css-architecture.md.
+ */
+
+@layer utilities {
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

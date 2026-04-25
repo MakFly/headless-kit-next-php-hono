@@ -19,7 +19,7 @@
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",
-    "check:css": "bash scripts/check-css-conventions.sh",
+    "check:css": "bash scripts/check-css-conventions.sh --all",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },

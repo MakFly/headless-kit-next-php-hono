@@ -1,0 +1,21 @@
+/*
+ * Custom utilities. All colors come from theme.css via var(--token).
+ * Convention: see .claude/rules/css-architecture.md.
+ */
+
+@layer utilities {
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+  .grain {
+    background-image: url('/noise.svg');
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+  .text-neon {
+    color: var(--neon);
+  }
+  .glow-neon {
+    box-shadow: 0 0 24px var(--neon-glow);
+  }
+}

@@ -1,0 +1,8 @@
+/*
+ * Keyframes + animation utilities.
+ * Convention: see .claude/rules/css-architecture.md.
+ */
+
+@layer utilities {
+  /* Add .animate-* utilities here. */
+}

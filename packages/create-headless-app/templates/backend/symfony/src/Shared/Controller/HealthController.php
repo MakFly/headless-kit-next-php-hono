@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Throwable;
 
 #[Route('/health', name: 'app_health', methods: ['GET'])]
 final class HealthController extends AbstractController
@@ -22,7 +23,7 @@ final class HealthController extends AbstractController
         $db = 'ok';
         try {
             $this->connection->executeQuery('SELECT 1');
-        } catch (\Throwable) {
+        } catch (Throwable) {
             $db = 'down';
         }
 

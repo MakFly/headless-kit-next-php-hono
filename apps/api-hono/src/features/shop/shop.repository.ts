@@ -159,6 +159,47 @@ export async function findProductById(id: string) {
   return result || null;
 }
 
+/**
+ * Create a new product
+ */
+export async function createProduct(data: {
+  name: string;
+  slug: string;
+  description?: string;
+  price: number;
+  compareAtPrice?: number;
+  sku?: string;
+  stockQuantity?: number;
+  categoryId?: string;
+  imageUrl?: string;
+  images?: string[];
+  status?: string;
+  featured?: boolean;
+}) {
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+
+  await db.insert(schema.products).values({
+    id,
+    name: data.name,
+    slug: data.slug,
+    description: data.description ?? null,
+    price: data.price,
+    compareAtPrice: data.compareAtPrice ?? null,
+    sku: data.sku ?? null,
+    stockQuantity: data.stockQuantity ?? 0,
+    categoryId: data.categoryId ?? null,
+    imageUrl: data.imageUrl ?? null,
+    images: data.images ?? [],
+    status: data.status ?? 'draft',
+    featured: data.featured ?? false,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  return findProductById(id);
+}
+
 // =========================================================================
 // Categories
 // =========================================================================

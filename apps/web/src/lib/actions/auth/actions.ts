@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
 import { getAuthAdapter, toUser, AdapterError } from '../../adapters';
 import { createLogger } from '@/lib/logger';
 import { AuthActionError, throwAuthError } from '../_shared/errors';
-import { bffPost, bffPatch, bffDelete } from '../_shared/bff-client';
+import { bffGet, bffPost, bffPatch, bffDelete } from '../_shared/bff-client';
 import { AUTH_BACKEND_COOKIE, resolveBackend } from '@/lib/auth/backend-context';
 
 const log = createLogger('auth');
@@ -247,6 +247,17 @@ export async function updateProfileAction(
 export async function deleteAccountAction(): Promise<void> {
   try {
     await bffDelete('/api/v1/auth/me');
+  } catch (error) {
+    throwAuthError(error);
+  }
+}
+
+export async function getSessionsAction(): Promise<ApiResponse<{ id: string; createdAt: string; expiresAt: string; created_at: string; expires_at: string }[]>> {
+  try {
+    const sessions = await bffGet<{ id: string; createdAt: string; expiresAt: string; created_at: string; expires_at: string }[]>(
+      '/api/v1/auth/sessions'
+    );
+    return { data: sessions };
   } catch (error) {
     throwAuthError(error);
   }

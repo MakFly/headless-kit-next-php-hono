@@ -15,3 +15,20 @@ export const productFiltersSchema = z.object({
 });
 
 export type ProductFiltersInput = z.infer<typeof productFiltersSchema>;
+
+export const createProductSchema = z.object({
+  name: z.string().min(1, 'name is required'),
+  slug: z.string().min(1, 'slug is required'),
+  description: z.string().optional(),
+  price: z.number().int().nonnegative('price must be non-negative'),
+  compareAtPrice: z.number().int().nonnegative().optional(),
+  sku: z.string().optional(),
+  stockQuantity: z.number().int().nonnegative().optional(),
+  categoryId: z.string().optional(),
+  imageUrl: z.string().url().optional(),
+  images: z.array(z.string().url()).optional(),
+  status: z.enum(['active', 'draft', 'archived']).optional(),
+  featured: z.boolean().optional(),
+});
+
+export type CreateProductInput = z.infer<typeof createProductSchema>;

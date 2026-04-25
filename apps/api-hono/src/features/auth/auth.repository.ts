@@ -2,7 +2,7 @@
  * Auth repository — merges user and token repositories
  */
 
-import { eq, lt } from 'drizzle-orm';
+import { and, eq, gt } from 'drizzle-orm';
 import { db, schema } from '../../shared/db/index.ts';
 import type { User, SafeUser, Role, RefreshToken } from '../../shared/types/index.ts';
 import { nanoid } from 'nanoid';
@@ -209,6 +209,34 @@ export async function deleteTokenByValue(token: string): Promise<boolean> {
  */
 export async function deleteTokensByUserId(userId: string): Promise<void> {
   await db.delete(schema.refreshTokens).where(eq(schema.refreshTokens.userId, userId));
+}
+
+/**
+ * Find active refresh tokens for a user (expiresAt > now)
+ * Does not return the raw token value — security
+ */
+export type SessionInfo = {
+  id: string;
+  createdAt: string;
+  expiresAt: string;
+};
+
+export async function findTokensByUserId(userId: string): Promise<SessionInfo[]> {
+  const now = new Date().toISOString();
+
+  const results = await db.query.refreshTokens.findMany({
+    where: and(
+      eq(schema.refreshTokens.userId, userId),
+      gt(schema.refreshTokens.expiresAt, now)
+    ),
+    columns: {
+      id: true,
+      createdAt: true,
+      expiresAt: true,
+    },
+  });
+
+  return results;
 }
 
 /**

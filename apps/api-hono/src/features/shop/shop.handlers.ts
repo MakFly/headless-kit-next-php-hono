@@ -6,6 +6,7 @@ import type { Context } from 'hono';
 import * as shopService from './shop.service.ts';
 import { AppError } from '../../shared/lib/errors.ts';
 import { apiSuccess } from '../../shared/lib/response.ts';
+import type { CreateProductInput } from './shop.schemas.ts';
 
 /**
  * List products with filters and pagination
@@ -46,6 +47,14 @@ export async function getProduct(c: Context) {
   }
 
   return apiSuccess(c, product);
+}
+
+/**
+ * Create a new product
+ */
+export async function createProduct(c: Context, data: CreateProductInput) {
+  const product = await shopService.createProduct(data);
+  return apiSuccess(c, product, undefined, 201);
 }
 
 /**

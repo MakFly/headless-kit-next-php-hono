@@ -160,6 +160,15 @@ export async function resetPassword(c: Context, data: ResetPasswordInput) {
 }
 
 /**
+ * Get active sessions handler
+ */
+export async function sessions(c: Context<{ Variables: AppVariables }>) {
+  const user = requireUser(c);
+  const data = await authService.getSessions(user.id);
+  return apiSuccess(c, data);
+}
+
+/**
  * Get OAuth providers handler
  */
 export async function getOAuthProviders(c: Context) {

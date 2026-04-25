@@ -3,6 +3,7 @@
  */
 
 import * as authRepository from './auth.repository.ts';
+import type { SessionInfo } from './auth.repository.ts';
 import {
   hashPassword,
   verifyPassword,
@@ -160,6 +161,13 @@ export async function getCurrentUser(
   userId: string
 ): Promise<(SafeUser & { roles: Role[] }) | null> {
   return authRepository.findWithRoles(userId);
+}
+
+/**
+ * Get active sessions for a user
+ */
+export async function getSessions(userId: string): Promise<SessionInfo[]> {
+  return authRepository.findTokensByUserId(userId);
 }
 
 /**

@@ -110,6 +110,14 @@ auth.get('/me', authMiddleware, async (c) => {
 });
 
 /**
+ * GET /api/auth/sessions
+ * Get active sessions for the authenticated user
+ */
+auth.get('/sessions', authMiddleware, async (c) => {
+  return authHandlers.sessions(c);
+});
+
+/**
  * GET /api/auth/oauth/providers
  * Get available OAuth providers
  */

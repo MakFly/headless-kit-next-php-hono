@@ -27,5 +27,6 @@ export {
   resetPasswordAction,
   updateProfileAction,
   deleteAccountAction,
+  getSessionsAction,
   AuthActionError,
 } from './actions';

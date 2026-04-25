@@ -36,6 +36,19 @@ export async function getProductBySlug(slug: string) {
 }
 
 /**
+ * Create a new product
+ */
+export async function createProduct(data: Parameters<typeof shopRepository.createProduct>[0]) {
+  const existing = await shopRepository.findProductBySlug(data.slug);
+  if (existing) {
+    const { AppError } = await import('../../shared/lib/errors.ts');
+    throw new AppError('A product with this slug already exists', 'CONFLICT', 409);
+  }
+
+  return shopRepository.createProduct(data);
+}
+
+/**
  * Get all categories with product counts
  */
 export async function getCategories() {

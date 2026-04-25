@@ -98,7 +98,7 @@ src/
 
 1. Reads `auth_backend` cookie to determine active backend
 2. Validates path segments (SSRF + path traversal protection)
-3. Validates CSRF for mutating methods (Origin/Referer check, bypassed via `x-bff-internal: 1`)
+3. Validates CSRF for mutating methods (Origin/Referer check). Server Actions forward `Origin: NEXT_PUBLIC_APP_URL` via `bff-client.ts` to satisfy the same-origin check.
 4. Transforms BFF path `/api/v1/*` → backend-specific path
 5. Checks middleware header `x-bff-refresh-needed` for proactive refresh
 6. Forwards request with `Authorization: Bearer <token>`

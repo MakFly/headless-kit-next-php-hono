@@ -57,7 +57,6 @@ type RouteParams = {
 };
 
 const REQUEST_ID_HEADER = 'x-request-id';
-const INTERNAL_REQUEST_HEADER = 'x-bff-internal';
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 /**
@@ -160,10 +159,6 @@ function getOriginFromReferer(referer: string | null): string | null {
 
 function validateCsrf(request: NextRequest, method: string): void {
   if (!MUTATING_METHODS.has(method)) {
-    return;
-  }
-
-  if (request.headers.get(INTERNAL_REQUEST_HEADER) === '1') {
     return;
   }
 

@@ -26,10 +26,12 @@ export async function bffRequest<T>(
   const authToken = cookieStore.get(AUTH_COOKIE_NAME);
   const refreshToken = cookieStore.get(REFRESH_COOKIE_NAME);
 
+  // Server-to-server fetch: the runtime does not set Origin, so we must
+  // forward the BFF's own origin to satisfy the CSRF check on /api/v1/*.
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
-    'x-bff-internal': '1',
+    Origin: BFF_URL,
     'x-request-id': crypto.randomUUID(),
     ...fetchOptions.headers,
   };

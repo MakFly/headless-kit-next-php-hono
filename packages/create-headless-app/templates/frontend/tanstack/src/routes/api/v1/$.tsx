@@ -21,7 +21,6 @@ import {
 
 const SAFE_PATH_SEGMENT = /^[a-zA-Z0-9_-]+$/
 const REQUEST_ID_HEADER = 'x-request-id'
-const INTERNAL_REQUEST_HEADER = 'x-bff-internal'
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 
 const COOKIE_CONFIG = {
@@ -151,8 +150,6 @@ function getOriginFromReferer(referer: string | null): string | null {
 
 function validateCsrf(request: Request, method: string): void {
   if (!MUTATING_METHODS.has(method)) return
-
-  if (request.headers.get(INTERNAL_REQUEST_HEADER) === '1') return
 
   const expectedOrigin = new URL(request.url).origin
   const origin = request.headers.get('origin')

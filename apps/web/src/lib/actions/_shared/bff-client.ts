@@ -26,7 +26,6 @@ import {
  * Base URL of Next.js BFF
  */
 const BFF_URL = env.NEXT_PUBLIC_APP_URL;
-const INTERNAL_REQUEST_HEADER = 'x-bff-internal';
 const REQUEST_ID_HEADER = 'x-request-id';
 
 /**
@@ -59,10 +58,12 @@ export async function bffRequest<T>(
   const refreshToken = cookieStore.get(cookieNames.refreshToken);
   const backendCookie = cookieStore.get(AUTH_BACKEND_COOKIE);
 
+  // Server-to-server fetch: the runtime does not set Origin, so we must
+  // forward the BFF's own origin to satisfy the CSRF check on /api/v1/*.
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
-    [INTERNAL_REQUEST_HEADER]: '1',
+    Origin: BFF_URL,
     [REQUEST_ID_HEADER]: crypto.randomUUID(),
     ...fetchOptions.headers,
   };

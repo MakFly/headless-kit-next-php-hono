@@ -81,7 +81,7 @@ To add a custom mapping, edit the `transformPath` function for the relevant back
 
 - **Path validation**: Rejects `..`, empty segments, `://` — prevents SSRF/path traversal
 - **Host validation**: Final URL must match configured backend host
-- **CSRF protection**: Mutating requests require matching `Origin`/`Referer` header (or `x-bff-internal: 1` for Server Actions)
+- **CSRF protection**: Mutating requests require matching `Origin`/`Referer` header. Server Actions forward `Origin: NEXT_PUBLIC_APP_URL` via `bff-client.ts` to satisfy this check (no special bypass header).
 - **No-store headers**: All proxy responses are `Cache-Control: no-store`
 
 ## AI routes

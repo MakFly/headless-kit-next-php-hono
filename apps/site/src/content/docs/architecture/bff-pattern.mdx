@@ -54,7 +54,7 @@ The proxy lives at `apps/web/src/app/api/v1/[...path]/route.ts`. It handles all 
 3. **Enforces content-type** — only `application/json` is accepted on mutating requests; others receive 415
 4. **Enforces body size limit** — requests larger than 1 MB are rejected with 413
 5. **Rate limits auth endpoints** — 20 requests per 15 minutes per IP (in-memory store, swap for Redis in multi-instance deployments)
-6. **Validates CSRF** for mutating methods (POST, PUT, PATCH, DELETE) by checking Origin and Referer headers. Internal BFF requests bypass this via the `x-bff-internal` header
+6. **Validates CSRF** for mutating methods (POST, PUT, PATCH, DELETE) by checking Origin and Referer headers. Server Actions forward `Origin: NEXT_PUBLIC_APP_URL` via `bff-client.ts` so they pass the same-origin check.
 7. **Transforms the path** from the BFF URL scheme to the backend URL scheme using the proxy config
 8. **Checks for proactive refresh** by reading the `x-bff-refresh-needed` header set by Edge middleware
 9. **Forwards the request** with the `Authorization: Bearer <token>` header and an `AbortSignal` tied to the client connection — if the client disconnects, the backend fetch is cancelled
@@ -127,7 +127,7 @@ This ensures the frontend always receives JSON, even when the backend is misconf
 
 Mutating requests (POST, PUT, PATCH, DELETE) are validated by checking that the `Origin` or `Referer` header matches the app URL. This prevents cross-site request forgery.
 
-Server Actions set the `x-bff-internal: 1` header to bypass CSRF checks since they already run on the server.
+Server Actions are server-side code, so the runtime does not set an `Origin` header automatically. The `bff-client.ts` helper forwards `Origin: NEXT_PUBLIC_APP_URL` explicitly, which satisfies the standard same-origin check — no special bypass header.
 
 ### Path Validation
 

@@ -60,3 +60,4 @@ coverage/
 # ── Search index (local) ─────────────────────────────────
 .ig/
 install-test/
+.claude/scheduled_tasks.lock

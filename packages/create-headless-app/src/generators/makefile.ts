@@ -76,6 +76,24 @@ export async function generateMakefile(
       ? '@cd apps/api && php bin/console doctrine:fixtures:load --no-interaction --append'
       : '@cd apps/api && bun run db:seed';
 
+  const migrateApi = isLaravel
+    ? '@cd apps/api && php artisan migrate --force'
+    : isSymfony
+      ? '@cd apps/api && php bin/console doctrine:migrations:migrate --no-interaction'
+      : '@cd apps/api && bun run db:push';
+
+  const logsApi = isLaravel
+    ? '@tail -f apps/api/storage/logs/laravel.log'
+    : isSymfony
+      ? '@tail -f apps/api/var/log/dev.log'
+      : '@echo "  $(C_DIM)Hono logs to stdout. Run make dev-api in another terminal.$(C_RESET)"';
+
+  const cacheClearApi = isLaravel
+    ? `@cd apps/api && php artisan cache:clear && php artisan config:clear && php artisan route:clear && php artisan view:clear`
+    : isSymfony
+      ? '@cd apps/api && php bin/console cache:clear'
+      : '@echo "  $(C_DIM)No persistent cache for Hono.$(C_RESET)"';
+
   const dbShellCmd = isPostgres
     ? `@docker compose exec db psql -U postgres ${options.projectName}`
     : isLaravel
@@ -157,9 +175,10 @@ C_MAGENTA := \\033[35m
 C_BLUE    := \\033[34m
 
 .PHONY: help setup install update build clean \\
-        dev dev-web dev-api stop \\
-        lint format typecheck test \\
-        db-reset db-seed db-shell routes health urls open${dockerPhony}
+        dev dev-web dev-api stop status logs \\
+        lint format typecheck test ci \\
+        db-reset db-migrate db-seed db-shell cache-clear \\
+        routes health urls open${dockerPhony}
 
 # ============================================================================
 # Help (default target)
@@ -184,17 +203,22 @@ help:
 \t@echo "  $(C_GREEN)dev-web$(C_RESET)          Frontend only $(C_DIM):${frontPort}$(C_RESET)"
 \t@echo "  $(C_GREEN)dev-api$(C_RESET)          Backend only $(C_DIM):${apiPort}$(C_RESET)"
 \t@echo "  $(C_GREEN)stop$(C_RESET)             Kill processes on dev ports"
+\t@echo "  $(C_GREEN)status$(C_RESET)           Show what's listening on dev ports"
+\t@echo "  $(C_GREEN)logs$(C_RESET)             Tail backend log file"
 \t@echo ""
 \t@echo "  $(C_BOLD)QA$(C_RESET)"
 \t@echo "  $(C_GREEN)lint$(C_RESET)             Lint web + api"
 \t@echo "  $(C_GREEN)format$(C_RESET)           Auto-format code"
 \t@echo "  $(C_GREEN)typecheck$(C_RESET)        TypeScript check $(C_DIM)(web)$(C_RESET)"
 \t@echo "  $(C_GREEN)test$(C_RESET)             Run all tests"
+\t@echo "  $(C_GREEN)ci$(C_RESET)               Lint + typecheck + test $(C_DIM)(pre-push)$(C_RESET)"
 \t@echo ""
 \t@echo "  $(C_BOLD)Database$(C_RESET)"
 \t@echo "  $(C_GREEN)db-reset$(C_RESET)         Reset DB + seed $(C_DIM)(${apiLabel})$(C_RESET)"
+\t@echo "  $(C_GREEN)db-migrate$(C_RESET)       Apply pending migrations $(C_DIM)(no wipe)$(C_RESET)"
 \t@echo "  $(C_GREEN)db-seed$(C_RESET)          Re-run seeders only"
 \t@echo "  $(C_GREEN)db-shell$(C_RESET)         Open ${isPostgres ? 'psql' : 'sqlite3'} shell"
+\t@echo "  $(C_GREEN)cache-clear$(C_RESET)      Clear framework caches"
 \t@echo ""
 \t@echo "  $(C_BOLD)Inspect$(C_RESET)"
 \t@echo "  $(C_GREEN)routes$(C_RESET)           List API routes"
@@ -260,6 +284,17 @@ stop:
 \t@lsof -ti:${apiPort} | xargs kill -9 2>/dev/null || true
 \t@echo "  $(C_GREEN)✓$(C_RESET) Stopped"
 
+status:
+\t@echo "  $(C_BOLD)Port :${frontPort}$(C_RESET) $(C_DIM)(web)$(C_RESET)"
+\t@lsof -nP -iTCP:${frontPort} -sTCP:LISTEN 2>/dev/null || echo "  $(C_DIM)nothing listening$(C_RESET)"
+\t@echo ""
+\t@echo "  $(C_BOLD)Port :${apiPort}$(C_RESET) $(C_DIM)(api)$(C_RESET)"
+\t@lsof -nP -iTCP:${apiPort} -sTCP:LISTEN 2>/dev/null || echo "  $(C_DIM)nothing listening$(C_RESET)"
+
+logs:
+\t@echo "  $(C_CYAN)►$(C_RESET) Tailing ${apiLabel} logs $(C_DIM)(Ctrl+C to exit)$(C_RESET)"
+\t${logsApi}
+
 # ============================================================================
 # QA
 # ============================================================================
@@ -290,6 +325,11 @@ test:
 \t${testApi}
 \t@echo "  $(C_GREEN)✓$(C_RESET) Tests passed"
 
+ci: lint typecheck test
+\t@echo ""
+\t@echo "  $(C_GREEN)$(C_BOLD)✓ CI checks passed$(C_RESET) $(C_DIM)— safe to push$(C_RESET)"
+\t@echo ""
+
 # ============================================================================
 # Database
 # ============================================================================
@@ -301,6 +341,11 @@ db-reset:
 \t@echo "  $(C_DIM)admin@example.com / Admin1234!$(C_RESET)"
 \t@echo "  $(C_DIM)user@example.com  / User1234!$(C_RESET)"
 
+db-migrate:
+\t@echo "  $(C_CYAN)►$(C_RESET) Applying pending migrations..."
+\t${migrateApi}
+\t@echo "  $(C_GREEN)✓$(C_RESET) Migrations applied"
+
 db-seed:
 \t@echo "  $(C_CYAN)►$(C_RESET) Re-seeding ${apiLabel}..."
 \t${seedApi}
@@ -308,6 +353,13 @@ db-seed:
 
 db-shell:
 \t${dbShellCmd}
+
+cache-clear:
+\t@echo "  $(C_YELLOW)►$(C_RESET) Clearing ${apiLabel} caches..."
+\t${cacheClearApi}
+\t@echo "  $(C_YELLOW)►$(C_RESET) Clearing web build cache..."
+\t@rm -rf apps/web/.next apps/web/.output apps/web/.turbo 2>/dev/null || true
+\t@echo "  $(C_GREEN)✓$(C_RESET) Caches cleared"
 
 # ============================================================================
 # Inspect
